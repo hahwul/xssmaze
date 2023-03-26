@@ -1,0 +1,17 @@
+name: xssmaze
+version: 0.1.0
+
+authors:
+  - hahwul <hahwul@gmail.com>
+
+targets:
+  xssmaze:
+    main: src/xssmaze.cr
+
+dependencies:
+  kemal:
+    github: kemalcr/kemal
+
+crystal: 1.7.3
+
+license: MIT
