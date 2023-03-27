@@ -18,6 +18,7 @@ end
 
 # Routes
 load_basic
+load_dom
 load_header
 load_path
 load_post
