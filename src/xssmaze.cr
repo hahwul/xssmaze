@@ -22,6 +22,7 @@ load_dom
 load_header
 load_path
 load_post
+load_redirect
 
 # Index
 list = Xssmaze.get
@@ -38,7 +39,28 @@ get "/" do
   "<h1>XSSMaze</h1>
    <p>XSSMaze is a web service configured to be vulnerable to XSS and is intended to measure and enhance the performance of security testing tools.</p>
    <p>You can find several vulnerable cases in the list below.</p>
-   <hr>"+indexdata
+   <hr>
+   <p>Endpoint Map: <a href='/map/txt'>Text</a> / <a href='/map/json'>JSON</a></p>
+   "+indexdata
+end
+
+get "/map/txt" do 
+  tmp = ""
+  list.each do |obj|
+    tmp += "#{obj.url}\n"
+  end
+
+  tmp
+end
+
+get "/map/json" do 
+  tmp = "{\"endpoints\": ["
+  list.each do |obj|
+    tmp += "\"#{obj.url}\","
+  end
+  tmp = tmp[0...-1] + "]}"
+
+  tmp
 end
 
 Kemal.run
