@@ -12,3 +12,9 @@ shards build
 ./bin/xssmaze
 # Default: http://0.0.0.0:3000
 ```
+
+## Installation
+### With Docker
+```bash
+docker pull ghcr.io/hahwul/xssmaze:main
+```
