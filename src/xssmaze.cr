@@ -40,11 +40,12 @@ get "/" do
    <p>XSSMaze is a web service configured to be vulnerable to XSS and is intended to measure and enhance the performance of security testing tools.</p>
    <p>You can find several vulnerable cases in the list below.</p>
    <hr>
-   <p>Endpoint Map: <a href='/map/txt'>Text</a> / <a href='/map/json'>JSON</a></p>
+   <p>Endpoint Map: <a href='/map/text'>Text</a> / <a href='/map/json'>JSON</a></p>
    "+indexdata
 end
 
-get "/map/txt" do 
+get "/map/text" do |env|
+  env.response.content_type = "text/plain"
   tmp = ""
   list.each do |obj|
     tmp += "#{obj.url}\n"
@@ -53,7 +54,8 @@ get "/map/txt" do
   tmp
 end
 
-get "/map/json" do 
+get "/map/json" do |env|
+  env.response.content_type = "application/json"
   tmp = "{\"endpoints\": ["
   list.each do |obj|
     tmp += "\"#{obj.url}\","
