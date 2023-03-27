@@ -19,3 +19,9 @@ shards build
 ```bash
 docker pull ghcr.io/hahwul/xssmaze:main
 ```
+
+## Map API
+```
+curl http://localhost:3000/map/txt
+curl http://localhost:3000/map/json
+```
