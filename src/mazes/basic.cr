@@ -1,20 +1,21 @@
 def load_basic
-    Xssmaze.push("basic-level1", "/basic/level1/?query=a","")
-    Xssmaze.push("basic-level2", "/basic/level2/","-x POST -d 'query=a'")
-    Xssmaze.push("basic-level3", "/basic/level3/a","")
-
+    Xssmaze.push("basic-level1", "/basic/level1/?query=a","no escape")
     get "/basic/level1/" do |env|
         env.params.query["query"]
     end
+
+    Xssmaze.push("basic-level2", "/basic/level2/?query=a","escape to double-quot")
     get "/basic/level2/" do |env|
-        "<form action='/basic/level2/' method='post'><input type='text' name='query' value='a'><input type='submit'></form>"
+        env.params.query["query"].gsub("\"", "&quot;")
     end
-    post "/basic/level2/" do |env|
-        query = env.params.body["query"].as(String)
-        "query: #{query}"
+
+    Xssmaze.push("basic-level3", "/basic/level3/?query=a","escape to single-quot")
+    get "/basic/level3/" do |env|
+        env.params.query["query"].gsub("'", "&quot;")
     end
-    get "/basic/level3/:name" do |env|
-        name = env.params.url["name"]
-        "Hi #{name}"
+
+    Xssmaze.push("basic-level4", "/basic/level4/?query=a","escape to all quot")
+    get "/basic/level4/" do |env|
+        env.params.query["query"].gsub("\"", "&quot;").gsub("'","&quot;")
     end
 end

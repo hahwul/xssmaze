@@ -1,6 +1,6 @@
 require "kemal"
 require "./maze"
-require "./mazes/basic"
+require "./mazes/**"
 
 module Xssmaze
   VERSION = "0.1.0"
@@ -18,6 +18,9 @@ end
 
 # Routes
 load_basic
+load_header
+load_path
+load_post
 
 # Index
 list = Xssmaze.get
