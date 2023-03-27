@@ -31,7 +31,10 @@ end
 indexdata += "</ul>"
 
 get "/" do
-  "<h1>Index</h1><hr>"+indexdata
+  "<h1>XSSMaze</h1>
+   <p>XSSMaze is a web service configured to be vulnerable to XSS and is intended to measure and enhance the performance of security testing tools.</p>
+   <p>You can find several vulnerable cases in the list below.</p>
+   <hr>"+indexdata
 end
 
 Kemal.run
