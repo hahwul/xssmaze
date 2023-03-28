@@ -21,6 +21,16 @@ def load_basic
 
     Xssmaze.push("basic-level5", "/basic/level5/?query=a","escape to parenthesis")
     get "/basic/level5/" do |env|
-        env.params.query["query"].gsub("\"", "&quot;").gsub("(","").gsub(")","")
+        env.params.query["query"].gsub("(","").gsub(")","")
+    end
+
+    Xssmaze.push("basic-level6", "/basic/level6/?query=a","escape to all quot and parenthesis")
+    get "/basic/level6/" do |env|
+        env.params.query["query"].gsub("\"", "&quot;").gsub("'","&quot;").gsub("(","").gsub(")","")
+    end
+
+    Xssmaze.push("basic-level7", "/basic/level7/?query=a","escape to all quot and parenthesis and backtick")
+    get "/basic/level7/" do |env|
+        env.params.query["query"].gsub("\"", "&quot;").gsub("'","&quot;").gsub("(","").gsub(")","").gsub("`","")
     end
 end
