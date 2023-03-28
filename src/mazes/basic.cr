@@ -18,4 +18,9 @@ def load_basic
     get "/basic/level4/" do |env|
         env.params.query["query"].gsub("\"", "&quot;").gsub("'","&quot;")
     end
+
+    Xssmaze.push("basic-level5", "/basic/level5/?query=a","escape to parenthesis")
+    get "/basic/level5/" do |env|
+        env.params.query["query"].gsub("\"", "&quot;").gsub("(","").gsub(")","")
+    end
 end
