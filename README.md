@@ -1,4 +1,4 @@
-# XSSMaze
+<img src="/public/xssmaze.png" style="width:200px;">
 
 [![Crystal CI](https://github.com/hahwul/xssmaze/actions/workflows/crystal.yml/badge.svg)](https://github.com/hahwul/xssmaze/actions/workflows/crystal.yml)
 [![Docker](https://github.com/hahwul/xssmaze/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/hahwul/xssmaze/actions/workflows/docker-publish.yml)
