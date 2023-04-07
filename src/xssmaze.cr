@@ -38,6 +38,7 @@ indexdata += "</ul>"
 get "/" do
   "<h1>XSSMaze</h1>
    <p>XSSMaze is a web service configured to be vulnerable to XSS and is intended to measure and enhance the performance of security testing tools.</p>
+   <p>All vulnerable parameters are named <code style='color: red;'>query</code>.</p>
    <p>You can find several vulnerable cases in the list below.</p>
    <hr>
    <p>Endpoint Map: <a href='/map/text'>Text</a> / <a href='/map/json'>JSON</a></p>
