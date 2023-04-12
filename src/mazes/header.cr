@@ -8,4 +8,9 @@ def load_header
     get "/header/level2/" do |env|
         env.response.headers["user-agent"]
     end
+
+    Xssmaze.push("header-level3", "/header/level3/","authorization header")
+    get "/header/level3/" do |env|
+        env.response.headers["authorization"]
+    end
 end
