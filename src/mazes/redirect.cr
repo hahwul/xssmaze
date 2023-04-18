@@ -9,8 +9,13 @@ def load_redirect
         env.redirect env.params.query["query"].gsub("javascript","")
     end
 
-    Xssmaze.push("redirect-level2", "/redirect/level3/","query param")
+    Xssmaze.push("redirect-level3", "/redirect/level3/","query param")
     get "/redirect/level3/" do |env|
         env.redirect env.params.query["query"].downcase.gsub("javascript","")
+    end
+
+    Xssmaze.push("redirect-level4", "/redirect/level4/","query param")
+    get "/redirect/level4/" do |env|
+        env.redirect env.params.query["query"].downcase.gsub("javascript","").downcase.gsub("javascript","")
     end
 end
