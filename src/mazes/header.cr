@@ -13,4 +13,9 @@ def load_header
     get "/header/level3/" do |env|
         env.response.headers["authorization"]
     end
+
+    Xssmaze.push("header-level4", "/header/level4/","cookie header")
+    get "/header/level4/" do |env|
+        env.response.headers["cookie"]
+    end
 end
