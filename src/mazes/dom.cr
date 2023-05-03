@@ -37,4 +37,13 @@ def load_dom
             eval(query)
         </script>"
     end
+
+    Xssmaze.push("dom-level6", "/dom/level6/","location.href (query param)")
+    get "/dom/level6/" do |_|
+        "<script>
+            const urlParams = new URL(location.href).searchParams;
+            const query = urlParams.get('query');
+            document.location.href = query
+        </script>"
+    end
 end
