@@ -23,7 +23,7 @@ load_header
 load_path
 load_post
 load_redirect
-load_encode
+load_decode
 
 # Index
 list = Xssmaze.get
