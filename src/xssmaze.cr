@@ -31,7 +31,7 @@ indexdata = "<ul>"
 
 list.each do |obj|
   puts "loaded - " + obj.name
-indexdata += "<li><a href='#{obj.url}'>#{obj.name}</a> | #{obj.desc}</li>"
+  indexdata += "<li><a href='#{obj.url}'>#{obj.name}</a> | #{obj.desc}</li>"
 end
 
 indexdata += "</ul>"
@@ -43,7 +43,7 @@ get "/" do
    <p>You can find several vulnerable cases in the list below.</p>
    <hr>
    <p>Endpoint Map: <a href='/map/text'>Text</a> / <a href='/map/json'>JSON</a></p>
-   "+indexdata
+   " + indexdata
 end
 
 get "/map/text" do |env|
