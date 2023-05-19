@@ -25,3 +25,29 @@ docker pull ghcr.io/hahwul/xssmaze:main
 curl http://localhost:3000/map/txt
 curl http://localhost:3000/map/json
 ```
+
+```json
+http http://localhost:3000/map/json
+HTTP/1.1 200 OK
+Connection: keep-alive
+Content-Length: 611
+Content-Type: application/json
+X-Powered-By: Kemal
+
+{
+    "endpoints": [
+        "/basic/level1/?query=a",
+        "/basic/level2/?query=a",
+        "/basic/level3/?query=a",
+        "/basic/level4/?query=a",
+        "/basic/level5/?query=a",
+        "/basic/level6/?query=a",
+        "/basic/level7/?query=a",
+        "/dom/level1/",
+        "/dom/level2/",
+        "/dom/level3/",
+        "/dom/level4/"
+        ...
+    ]
+}
+```
