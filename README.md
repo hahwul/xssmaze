@@ -26,8 +26,7 @@ curl http://localhost:3000/map/txt
 curl http://localhost:3000/map/json
 ```
 
-```json
-http http://localhost:3000/map/json
+```http
 HTTP/1.1 200 OK
 Connection: keep-alive
 Content-Length: 611
