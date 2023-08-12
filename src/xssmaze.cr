@@ -25,6 +25,7 @@ load_post
 load_redirect
 load_decode
 load_hidden_xss
+load_injs_xss
 
 # Index
 list = Xssmaze.get
