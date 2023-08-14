@@ -1,6 +1,7 @@
 require "kemal"
 require "./maze"
 require "./mazes/**"
+require "./banner"
 
 module Xssmaze
   VERSION = "0.1.0"
@@ -15,6 +16,8 @@ module Xssmaze
     @@mazes
   end
 end
+
+banner
 
 # Routes
 load_basic
@@ -33,7 +36,6 @@ list = Xssmaze.get
 indexdata = "<ul>"
 
 list.each do |obj|
-  puts "loaded - " + obj.name
   indexdata += "<li><a href='#{obj.url}'>#{obj.name}</a> | #{obj.desc}</li>"
 end
 
