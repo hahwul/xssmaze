@@ -5,7 +5,8 @@
 
 XSSMaze is a web service configured to be vulnerable to XSS and is intended to measure and enhance the performance of security testing tools. You can find several vulnerable cases in the list below.
 
-## Build
+## Installation
+### From Source 
 ```bash
 # Install dependencies
 shards install
@@ -19,10 +20,21 @@ shards build --release --no-debug --production
 ./bin/xssmaze
 ```
 
-## Installation
-### With Docker
+### From Docker
 ```bash
 docker pull ghcr.io/hahwul/xssmaze:main
+```
+
+## Usage
+```bash
+./xssmaze
+
+# -b HOST, --bind HOST             Host to bind (defaults to 0.0.0.0)
+# -p PORT, --port PORT             Port to listen for connections (defaults to 3000)
+# -s, --ssl                        Enables SSL
+# --ssl-key-file FILE              SSL key file
+# --ssl-cert-file FILE             SSL certificate file
+# -h, --help                       Shows this help
 ```
 
 ## Map API
