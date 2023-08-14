@@ -7,11 +7,16 @@ XSSMaze is a web service configured to be vulnerable to XSS and is intended to m
 
 ## Build
 ```bash
+# Install dependencies
 shards install
-shards build
 
+# Build
+shards build # Dev build
+shards build --release --no-debug --production
+
+# Run XSSMaze
+# Defatul: http://0.0.0.0:3000
 ./bin/xssmaze
-# Default: http://0.0.0.0:3000
 ```
 
 ## Installation
