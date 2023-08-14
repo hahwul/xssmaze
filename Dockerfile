@@ -5,7 +5,7 @@ WORKDIR /xssmaze
 COPY . .
 
 RUN shards install
-RUN shards build --release --no-debug
+RUN shards build --release --no-debug --production
 
 # RUNNING
 #FROM scratch
