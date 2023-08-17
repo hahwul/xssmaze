@@ -30,6 +30,7 @@ load_decode
 load_hidden_xss
 load_injs_xss
 load_inattr_xss
+load_jf_xss
 
 # Index
 list = Xssmaze.get
