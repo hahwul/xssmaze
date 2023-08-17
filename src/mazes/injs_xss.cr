@@ -5,7 +5,7 @@ def load_injs_xss
 
     "<script>
         var data = #{query};
-      </script>"
+    </script>"
   end
 
   Xssmaze.push("injs-xss-level2", "/injs/level2/?query=a", "injs-xss - in single quote")
@@ -14,7 +14,7 @@ def load_injs_xss
 
     "<script>
         var data = '#{query}';
-      </script>"
+    </script>"
   end
 
   Xssmaze.push("injs-xss-level3", "/injs/level3/?query=a", "injs-xss - in double quote")
@@ -23,6 +23,6 @@ def load_injs_xss
 
     "<script>
         var data = \"#{query}\";
-      </script>"
+    </script>"
   end
 end
