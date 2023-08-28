@@ -25,4 +25,13 @@ def load_injs_xss
         var data = \"#{query}\";
     </script>"
   end
+
+  Xssmaze.push("injs-xss-level4", "/injs/level4/?query=a", "injs-xss - in single quote and double quote")
+  get "/injs/level4/" do |env|
+    query = env.params.query["query"].gsub("'","")
+
+    "<script>
+        var data = '#{query}' // this is '#{query}';
+    </script>"
+  end
 end
