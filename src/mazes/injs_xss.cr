@@ -34,4 +34,22 @@ def load_injs_xss
         var data = '#{query}' // this is '#{query}';
     </script>"
   end
+
+  Xssmaze.push("injs-xss-level5", "/injs/level5/?query=a", "injs-xss - in comments style 1")
+  get "/injs/level5/" do |env|
+    query = env.params.query["query"]
+
+    "<script>
+        /* this is '#{query}' */
+    </script>"
+  end
+
+  Xssmaze.push("injs-xss-level6", "/injs/level6/?query=a", "injs-xss - in comments style 2")
+  get "/injs/level6/" do |env|
+    query = env.params.query["query"]
+
+    "<script>
+        // this is '#{query}'
+    </script>"
+  end
 end
