@@ -16,4 +16,4 @@ COPY --from=builder /etc/ssl/cert.pem /etc/ssl/
 
 WORKDIR /app/
 
-CMD ["/xssmaze/bin/xssmaze"]
+CMD ["/app/xssmaze"]
