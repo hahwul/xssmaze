@@ -32,6 +32,7 @@ load_injs_xss
 load_inframe_xss
 load_inattr_xss
 load_jf_xss
+load_eventhandler_xss
 
 # Index
 list = Xssmaze.get
