@@ -33,6 +33,13 @@ load_inframe_xss
 load_inattr_xss
 load_jf_xss
 load_eventhandler_xss
+load_csp_bypass
+load_svg_xss
+load_css_injection
+load_template_injection
+load_websocket_xss
+load_json_xss
+load_advanced_xss
 
 # Index
 list = Xssmaze.get
