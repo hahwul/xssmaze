@@ -1,0 +1,20 @@
+name: Security Analysis
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  noir-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Run OWASP Noir
+        id: noir
+        uses: owasp-noir/noir@v0.24.0
+        with:
+          base_path: "."
+
+      - name: Display results
+        run: echo '${{ steps.noir.outputs.endpoints }}' | jq .
