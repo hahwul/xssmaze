@@ -13,7 +13,7 @@ def load_inattr_xss
     "<div class='#{query}'>Hello</div>"
   end
 
-  Xssmaze.push("inattr-xss-level3", "/inattr/level3/?query=a", "inattr-xss (double quote with <> fileter)", "inattr-xss")
+  Xssmaze.push("inattr-xss-level3", "/inattr/level3/?query=a", "inattr-xss (double quote with <> filter)", "inattr-xss")
   get "/inattr/level3/" do |env|
     query = env.params.query["query"]
 

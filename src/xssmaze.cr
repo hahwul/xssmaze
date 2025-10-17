@@ -44,10 +44,19 @@ load_advanced_xss
 # Index
 list = Xssmaze.get
 
+# Helper function to escape HTML
+def html_escape(str : String)
+  str.gsub("&", "&amp;")
+     .gsub("<", "&lt;")
+     .gsub(">", "&gt;")
+     .gsub("\"", "&quot;")
+     .gsub("'", "&#39;")
+end
+
 # Group mazes by category
 grouped_mazes = {} of String => Array(Maze)
 list.each do |maze|
-  category = maze.category.empty? ? maze.name.split("-")[0] : maze.category
+  category = maze.category.empty? ? maze.name.split("-").first? || "other" : maze.category
   grouped_mazes[category] ||= [] of Maze
   grouped_mazes[category] << maze
 end
@@ -58,10 +67,10 @@ sorted_categories = grouped_mazes.keys.sort
 indexdata = ""
 sorted_categories.each do |category|
   indexdata += "<div class='category'>"
-  indexdata += "<h2>#{category.capitalize.gsub("-", " ").gsub("_", " ")}</h2>"
+  indexdata += "<h2>#{html_escape(category.capitalize.gsub("-", " ").gsub("_", " "))}</h2>"
   indexdata += "<ul>"
   grouped_mazes[category].each do |obj|
-    indexdata += "<li><a href='#{obj.url}'>#{obj.name}</a> <span class='desc'>#{obj.desc}</span></li>"
+    indexdata += "<li><a href='#{html_escape(obj.url)}'>#{html_escape(obj.name)}</a> <span class='desc'>#{html_escape(obj.desc)}</span></li>"
   end
   indexdata += "</ul>"
   indexdata += "</div>"
