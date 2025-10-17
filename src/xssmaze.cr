@@ -49,7 +49,8 @@ grouped_mazes = Hash(String, Array(Maze)).new
 
 list.each do |obj|
   # Extract type from name (e.g., "basic-level1" -> "basic")
-  type = obj.name.split("-")[0]
+  parts = obj.name.split("-")
+  type = parts.size > 0 ? parts[0] : "other"
   grouped_mazes[type] ||= [] of Maze
   grouped_mazes[type] << obj
 end
@@ -65,13 +66,11 @@ sorted_types.each do |type|
   indexdata += "<li>#{type}"
   
   mazes = grouped_mazes[type]
-  if mazes.size > 0
-    indexdata += "<ul class='list'>"
-    mazes.each do |maze|
-      indexdata += "<li><a href='#{maze.url}'>#{maze.name}</a> - #{maze.desc}</li>"
-    end
-    indexdata += "</ul>"
+  indexdata += "<ul class='list'>"
+  mazes.each do |maze|
+    indexdata += "<li><a href='#{maze.url}'>#{maze.name}</a> - #{maze.desc}</li>"
   end
+  indexdata += "</ul>"
   
   indexdata += "</li>"
 end
