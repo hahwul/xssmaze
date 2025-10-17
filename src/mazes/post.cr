@@ -1,5 +1,5 @@
 def load_post
-  Xssmaze.push("post-level1", "/post/level1/", "POST-Form => 'query=a'")
+  Xssmaze.push("post-level1", "/post/level1/", "POST-Form => 'query=a'", "post")
   get "/post/level1/" do |_|
     "<form action='/post/level1/' method='post'><input type='text' name='query' value='a'><input type='submit'></form>"
   end
@@ -8,7 +8,7 @@ def load_post
     "query: #{query}"
   end
 
-  Xssmaze.push("post-level2", "/post/level2/", "POST-Json => {\"query\":\"a\"}")
+  Xssmaze.push("post-level2", "/post/level2/", "POST-Json => {\"query\":\"a\"}", "post")
   get "/post/level2/" do |_|
     "<button onclick=send()>run</button>
          <script>

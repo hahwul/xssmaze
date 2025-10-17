@@ -1,5 +1,5 @@
 def load_advanced_xss
-  Xssmaze.push("advanced-xss-level1", "/advanced/level1/?query=a", "XSS with WAF bypass using encoding")
+  Xssmaze.push("advanced-xss-level1", "/advanced/level1/?query=a", "XSS with WAF bypass using encoding", "advanced-xss")
   get "/advanced/level1/" do |env|
     query = env.params.query["query"]
     # Simulate basic WAF filtering
@@ -11,7 +11,7 @@ def load_advanced_xss
     </body></html>"
   end
 
-  Xssmaze.push("advanced-xss-level2", "/advanced/level2/?query=a", "XSS with mutation observer")
+  Xssmaze.push("advanced-xss-level2", "/advanced/level2/?query=a", "XSS with mutation observer", "advanced-xss")
   get "/advanced/level2/" do |env|
     query = env.params.query["query"]
     
@@ -43,7 +43,7 @@ def load_advanced_xss
     </body></html>"
   end
 
-  Xssmaze.push("advanced-xss-level3", "/advanced/level3/?query=a", "XSS with Service Worker")
+  Xssmaze.push("advanced-xss-level3", "/advanced/level3/?query=a", "XSS with Service Worker", "advanced-xss")
   get "/advanced/level3/" do |env|
     query = env.params.query["query"]
     
@@ -65,7 +65,7 @@ def load_advanced_xss
     </body></html>"
   end
 
-  Xssmaze.push("advanced-xss-level4", "/advanced/level4/?query=a", "XSS with Web Components")
+  Xssmaze.push("advanced-xss-level4", "/advanced/level4/?query=a", "XSS with Web Components", "advanced-xss")
   get "/advanced/level4/" do |env|
     query = env.params.query["query"]
     
@@ -89,7 +89,7 @@ def load_advanced_xss
     </body></html>"
   end
 
-  Xssmaze.push("advanced-xss-level5", "/advanced/level5/?query=a", "XSS with Trusted Types bypass")
+  Xssmaze.push("advanced-xss-level5", "/advanced/level5/?query=a", "XSS with Trusted Types bypass", "advanced-xss")
   get "/advanced/level5/" do |env|
     query = env.params.query["query"]
     
@@ -119,7 +119,7 @@ def load_advanced_xss
     </body></html>"
   end
 
-  Xssmaze.push("advanced-xss-level6", "/advanced/level6/?query=a", "XSS with Proxy object manipulation")
+  Xssmaze.push("advanced-xss-level6", "/advanced/level6/?query=a", "XSS with Proxy object manipulation", "advanced-xss")
   get "/advanced/level6/" do |env|
     query = env.params.query["query"]
     

@@ -1,5 +1,5 @@
 def load_injs_xss
-  Xssmaze.push("injs-xss-level1", "/injs/level1/?query=a", "injs-xss")
+  Xssmaze.push("injs-xss-level1", "/injs/level1/?query=a", "injs-xss", "injs-xss")
   get "/injs/level1/" do |env|
     query = env.params.query["query"]
 
@@ -8,7 +8,7 @@ def load_injs_xss
     </script>"
   end
 
-  Xssmaze.push("injs-xss-level2", "/injs/level2/?query=a", "injs-xss - in single quote")
+  Xssmaze.push("injs-xss-level2", "/injs/level2/?query=a", "injs-xss - in single quote", "injs-xss")
   get "/injs/level2/" do |env|
     query = env.params.query["query"]
 
@@ -17,7 +17,7 @@ def load_injs_xss
     </script>"
   end
 
-  Xssmaze.push("injs-xss-level3", "/injs/level3/?query=a", "injs-xss - in double quote")
+  Xssmaze.push("injs-xss-level3", "/injs/level3/?query=a", "injs-xss - in double quote", "injs-xss")
   get "/injs/level3/" do |env|
     query = env.params.query["query"]
 
@@ -26,7 +26,7 @@ def load_injs_xss
     </script>"
   end
 
-  Xssmaze.push("injs-xss-level4", "/injs/level4/?query=a", "injs-xss - in single quote and double quote")
+  Xssmaze.push("injs-xss-level4", "/injs/level4/?query=a", "injs-xss - in single quote and double quote", "injs-xss")
   get "/injs/level4/" do |env|
     query = env.params.query["query"].gsub("'", "")
 
@@ -35,7 +35,7 @@ def load_injs_xss
     </script>"
   end
 
-  Xssmaze.push("injs-xss-level5", "/injs/level5/?query=a", "injs-xss - in comments style 1")
+  Xssmaze.push("injs-xss-level5", "/injs/level5/?query=a", "injs-xss - in comments style 1", "injs-xss")
   get "/injs/level5/" do |env|
     query = env.params.query["query"]
 
@@ -44,7 +44,7 @@ def load_injs_xss
     </script>"
   end
 
-  Xssmaze.push("injs-xss-level6", "/injs/level6/?query=a", "injs-xss - in comments style 2")
+  Xssmaze.push("injs-xss-level6", "/injs/level6/?query=a", "injs-xss - in comments style 2", "injs-xss")
   get "/injs/level6/" do |env|
     query = env.params.query["query"]
 

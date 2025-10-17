@@ -1,5 +1,5 @@
 def load_websocket_xss
-  Xssmaze.push("websocket-xss-level1", "/websocket/level1/?query=a", "WebSocket message XSS (basic)")
+  Xssmaze.push("websocket-xss-level1", "/websocket/level1/?query=a", "WebSocket message XSS (basic)", "websocket-xss")
   get "/websocket/level1/" do |env|
     query = env.params.query["query"]
     
@@ -19,7 +19,7 @@ def load_websocket_xss
     </body></html>"
   end
 
-  Xssmaze.push("websocket-xss-level2", "/websocket/level2/?query=a", "WebSocket JSON message XSS")
+  Xssmaze.push("websocket-xss-level2", "/websocket/level2/?query=a", "WebSocket JSON message XSS", "websocket-xss")
   get "/websocket/level2/" do |env|
     query = env.params.query["query"]
     
@@ -40,7 +40,7 @@ def load_websocket_xss
     </body></html>"
   end
 
-  Xssmaze.push("websocket-xss-level3", "/websocket/level3/?query=a", "WebSocket with HTML message rendering")
+  Xssmaze.push("websocket-xss-level3", "/websocket/level3/?query=a", "WebSocket with HTML message rendering", "websocket-xss")
   get "/websocket/level3/" do |env|
     query = env.params.query["query"]
     
@@ -67,7 +67,7 @@ def load_websocket_xss
     </body></html>"
   end
 
-  Xssmaze.push("websocket-xss-level4", "/websocket/level4/?query=a", "WebSocket with eval-based message processing")
+  Xssmaze.push("websocket-xss-level4", "/websocket/level4/?query=a", "WebSocket with eval-based message processing", "websocket-xss")
   get "/websocket/level4/" do |env|
     query = env.params.query["query"]
     
@@ -91,7 +91,7 @@ def load_websocket_xss
     </body></html>"
   end
 
-  Xssmaze.push("websocket-xss-level5", "/websocket/level5/?query=a", "WebSocket with DOM manipulation")
+  Xssmaze.push("websocket-xss-level5", "/websocket/level5/?query=a", "WebSocket with DOM manipulation", "websocket-xss")
   get "/websocket/level5/" do |env|
     query = env.params.query["query"]
     

@@ -1,5 +1,5 @@
 def load_svg_xss
-  Xssmaze.push("svg-xss-level1", "/svg/level1/?query=a", "SVG onload XSS")
+  Xssmaze.push("svg-xss-level1", "/svg/level1/?query=a", "SVG onload XSS", "svg-xss")
   get "/svg/level1/" do |env|
     query = env.params.query["query"]
     
@@ -9,7 +9,7 @@ def load_svg_xss
     </body></html>"
   end
 
-  Xssmaze.push("svg-xss-level2", "/svg/level2/?query=a", "SVG animate XSS")
+  Xssmaze.push("svg-xss-level2", "/svg/level2/?query=a", "SVG animate XSS", "svg-xss")
   get "/svg/level2/" do |env|
     query = env.params.query["query"]
     
@@ -19,7 +19,7 @@ def load_svg_xss
     </body></html>"
   end
 
-  Xssmaze.push("svg-xss-level3", "/svg/level3/?query=a", "SVG foreignObject XSS")
+  Xssmaze.push("svg-xss-level3", "/svg/level3/?query=a", "SVG foreignObject XSS", "svg-xss")
   get "/svg/level3/" do |env|
     query = env.params.query["query"]
     
@@ -29,7 +29,7 @@ def load_svg_xss
     </body></html>"
   end
 
-  Xssmaze.push("svg-xss-level4", "/svg/level4/?query=a", "SVG use XSS with href")
+  Xssmaze.push("svg-xss-level4", "/svg/level4/?query=a", "SVG use XSS with href", "svg-xss")
   get "/svg/level4/" do |env|
     query = env.params.query["query"]
     
@@ -39,7 +39,7 @@ def load_svg_xss
     </body></html>"
   end
 
-  Xssmaze.push("svg-xss-level5", "/svg/level5/?query=a", "SVG embedded with data URI")
+  Xssmaze.push("svg-xss-level5", "/svg/level5/?query=a", "SVG embedded with data URI", "svg-xss")
   get "/svg/level5/" do |env|
     query = env.params.query["query"]
     
@@ -49,7 +49,7 @@ def load_svg_xss
     </body></html>"
   end
 
-  Xssmaze.push("svg-xss-level6", "/svg/level6/?query=a", "SVG with filtered script tags")
+  Xssmaze.push("svg-xss-level6", "/svg/level6/?query=a", "SVG with filtered script tags", "svg-xss")
   get "/svg/level6/" do |env|
     query = env.params.query["query"].gsub("<script", "").gsub("</script>", "")
     

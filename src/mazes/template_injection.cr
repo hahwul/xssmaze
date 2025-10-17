@@ -1,5 +1,5 @@
 def load_template_injection
-  Xssmaze.push("template-injection-level1", "/template/level1/?query=a", "Server-side template injection (basic)")
+  Xssmaze.push("template-injection-level1", "/template/level1/?query=a", "Server-side template injection (basic)", "template-injection")
   get "/template/level1/" do |env|
     query = env.params.query["query"]
     template = "Hello {{user_input}}"
@@ -11,7 +11,7 @@ def load_template_injection
     </body></html>"
   end
 
-  Xssmaze.push("template-injection-level2", "/template/level2/?query=a", "Client-side template injection (Handlebars style)")
+  Xssmaze.push("template-injection-level2", "/template/level2/?query=a", "Client-side template injection (Handlebars style)", "template-injection")
   get "/template/level2/" do |env|
     query = env.params.query["query"]
     
@@ -28,7 +28,7 @@ def load_template_injection
     </body></html>"
   end
 
-  Xssmaze.push("template-injection-level3", "/template/level3/?query=a", "Template injection with expression evaluation")
+  Xssmaze.push("template-injection-level3", "/template/level3/?query=a", "Template injection with expression evaluation", "template-injection")
   get "/template/level3/" do |env|
     query = env.params.query["query"]
     
@@ -48,7 +48,7 @@ def load_template_injection
     </body></html>"
   end
 
-  Xssmaze.push("template-injection-level4", "/template/level4/?query=a", "Template injection with conditional rendering")
+  Xssmaze.push("template-injection-level4", "/template/level4/?query=a", "Template injection with conditional rendering", "template-injection")
   get "/template/level4/" do |env|
     query = env.params.query["query"]
     
@@ -63,7 +63,7 @@ def load_template_injection
     </body></html>"
   end
 
-  Xssmaze.push("template-injection-level5", "/template/level5/?query=a", "Template injection with loop rendering")
+  Xssmaze.push("template-injection-level5", "/template/level5/?query=a", "Template injection with loop rendering", "template-injection")
   get "/template/level5/" do |env|
     query = env.params.query["query"]
     
@@ -81,7 +81,7 @@ def load_template_injection
     </body></html>"
   end
 
-  Xssmaze.push("template-injection-level6", "/template/level6/?query=a", "Template injection with sanitization bypass")
+  Xssmaze.push("template-injection-level6", "/template/level6/?query=a", "Template injection with sanitization bypass", "template-injection")
   get "/template/level6/" do |env|
     query = env.params.query["query"].gsub("<script", "&lt;script").gsub("</script>", "&lt;/script&gt;")
     

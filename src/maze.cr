@@ -2,8 +2,9 @@ class Maze
   @name : String
   @url : String
   @desc : String
+  @category : String
 
-  def initialize(@name, @url, @desc)
+  def initialize(@name, @url, @desc, @category = "")
   end
 
   macro define_getter_methods(names)
@@ -14,5 +15,5 @@ class Maze
     {% end %}
   end
 
-  define_getter_methods [name, url, desc]
+  define_getter_methods [name, url, desc, category]
 end

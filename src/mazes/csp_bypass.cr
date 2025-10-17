@@ -1,5 +1,5 @@
 def load_csp_bypass
-  Xssmaze.push("csp-bypass-level1", "/csp/level1/?query=a", "CSP bypass with unsafe-inline")
+  Xssmaze.push("csp-bypass-level1", "/csp/level1/?query=a", "CSP bypass with unsafe-inline", "csp-bypass")
   get "/csp/level1/" do |env|
     query = env.params.query["query"]
     env.response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'unsafe-inline'"
@@ -10,7 +10,7 @@ def load_csp_bypass
     </body></html>"
   end
 
-  Xssmaze.push("csp-bypass-level2", "/csp/level2/?query=a", "CSP bypass with nonce")
+  Xssmaze.push("csp-bypass-level2", "/csp/level2/?query=a", "CSP bypass with nonce", "csp-bypass")
   get "/csp/level2/" do |env|
     query = env.params.query["query"]
     nonce = "abc123"
@@ -24,7 +24,7 @@ def load_csp_bypass
     </body></html>"
   end
 
-  Xssmaze.push("csp-bypass-level3", "/csp/level3/?query=a", "CSP bypass with eval and unsafe-eval")
+  Xssmaze.push("csp-bypass-level3", "/csp/level3/?query=a", "CSP bypass with eval and unsafe-eval", "csp-bypass")
   get "/csp/level3/" do |env|
     query = env.params.query["query"]
     env.response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'unsafe-eval'"
@@ -37,7 +37,7 @@ def load_csp_bypass
     </body></html>"
   end
 
-  Xssmaze.push("csp-bypass-level4", "/csp/level4/?query=a", "CSP bypass with strict policy (data: URI)")
+  Xssmaze.push("csp-bypass-level4", "/csp/level4/?query=a", "CSP bypass with strict policy (data: URI)", "csp-bypass")
   get "/csp/level4/" do |env|
     query = env.params.query["query"]
     env.response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'"
@@ -53,7 +53,7 @@ def load_csp_bypass
     </body></html>"
   end
 
-  Xssmaze.push("csp-bypass-level5", "/csp/level5/?query=a", "CSP bypass with meta tag injection")
+  Xssmaze.push("csp-bypass-level5", "/csp/level5/?query=a", "CSP bypass with meta tag injection", "csp-bypass")
   get "/csp/level5/" do |env|
     query = env.params.query["query"]
     

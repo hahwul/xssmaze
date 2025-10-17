@@ -1,5 +1,5 @@
 def load_css_injection
-  Xssmaze.push("css-injection-level1", "/css/level1/?query=a", "CSS expression() XSS (IE)")
+  Xssmaze.push("css-injection-level1", "/css/level1/?query=a", "CSS expression() XSS (IE)", "css-injection")
   get "/css/level1/" do |env|
     query = env.params.query["query"]
     
@@ -15,7 +15,7 @@ def load_css_injection
     </body></html>"
   end
 
-  Xssmaze.push("css-injection-level2", "/css/level2/?query=a", "CSS import with javascript: URL")
+  Xssmaze.push("css-injection-level2", "/css/level2/?query=a", "CSS import with javascript: URL", "css-injection")
   get "/css/level2/" do |env|
     query = env.params.query["query"]
     
@@ -29,7 +29,7 @@ def load_css_injection
     </body></html>"
   end
 
-  Xssmaze.push("css-injection-level3", "/css/level3/?query=a", "CSS background-image with javascript: URL")
+  Xssmaze.push("css-injection-level3", "/css/level3/?query=a", "CSS background-image with javascript: URL", "css-injection")
   get "/css/level3/" do |env|
     query = env.params.query["query"]
     
@@ -47,7 +47,7 @@ def load_css_injection
     </body></html>"
   end
 
-  Xssmaze.push("css-injection-level4", "/css/level4/?query=a", "CSS content property XSS")
+  Xssmaze.push("css-injection-level4", "/css/level4/?query=a", "CSS content property XSS", "css-injection")
   get "/css/level4/" do |env|
     query = env.params.query["query"]
     
@@ -63,7 +63,7 @@ def load_css_injection
     </body></html>"
   end
 
-  Xssmaze.push("css-injection-level5", "/css/level5/?query=a", "CSS keyframes animation XSS")
+  Xssmaze.push("css-injection-level5", "/css/level5/?query=a", "CSS keyframes animation XSS", "css-injection")
   get "/css/level5/" do |env|
     query = env.params.query["query"]
     
@@ -82,7 +82,7 @@ def load_css_injection
     </body></html>"
   end
 
-  Xssmaze.push("css-injection-level6", "/css/level6/?query=a", "CSS attr() function with HTML injection")
+  Xssmaze.push("css-injection-level6", "/css/level6/?query=a", "CSS attr() function with HTML injection", "css-injection")
   get "/css/level6/" do |env|
     query = env.params.query["query"]
     
