@@ -10,7 +10,7 @@ shards:
 
   kemal:
     git: https://github.com/kemalcr/kemal.git
-    version: 1.7.2
+    version: 1.7.3
 
   radix:
     git: https://github.com/luislavena/radix.git
