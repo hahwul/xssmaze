@@ -3,7 +3,7 @@ def load_csp_bypass
   get "/csp/level1/" do |env|
     query = env.params.query["query"]
     env.response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'unsafe-inline'"
-    
+
     "<html><head></head><body>
     <h1>CSP Level 1</h1>
     <div>User input: #{query}</div>
@@ -12,7 +12,7 @@ def load_csp_bypass
   get "/csp/level1" do |env|
     query = env.params.query["query"]
     env.response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'unsafe-inline'"
-    
+
     "<html><head></head><body>
     <h1>CSP Level 1</h1>
     <div>User input: #{query}</div>
@@ -24,7 +24,7 @@ def load_csp_bypass
     query = env.params.query["query"]
     nonce = "abc123"
     env.response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'nonce-#{nonce}'"
-    
+
     "<html><head></head><body>
     <h1>CSP Level 2</h1>
     <script nonce='#{nonce}'>
@@ -36,7 +36,7 @@ def load_csp_bypass
     query = env.params.query["query"]
     nonce = "abc123"
     env.response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'nonce-#{nonce}'"
-    
+
     "<html><head></head><body>
     <h1>CSP Level 2</h1>
     <script nonce='#{nonce}'>
@@ -49,7 +49,7 @@ def load_csp_bypass
   get "/csp/level3/" do |env|
     query = env.params.query["query"]
     env.response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'unsafe-eval'"
-    
+
     "<html><head></head><body>
     <h1>CSP Level 3</h1>
     <script>
@@ -60,7 +60,7 @@ def load_csp_bypass
   get "/csp/level3" do |env|
     query = env.params.query["query"]
     env.response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'unsafe-eval'"
-    
+
     "<html><head></head><body>
     <h1>CSP Level 3</h1>
     <script>
@@ -73,7 +73,7 @@ def load_csp_bypass
   get "/csp/level4/" do |env|
     query = env.params.query["query"]
     env.response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'"
-    
+
     "<html><head></head><body>
     <h1>CSP Level 4</h1>
     <iframe src=\"data:text/html,<script>parent.postMessage('#{query}','*')</script>\"></iframe>
@@ -87,7 +87,7 @@ def load_csp_bypass
   get "/csp/level4" do |env|
     query = env.params.query["query"]
     env.response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'"
-    
+
     "<html><head></head><body>
     <h1>CSP Level 4</h1>
     <iframe src=\"data:text/html,<script>parent.postMessage('#{query}','*')</script>\"></iframe>
@@ -102,7 +102,7 @@ def load_csp_bypass
   Xssmaze.push("csp-bypass-level5", "/csp/level5/?query=a", "CSP bypass with meta tag injection")
   get "/csp/level5/" do |env|
     query = env.params.query["query"]
-    
+
     "<html><head>
     <meta http-equiv='Content-Security-Policy' content=\"default-src 'self'; script-src 'unsafe-inline'\">
     </head><body>
@@ -112,7 +112,7 @@ def load_csp_bypass
   end
   get "/csp/level5" do |env|
     query = env.params.query["query"]
-    
+
     "<html><head>
     <meta http-equiv='Content-Security-Policy' content=\"default-src 'self'; script-src 'unsafe-inline'\">
     </head><body>

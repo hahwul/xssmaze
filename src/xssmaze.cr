@@ -56,7 +56,7 @@ list.each do |obj|
 end
 
 # Sort types alphabetically
-sorted_types = grouped_mazes.keys.sort
+sorted_types = grouped_mazes.keys.sort!
 
 # Build hierarchical HTML
 indexdata = "<div class='container'>
@@ -64,14 +64,14 @@ indexdata = "<div class='container'>
 
 sorted_types.each do |type|
   indexdata += "<li>#{type}"
-  
+
   mazes = grouped_mazes[type]
   indexdata += "<ul class='list'>"
   mazes.each do |maze|
     indexdata += "<li><a href='#{maze.url}'>#{maze.name}</a> - #{maze.desc}</li>"
   end
   indexdata += "</ul>"
-  
+
   indexdata += "</li>"
 end
 

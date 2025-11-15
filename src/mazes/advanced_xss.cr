@@ -4,7 +4,7 @@ def load_advanced_xss
     query = env.params.query["query"]
     # Simulate basic WAF filtering
     filtered_query = query.gsub("script", "").gsub("javascript", "").gsub("onload", "")
-    
+
     "<html><body>
     <h1>Advanced XSS Level 1</h1>
     <div>Filtered input: #{filtered_query}</div>
@@ -14,7 +14,7 @@ def load_advanced_xss
     query = env.params.query["query"]
     # Simulate basic WAF filtering
     filtered_query = query.gsub("script", "").gsub("javascript", "").gsub("onload", "")
-    
+
     "<html><body>
     <h1>Advanced XSS Level 1</h1>
     <div>Filtered input: #{filtered_query}</div>
@@ -24,7 +24,7 @@ def load_advanced_xss
   Xssmaze.push("advanced-xss-level2", "/advanced/level2/?query=a", "XSS with mutation observer")
   get "/advanced/level2/" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>Advanced XSS Level 2</h1>
     <div id='target'></div>
@@ -43,10 +43,10 @@ def load_advanced_xss
           }
         });
       });
-      
+
       var target = document.getElementById('target');
       observer.observe(target, { childList: true, subtree: true });
-      
+
       // Trigger mutation
       target.appendChild(document.createTextNode('#{query}'));
     </script>
@@ -54,7 +54,7 @@ def load_advanced_xss
   end
   get "/advanced/level2" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>Advanced XSS Level 2</h1>
     <div id='target'></div>
@@ -73,10 +73,10 @@ def load_advanced_xss
           }
         });
       });
-      
+
       var target = document.getElementById('target');
       observer.observe(target, { childList: true, subtree: true });
-      
+
       // Trigger mutation
       target.appendChild(document.createTextNode('#{query}'));
     </script>
@@ -86,7 +86,7 @@ def load_advanced_xss
   Xssmaze.push("advanced-xss-level3", "/advanced/level3/?query=a", "XSS with Service Worker")
   get "/advanced/level3/" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>Advanced XSS Level 3</h1>
     <div id='content'></div>
@@ -97,7 +97,7 @@ def load_advanced_xss
           document.getElementById('content').innerHTML = 'SW Message: ' + event.data;
         });
       }
-      
+
       // Simulate message from service worker
       var simulatedMessage = { data: '#{query}' };
       document.getElementById('content').innerHTML = 'SW Message: ' + simulatedMessage.data;
@@ -106,7 +106,7 @@ def load_advanced_xss
   end
   get "/advanced/level3" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>Advanced XSS Level 3</h1>
     <div id='content'></div>
@@ -117,7 +117,7 @@ def load_advanced_xss
           document.getElementById('content').innerHTML = 'SW Message: ' + event.data;
         });
       }
-      
+
       // Simulate message from service worker
       var simulatedMessage = { data: '#{query}' };
       document.getElementById('content').innerHTML = 'SW Message: ' + simulatedMessage.data;
@@ -128,7 +128,7 @@ def load_advanced_xss
   Xssmaze.push("advanced-xss-level4", "/advanced/level4/?query=a", "XSS with Web Components")
   get "/advanced/level4/" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>Advanced XSS Level 4</h1>
     <div id='custom-component'></div>
@@ -139,18 +139,18 @@ def load_advanced_xss
           this.innerHTML = '<div>Custom: #{query}</div>';
         }
       }
-      
+
       if (!customElements.get('custom-element')) {
         customElements.define('custom-element', CustomElement);
       }
-      
+
       document.getElementById('custom-component').innerHTML = '<custom-element></custom-element>';
     </script>
     </body></html>"
   end
   get "/advanced/level4" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>Advanced XSS Level 4</h1>
     <div id='custom-component'></div>
@@ -161,11 +161,11 @@ def load_advanced_xss
           this.innerHTML = '<div>Custom: #{query}</div>';
         }
       }
-      
+
       if (!customElements.get('custom-element')) {
         customElements.define('custom-element', CustomElement);
       }
-      
+
       document.getElementById('custom-component').innerHTML = '<custom-element></custom-element>';
     </script>
     </body></html>"
@@ -174,7 +174,7 @@ def load_advanced_xss
   Xssmaze.push("advanced-xss-level5", "/advanced/level5/?query=a", "XSS with Trusted Types bypass")
   get "/advanced/level5/" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>Advanced XSS Level 5</h1>
     <div id='trusted-content'></div>
@@ -188,7 +188,7 @@ def load_advanced_xss
               return input;
             }
           });
-          
+
           document.getElementById('trusted-content').innerHTML = policy.createHTML('#{query}');
         } catch (e) {
           // Fallback without Trusted Types
@@ -202,7 +202,7 @@ def load_advanced_xss
   end
   get "/advanced/level5" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>Advanced XSS Level 5</h1>
     <div id='trusted-content'></div>
@@ -216,7 +216,7 @@ def load_advanced_xss
               return input;
             }
           });
-          
+
           document.getElementById('trusted-content').innerHTML = policy.createHTML('#{query}');
         } catch (e) {
           // Fallback without Trusted Types
@@ -232,13 +232,13 @@ def load_advanced_xss
   Xssmaze.push("advanced-xss-level6", "/advanced/level6/?query=a", "XSS with Proxy object manipulation")
   get "/advanced/level6/" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>Advanced XSS Level 6</h1>
     <div id='proxy-content'></div>
     <script>
       var userInput = '#{query}';
-      
+
       var handler = {
         get: function(target, prop) {
           if (prop === 'innerHTML') {
@@ -250,7 +250,7 @@ def load_advanced_xss
           return target[prop];
         }
       };
-      
+
       var element = new Proxy(document.getElementById('proxy-content'), handler);
       element.innerHTML(userInput);
     </script>
@@ -258,13 +258,13 @@ def load_advanced_xss
   end
   get "/advanced/level6" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>Advanced XSS Level 6</h1>
     <div id='proxy-content'></div>
     <script>
       var userInput = '#{query}';
-      
+
       var handler = {
         get: function(target, prop) {
           if (prop === 'innerHTML') {
@@ -276,7 +276,7 @@ def load_advanced_xss
           return target[prop];
         }
       };
-      
+
       var element = new Proxy(document.getElementById('proxy-content'), handler);
       element.innerHTML(userInput);
     </script>

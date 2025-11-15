@@ -4,14 +4,14 @@ def load_json_xss
     query = env.params.query["query"]
     callback = env.params.query["callback"]? || "callback"
     env.response.content_type = "application/javascript"
-    
+
     "#{callback}({\"message\": \"#{query}\", \"status\": \"success\"})"
   end
   get "/json/level1" do |env|
     query = env.params.query["query"]
     callback = env.params.query["callback"]? || "callback"
     env.response.content_type = "application/javascript"
-    
+
     "#{callback}({\"message\": \"#{query}\", \"status\": \"success\"})"
   end
 
@@ -19,13 +19,13 @@ def load_json_xss
   get "/json/level2/" do |env|
     query = env.params.query["query"]
     env.response.content_type = "application/json"
-    
+
     "{\"html_content\": \"<div>#{query}</div>\", \"escaped\": false}"
   end
   get "/json/level2" do |env|
     query = env.params.query["query"]
     env.response.content_type = "application/json"
-    
+
     "{\"html_content\": \"<div>#{query}</div>\", \"escaped\": false}"
   end
 
@@ -33,7 +33,7 @@ def load_json_xss
   get "/json/level3/" do |env|
     query = env.params.query["query"]
     env.response.content_type = "application/json"
-    
+
     # Simulate improper Unicode handling
     unicode_query = query.gsub("\\", "\\\\").gsub("\"", "\\\"")
     "{\"data\": \"#{unicode_query}\", \"type\": \"unicode\"}"
@@ -41,7 +41,7 @@ def load_json_xss
   get "/json/level3" do |env|
     query = env.params.query["query"]
     env.response.content_type = "application/json"
-    
+
     # Simulate improper Unicode handling
     unicode_query = query.gsub("\\", "\\\\").gsub("\"", "\\\"")
     "{\"data\": \"#{unicode_query}\", \"type\": \"unicode\"}"
@@ -50,7 +50,7 @@ def load_json_xss
   Xssmaze.push("json-xss-level4", "/json/level4/?query=a", "JSON XSS in script tag context")
   get "/json/level4/" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>JSON XSS Level 4</h1>
     <script>
@@ -61,7 +61,7 @@ def load_json_xss
   end
   get "/json/level4" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>JSON XSS Level 4</h1>
     <script>
@@ -74,7 +74,7 @@ def load_json_xss
   Xssmaze.push("json-xss-level5", "/json/level5/?query=a", "JSON XSS with array injection")
   get "/json/level5/" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>JSON XSS Level 5</h1>
     <script>
@@ -87,7 +87,7 @@ def load_json_xss
   end
   get "/json/level5" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>JSON XSS Level 5</h1>
     <script>
@@ -102,7 +102,7 @@ def load_json_xss
   Xssmaze.push("json-xss-level6", "/json/level6/?query=a", "JSON XSS with nested object injection")
   get "/json/level6/" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>JSON XSS Level 6</h1>
     <script>
@@ -121,7 +121,7 @@ def load_json_xss
   end
   get "/json/level6" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>JSON XSS Level 6</h1>
     <script>

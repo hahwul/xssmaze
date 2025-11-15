@@ -4,7 +4,7 @@ def load_template_injection
     query = env.params.query["query"]
     template = "Hello {{user_input}}"
     output = template.gsub("{{user_input}}", query)
-    
+
     "<html><body>
     <h1>Template Injection Level 1</h1>
     <div>#{output}</div>
@@ -14,7 +14,7 @@ def load_template_injection
     query = env.params.query["query"]
     template = "Hello {{user_input}}"
     output = template.gsub("{{user_input}}", query)
-    
+
     "<html><body>
     <h1>Template Injection Level 1</h1>
     <div>#{output}</div>
@@ -24,7 +24,7 @@ def load_template_injection
   Xssmaze.push("template-injection-level2", "/template/level2/?query=a", "Client-side template injection (Handlebars style)")
   get "/template/level2/" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>Template Injection Level 2</h1>
     <div id='output'></div>
@@ -39,7 +39,7 @@ def load_template_injection
   end
   get "/template/level2" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>Template Injection Level 2</h1>
     <div id='output'></div>
@@ -56,7 +56,7 @@ def load_template_injection
   Xssmaze.push("template-injection-level3", "/template/level3/?query=a", "Template injection with expression evaluation")
   get "/template/level3/" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>Template Injection Level 3</h1>
     <div id='output'></div>
@@ -74,7 +74,7 @@ def load_template_injection
   end
   get "/template/level3" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>Template Injection Level 3</h1>
     <div id='output'></div>
@@ -94,7 +94,7 @@ def load_template_injection
   Xssmaze.push("template-injection-level4", "/template/level4/?query=a", "Template injection with conditional rendering")
   get "/template/level4/" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>Template Injection Level 4</h1>
     <div id='output'></div>
@@ -107,7 +107,7 @@ def load_template_injection
   end
   get "/template/level4" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>Template Injection Level 4</h1>
     <div id='output'></div>
@@ -122,7 +122,7 @@ def load_template_injection
   Xssmaze.push("template-injection-level5", "/template/level5/?query=a", "Template injection with loop rendering")
   get "/template/level5/" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>Template Injection Level 5</h1>
     <div id='output'></div>
@@ -138,7 +138,7 @@ def load_template_injection
   end
   get "/template/level5" do |env|
     query = env.params.query["query"]
-    
+
     "<html><body>
     <h1>Template Injection Level 5</h1>
     <div id='output'></div>
@@ -156,7 +156,7 @@ def load_template_injection
   Xssmaze.push("template-injection-level6", "/template/level6/?query=a", "Template injection with sanitization bypass")
   get "/template/level6/" do |env|
     query = env.params.query["query"].gsub("<script", "&lt;script").gsub("</script>", "&lt;/script&gt;")
-    
+
     "<html><body>
     <h1>Template Injection Level 6</h1>
     <div id='output'></div>
@@ -169,7 +169,7 @@ def load_template_injection
   end
   get "/template/level6" do |env|
     query = env.params.query["query"].gsub("<script", "&lt;script").gsub("</script>", "&lt;/script&gt;")
-    
+
     "<html><body>
     <h1>Template Injection Level 6</h1>
     <div id='output'></div>

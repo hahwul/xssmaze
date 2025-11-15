@@ -2,10 +2,10 @@ def load_css_injection
   Xssmaze.push("css-injection-level1", "/css/level1/?query=a", "CSS expression() XSS (IE)")
   get "/css/level1/" do |env|
     query = env.params.query["query"]
-    
+
     "<html><head>
     <style>
-    .user-style { 
+    .user-style {
       color: expression(#{query});
     }
     </style>
@@ -16,10 +16,10 @@ def load_css_injection
   end
   get "/css/level1" do |env|
     query = env.params.query["query"]
-    
+
     "<html><head>
     <style>
-    .user-style { 
+    .user-style {
       color: expression(#{query});
     }
     </style>
@@ -32,7 +32,7 @@ def load_css_injection
   Xssmaze.push("css-injection-level2", "/css/level2/?query=a", "CSS import with javascript: URL")
   get "/css/level2/" do |env|
     query = env.params.query["query"]
-    
+
     "<html><head>
     <style>
     @import url('#{query}');
@@ -44,7 +44,7 @@ def load_css_injection
   end
   get "/css/level2" do |env|
     query = env.params.query["query"]
-    
+
     "<html><head>
     <style>
     @import url('#{query}');
@@ -58,10 +58,10 @@ def load_css_injection
   Xssmaze.push("css-injection-level3", "/css/level3/?query=a", "CSS background-image with javascript: URL")
   get "/css/level3/" do |env|
     query = env.params.query["query"]
-    
+
     "<html><head>
     <style>
-    .bg { 
+    .bg {
       background-image: url('#{query}');
       width: 100px;
       height: 100px;
@@ -74,10 +74,10 @@ def load_css_injection
   end
   get "/css/level3" do |env|
     query = env.params.query["query"]
-    
+
     "<html><head>
     <style>
-    .bg { 
+    .bg {
       background-image: url('#{query}');
       width: 100px;
       height: 100px;
@@ -92,10 +92,10 @@ def load_css_injection
   Xssmaze.push("css-injection-level4", "/css/level4/?query=a", "CSS content property XSS")
   get "/css/level4/" do |env|
     query = env.params.query["query"]
-    
+
     "<html><head>
     <style>
-    .content::before { 
+    .content::before {
       content: '#{query}';
     }
     </style>
@@ -106,10 +106,10 @@ def load_css_injection
   end
   get "/css/level4" do |env|
     query = env.params.query["query"]
-    
+
     "<html><head>
     <style>
-    .content::before { 
+    .content::before {
       content: '#{query}';
     }
     </style>
@@ -122,13 +122,13 @@ def load_css_injection
   Xssmaze.push("css-injection-level5", "/css/level5/?query=a", "CSS keyframes animation XSS")
   get "/css/level5/" do |env|
     query = env.params.query["query"]
-    
+
     "<html><head>
     <style>
     @keyframes hack {
       0% { background: url('#{query}'); }
     }
-    .animated { 
+    .animated {
       animation: hack 1s;
     }
     </style>
@@ -139,13 +139,13 @@ def load_css_injection
   end
   get "/css/level5" do |env|
     query = env.params.query["query"]
-    
+
     "<html><head>
     <style>
     @keyframes hack {
       0% { background: url('#{query}'); }
     }
-    .animated { 
+    .animated {
       animation: hack 1s;
     }
     </style>
@@ -158,10 +158,10 @@ def load_css_injection
   Xssmaze.push("css-injection-level6", "/css/level6/?query=a", "CSS attr() function with HTML injection")
   get "/css/level6/" do |env|
     query = env.params.query["query"]
-    
+
     "<html><head>
     <style>
-    .attr-content::after { 
+    .attr-content::after {
       content: attr(data-content);
     }
     </style>
@@ -172,10 +172,10 @@ def load_css_injection
   end
   get "/css/level6" do |env|
     query = env.params.query["query"]
-    
+
     "<html><head>
     <style>
-    .attr-content::after { 
+    .attr-content::after {
       content: attr(data-content);
     }
     </style>
