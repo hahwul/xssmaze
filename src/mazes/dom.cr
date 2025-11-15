@@ -5,9 +5,19 @@ def load_dom
             document.write(decodeURI(location.href))
         </script>"
   end
+  get "/dom/level1" do |_|
+    "<script>
+            document.write(decodeURI(location.href))
+        </script>"
+  end
 
   Xssmaze.push("dom-level2", "/dom/level2/", "dom write (location.hash)")
   get "/dom/level2/" do |_|
+    "<script>
+            document.write(decodeURI(location.hash))
+        </script>"
+  end
+  get "/dom/level2" do |_|
     "<script>
             document.write(decodeURI(location.hash))
         </script>"
@@ -19,9 +29,21 @@ def load_dom
             document.location.href = location.hash.replace('#','')
         </script>"
   end
+  get "/dom/level3" do |_|
+    "<script>
+            document.location.href = location.hash.replace('#','')
+        </script>"
+  end
 
   Xssmaze.push("dom-level4", "/dom/level4/", "dom write (query param)")
   get "/dom/level4/" do |_|
+    "<script>
+            const urlParams = new URL(location.href).searchParams;
+            const query = urlParams.get('query');
+            document.write(query)
+        </script>"
+  end
+  get "/dom/level4" do |_|
     "<script>
             const urlParams = new URL(location.href).searchParams;
             const query = urlParams.get('query');
@@ -37,9 +59,23 @@ def load_dom
             eval(query)
         </script>"
   end
+  get "/dom/level5" do |_|
+    "<script>
+            const urlParams = new URL(location.href).searchParams;
+            const query = urlParams.get('query');
+            eval(query)
+        </script>"
+  end
 
   Xssmaze.push("dom-level6", "/dom/level6/", "location.href (query param)")
   get "/dom/level6/" do |_|
+    "<script>
+            const urlParams = new URL(location.href).searchParams;
+            const query = urlParams.get('query');
+            document.location.href = query
+        </script>"
+  end
+  get "/dom/level6" do |_|
     "<script>
             const urlParams = new URL(location.href).searchParams;
             const query = urlParams.get('query');
@@ -55,9 +91,23 @@ def load_dom
         document.getElementById('output').innerHTML = location.hash.substring(1)
     </script>"
   end
+  get "/dom/level7" do |_|
+    "<div id='output'></div>
+    <script>
+        document.getElementById('output').innerHTML = location.hash.substring(1)
+    </script>"
+  end
 
   Xssmaze.push("dom-level8", "/dom/level8/", "innerHTML (query param)")
   get "/dom/level8/" do |_|
+    "<div id='output'></div>
+    <script>
+        const urlParams = new URL(location.href).searchParams;
+        const query = urlParams.get('query');
+        document.getElementById('output').innerHTML = query
+    </script>"
+  end
+  get "/dom/level8" do |_|
     "<div id='output'></div>
     <script>
         const urlParams = new URL(location.href).searchParams;
@@ -76,10 +126,26 @@ def load_dom
         document.getElementById('scriptTag').innerText = query
     </script>"
   end
+  get "/dom/level9" do |_|
+    "<script id='scriptTag'></script>
+    <script>
+        const urlParams = new URL(location.href).searchParams;
+        const query = urlParams.get('query');
+        document.getElementById('scriptTag').innerText = query
+    </script>"
+  end
 
   # Element attribute manipulation - src
   Xssmaze.push("dom-level10", "/dom/level10/", "img src (query param)")
   get "/dom/level10/" do |_|
+    "<img id='image'>
+    <script>
+        const urlParams = new URL(location.href).searchParams;
+        const query = urlParams.get('query');
+        document.getElementById('image').src = query
+    </script>"
+  end
+  get "/dom/level10" do |_|
     "<img id='image'>
     <script>
         const urlParams = new URL(location.href).searchParams;
@@ -96,10 +162,21 @@ def load_dom
         document.getElementById('link').href = location.hash.substring(1)
     </script>"
   end
+  get "/dom/level11" do |_|
+    "<a id='link'>Click here</a>
+    <script>
+        document.getElementById('link').href = location.hash.substring(1)
+    </script>"
+  end
 
   # document.cookie reflection
   Xssmaze.push("dom-level12", "/dom/level12/", "document.write (document.cookie)")
   get "/dom/level12/" do |_|
+    "<script>
+        document.write(document.cookie)
+    </script>"
+  end
+  get "/dom/level12" do |_|
     "<script>
         document.write(document.cookie)
     </script>"
@@ -113,10 +190,21 @@ def load_dom
         document.getElementById('output').innerHTML = window.name
     </script>"
   end
+  get "/dom/level13" do |_|
+    "<div id='output'></div>
+    <script>
+        document.getElementById('output').innerHTML = window.name
+    </script>"
+  end
 
   # document.referrer reflection
   Xssmaze.push("dom-level14", "/dom/level14/", "document.write (document.referrer)")
   get "/dom/level14/" do |_|
+    "<script>
+        document.write(document.referrer)
+    </script>"
+  end
+  get "/dom/level14" do |_|
     "<script>
         document.write(document.referrer)
     </script>"
@@ -132,10 +220,24 @@ def load_dom
         document.getElementById('output').insertAdjacentHTML('beforeend', query)
     </script>"
   end
+  get "/dom/level15" do |_|
+    "<div id='output'></div>
+    <script>
+        const urlParams = new URL(location.href).searchParams;
+        const query = urlParams.get('query');
+        document.getElementById('output').insertAdjacentHTML('beforeend', query)
+    </script>"
+  end
 
   # outerHTML manipulation
   Xssmaze.push("dom-level16", "/dom/level16/", "outerHTML (location.hash)")
   get "/dom/level16/" do |_|
+    "<div id='output'>Original content</div>
+    <script>
+        document.getElementById('output').outerHTML = location.hash.substring(1)
+    </script>"
+  end
+  get "/dom/level16" do |_|
     "<div id='output'>Original content</div>
     <script>
         document.getElementById('output').outerHTML = location.hash.substring(1)
@@ -155,10 +257,27 @@ def load_dom
         document.getElementById('container').appendChild(link)
     </script>"
   end
+  get "/dom/level17" do |_|
+    "<div id='container'></div>
+    <script>
+        const urlParams = new URL(location.href).searchParams;
+        const query = urlParams.get('query');
+        const link = document.createElement('a');
+        link.setAttribute('href', query);
+        link.textContent = 'Click me';
+        document.getElementById('container').appendChild(link)
+    </script>"
+  end
 
   # iframe src manipulation
   Xssmaze.push("dom-level18", "/dom/level18/", "iframe src (location.hash)")
   get "/dom/level18/" do |_|
+    "<iframe id='frame'></iframe>
+    <script>
+        document.getElementById('frame').src = location.hash.substring(1)
+    </script>"
+  end
+  get "/dom/level18" do |_|
     "<iframe id='frame'></iframe>
     <script>
         document.getElementById('frame').src = location.hash.substring(1)
@@ -174,6 +293,13 @@ def load_dom
         setTimeout(query, 0)
     </script>"
   end
+  get "/dom/level19" do |_|
+    "<script>
+        const urlParams = new URL(location.href).searchParams;
+        const query = urlParams.get('query');
+        setTimeout(query, 0)
+    </script>"
+  end
 
   # setInterval with string
   Xssmaze.push("dom-level20", "/dom/level20/", "setInterval (location.hash)")
@@ -183,10 +309,24 @@ def load_dom
         if(hash) setInterval(hash, 1000)
     </script>"
   end
+  get "/dom/level20" do |_|
+    "<script>
+        const hash = location.hash.substring(1);
+        if(hash) setInterval(hash, 1000)
+    </script>"
+  end
 
   # Function constructor
   Xssmaze.push("dom-level21", "/dom/level21/", "Function constructor (query param)")
   get "/dom/level21/" do |_|
+    "<script>
+        const urlParams = new URL(location.href).searchParams;
+        const query = urlParams.get('query');
+        const fn = new Function(query);
+        fn()
+    </script>"
+  end
+  get "/dom/level21" do |_|
     "<script>
         const urlParams = new URL(location.href).searchParams;
         const query = urlParams.get('query');
@@ -210,6 +350,19 @@ def load_dom
         }
     </script>"
   end
+  get "/dom/level22" do |_|
+    "<div id='output'></div>
+    <script>
+        const urlParams = new URL(location.href).searchParams;
+        const query = urlParams.get('query');
+        try {
+            const data = JSON.parse(query);
+            document.getElementById('output').innerHTML = data.message
+        } catch(e) {
+            document.getElementById('output').innerHTML = 'Invalid JSON'
+        }
+    </script>"
+  end
 
   # postMessage receiver
   Xssmaze.push("dom-level23", "/dom/level23/", "postMessage + innerHTML")
@@ -221,10 +374,25 @@ def load_dom
         });
     </script>"
   end
+  get "/dom/level23" do |_|
+    "<div id='output'></div>
+    <script>
+        window.addEventListener('message', function(e) {
+            document.getElementById('output').innerHTML = e.data
+        });
+    </script>"
+  end
 
   # Template literal in eval-like context
   Xssmaze.push("dom-level24", "/dom/level24/", "template literal eval (query param)")
   get "/dom/level24/" do |_|
+    "<script>
+        const urlParams = new URL(location.href).searchParams;
+        const query = urlParams.get('query');
+        eval('`' + query + '`')
+    </script>"
+  end
+  get "/dom/level24" do |_|
     "<script>
         const urlParams = new URL(location.href).searchParams;
         const query = urlParams.get('query');
@@ -245,10 +413,26 @@ def load_dom
         }
     </script>"
   end
+  get "/dom/level25" do |_|
+    "<div id='output'></div>
+    <script>
+        const urlParams = new URL(location.href).searchParams;
+        const query = urlParams.get('query');
+        document.getElementById('output').innerHTML = '<form name=\"test\">' + query + '</form>';
+        if(window.test) {
+            console.log('DOM clobbering detected')
+        }
+    </script>"
+  end
 
   # document.URL reflection
   Xssmaze.push("dom-level26", "/dom/level26/", "document.write (document.URL)")
   get "/dom/level26/" do |_|
+    "<script>
+        document.write(document.URL)
+    </script>"
+  end
+  get "/dom/level26" do |_|
     "<script>
         document.write(document.URL)
     </script>"
@@ -262,6 +446,12 @@ def load_dom
         document.getElementById('output').innerHTML = location.search.substring(1)
     </script>"
   end
+  get "/dom/level27" do |_|
+    "<div id='output'></div>
+    <script>
+        document.getElementById('output').innerHTML = location.search.substring(1)
+    </script>"
+  end
 
   # location.pathname reflection
   Xssmaze.push("dom-level28", "/dom/level28/", "document.write (location.pathname)")
@@ -270,10 +460,23 @@ def load_dom
         document.write(location.pathname)
     </script>"
   end
+  get "/dom/level28" do |_|
+    "<script>
+        document.write(location.pathname)
+    </script>"
+  end
 
   # Anchor element with javascript: protocol
   Xssmaze.push("dom-level29", "/dom/level29/", "anchor click with javascript: (query param)")
   get "/dom/level29/" do |_|
+    "<a id='link' href='#'>Click me</a>
+    <script>
+        const urlParams = new URL(location.href).searchParams;
+        const query = urlParams.get('query');
+        document.getElementById('link').href = 'javascript:' + query
+    </script>"
+  end
+  get "/dom/level29" do |_|
     "<a id='link' href='#'>Click me</a>
     <script>
         const urlParams = new URL(location.href).searchParams;
@@ -293,6 +496,15 @@ def load_dom
         document.execCommand('insertHTML', false, query)
     </script>"
   end
+  get "/dom/level30" do |_|
+    "<div id='editor' contenteditable='true'></div>
+    <script>
+        const urlParams = new URL(location.href).searchParams;
+        const query = urlParams.get('query');
+        document.getElementById('editor').focus();
+        document.execCommand('insertHTML', false, query)
+    </script>"
+  end
 
   # Range.createContextualFragment
   Xssmaze.push("dom-level31", "/dom/level31/", "createContextualFragment (location.hash)")
@@ -304,10 +516,28 @@ def load_dom
         document.getElementById('output').appendChild(fragment)
     </script>"
   end
+  get "/dom/level31" do |_|
+    "<div id='output'></div>
+    <script>
+        const range = document.createRange();
+        const fragment = range.createContextualFragment(location.hash.substring(1));
+        document.getElementById('output').appendChild(fragment)
+    </script>"
+  end
 
   # DOMParser
   Xssmaze.push("dom-level32", "/dom/level32/", "DOMParser (query param)")
   get "/dom/level32/" do |_|
+    "<div id='output'></div>
+    <script>
+        const urlParams = new URL(location.href).searchParams;
+        const query = urlParams.get('query');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(query, 'text/html');
+        document.getElementById('output').innerHTML = doc.body.innerHTML
+    </script>"
+  end
+  get "/dom/level32" do |_|
     "<div id='output'></div>
     <script>
         const urlParams = new URL(location.href).searchParams;
@@ -329,6 +559,15 @@ def load_dom
         document.getElementById('output').innerHTML = param1 + param2
     </script>"
   end
+  get "/dom/level33" do |_|
+    "<div id='output'></div>
+    <script>
+        const urlParams = new URL(location.href).searchParams;
+        const param1 = urlParams.get('query') || '';
+        const param2 = urlParams.get('query2') || '';
+        document.getElementById('output').innerHTML = param1 + param2
+    </script>"
+  end
 
   # Object property access
   Xssmaze.push("dom-level34", "/dom/level34/", "object property innerHTML (query param)")
@@ -341,10 +580,26 @@ def load_dom
         document.getElementById('output').innerHTML = obj.value
     </script>"
   end
+  get "/dom/level34" do |_|
+    "<div id='output'></div>
+    <script>
+        const urlParams = new URL(location.href).searchParams;
+        const query = urlParams.get('query');
+        const obj = { value: query };
+        document.getElementById('output').innerHTML = obj.value
+    </script>"
+  end
 
   # Array join
   Xssmaze.push("dom-level35", "/dom/level35/", "array join innerHTML (location.hash)")
   get "/dom/level35/" do |_|
+    "<div id='output'></div>
+    <script>
+        const parts = location.hash.substring(1).split(',');
+        document.getElementById('output').innerHTML = parts.join('')
+    </script>"
+  end
+  get "/dom/level35" do |_|
     "<div id='output'></div>
     <script>
         const parts = location.hash.substring(1).split(',');
