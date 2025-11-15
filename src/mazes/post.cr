@@ -3,7 +3,14 @@ def load_post
   get "/post/level1/" do |_|
     "<form action='/post/level1/' method='post'><input type='text' name='query' value='a'><input type='submit'></form>"
   end
+  get "/post/level1" do |_|
+    "<form action='/post/level1/' method='post'><input type='text' name='query' value='a'><input type='submit'></form>"
+  end
   post "/post/level1/" do |env|
+    query = env.params.body["query"].as(String)
+    "query: #{query}"
+  end
+  post "/post/level1" do |env|
     query = env.params.body["query"].as(String)
     "query: #{query}"
   end
@@ -20,7 +27,22 @@ def load_post
             }
          </script>"
   end
+  get "/post/level2" do |_|
+    "<button onclick=send()>run</button>
+         <script>
+            function send(){
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.open('POST', '/post/level2/');
+                xmlhttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+                xmlhttp.send(JSON.stringify({\"query\":\"a\"}));
+            }
+         </script>"
+  end
   post "/post/level2/" do |env|
+    query = env.params.json["query"].as(String)
+    "query: #{query}"
+  end
+  post "/post/level2" do |env|
     query = env.params.json["query"].as(String)
     "query: #{query}"
   end
