@@ -24,9 +24,18 @@ def load_eventhandler_xss
     query = env.params.query["query"]
     common_logic(query)
   end
+  get "/eventhandler/level1" do |env|
+    query = env.params.query["query"]
+    common_logic(query)
+  end
 
   Xssmaze.push("eventhandler-xss-level2", "/eventhandler/level2/?query=a", "eventhandler-xss (level 2)")
   get "/eventhandler/level2/" do |env|
+    query = env.params.query["query"]
+    query = sanitize_query(query, 2)
+    common_logic(query)
+  end
+  get "/eventhandler/level2" do |env|
     query = env.params.query["query"]
     query = sanitize_query(query, 2)
     common_logic(query)
@@ -38,6 +47,11 @@ def load_eventhandler_xss
     query = sanitize_query(query, 3)
     common_logic(query)
   end
+  get "/eventhandler/level3" do |env|
+    query = env.params.query["query"]
+    query = sanitize_query(query, 3)
+    common_logic(query)
+  end
 
   Xssmaze.push("eventhandler-xss-level4", "/eventhandler/level4/?query=a", "eventhandler-xss (level 4)")
   get "/eventhandler/level4/" do |env|
@@ -45,9 +59,19 @@ def load_eventhandler_xss
     query = sanitize_query(query, 4)
     common_logic(query)
   end
+  get "/eventhandler/level4" do |env|
+    query = env.params.query["query"]
+    query = sanitize_query(query, 4)
+    common_logic(query)
+  end
 
   Xssmaze.push("eventhandler-xss-level5", "/eventhandler/level5/?query=a", "eventhandler-xss (level 5)")
   get "/eventhandler/level5/" do |env|
+    query = env.params.query["query"]
+    query = sanitize_query(query, 5)
+    common_logic(query)
+  end
+  get "/eventhandler/level5" do |env|
     query = env.params.query["query"]
     query = sanitize_query(query, 5)
     common_logic(query)

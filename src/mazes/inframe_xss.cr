@@ -5,9 +5,19 @@ def load_inframe_xss
 
     "<iframe src='#{query}'></iframe>"
   end
+  get "/inframe/level1" do |env|
+    query = env.params.query["url"]
+
+    "<iframe src='#{query}'></iframe>"
+  end
 
   Xssmaze.push("inframe-xss-level2", "/inframe/level2/?url=a", "src attribute in iframe tag")
   get "/inframe/level2/" do |env|
+    query = env.params.query["url"]
+
+    "<iframe src='#{query.gsub("'", "").gsub("\"", "")}'></iframe>"
+  end
+  get "/inframe/level2" do |env|
     query = env.params.query["url"]
 
     "<iframe src='#{query.gsub("'", "").gsub("\"", "")}'></iframe>"
@@ -19,9 +29,19 @@ def load_inframe_xss
 
     "<iframe src='#{query.gsub("'", "").gsub("\"", "").downcase.gsub("javascript:", "")}'></iframe>"
   end
+  get "/inframe/level3" do |env|
+    query = env.params.query["url"]
+
+    "<iframe src='#{query.gsub("'", "").gsub("\"", "").downcase.gsub("javascript:", "")}'></iframe>"
+  end
 
   Xssmaze.push("inframe-xss-level4", "/inframe/level4/?url=a", "src attribute in iframe tag")
   get "/inframe/level4/" do |env|
+    query = env.params.query["url"]
+
+    "<iframe src='#{query.gsub("'", "").gsub("\"", "").downcase.gsub("javascript:", "").gsub("alert", "")}'></iframe>"
+  end
+  get "/inframe/level4" do |env|
     query = env.params.query["url"]
 
     "<iframe src='#{query.gsub("'", "").gsub("\"", "").downcase.gsub("javascript:", "").gsub("alert", "")}'></iframe>"

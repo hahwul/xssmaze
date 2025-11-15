@@ -7,4 +7,11 @@ def load_jf_xss
         #{query.gsub(/[a-zA-Z]/, "")}
       </script>"
   end
+  get "/jf/level1" do |env|
+    query = env.params.query["query"]
+
+    "<script>
+        #{query.gsub(/[a-zA-Z]/, "")}
+      </script>"
+  end
 end
