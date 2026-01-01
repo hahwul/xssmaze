@@ -116,12 +116,14 @@ After building and running XSSMaze, ALWAYS validate functionality by:
 │   ├── xssmaze.cr         # Application entry point
 │   ├── maze.cr            # Maze class definition
 │   ├── banner.cr          # Application banner
-│   └── mazes/             # XSS vulnerability implementations
-│       ├── basic.cr       # Basic XSS scenarios
-│       ├── dom.cr         # DOM-based XSS
-│       ├── header.cr      # Header injection XSS
-│       ├── post.cr        # POST-based XSS
-│       └── [others].cr    # Additional XSS types
+│   ├── mazes/             # XSS vulnerability implementations
+│   │   ├── basic.cr       # Basic XSS scenarios
+│   │   ├── dom.cr         # DOM-based XSS
+│   │   ├── header.cr      # Header injection XSS
+│   │   ├── post.cr        # POST-based XSS
+│   │   └── [others].cr    # Additional XSS types
+│   └── protections/       # XSS protection modules
+│       └── protections.cr # Protection escape functions
 ├── spec/                  # Test files
 │   ├── spec_helper.cr     # Test configuration
 │   └── xssmaze_spec.cr    # Main test suite (minimal)
@@ -153,13 +155,20 @@ The application includes these vulnerability categories:
 - **In-Attribute XSS** (`inattr_xss.cr`): HTML attribute injection
 - **JavaScript Function XSS** (`jf_xss.cr`): Function call vulnerabilities
 - **Event Handler XSS** (`event_handler.cr`): HTML event handler injection
+- **CSP Bypass** (`csp_bypass.cr`): 5 levels of Content Security Policy bypass scenarios
+- **SVG XSS** (`svg_xss.cr`): 6 levels of SVG-based XSS vulnerabilities
+- **CSS Injection** (`css_injection.cr`): 6 levels of CSS-based injection attacks
+- **Template Injection** (`template_injection.cr`): 6 levels of template injection vulnerabilities
+- **WebSocket XSS** (`websocket_xss.cr`): 5 levels of WebSocket message-based XSS
+- **JSON XSS** (`json_xss.cr`): 6 levels of JSON response XSS vulnerabilities
+- **Advanced XSS** (`advanced_xss.cr`): 6 levels of advanced techniques (WAF bypass, mutation observer, service worker, web components, trusted types, proxy manipulation)
 
 ## Common Tasks and Troubleshooting
 
 ### Dependency Issues
 - If `shards install` fails due to network issues, check internet connectivity
 - Dependency resolution can fail if GitHub is inaccessible
-- The application requires the Kemal framework (version 1.7.2)
+- The application requires the Kemal framework (version 1.7.3)
 
 ### Build Failures
 - Ensure Crystal version matches shard.yml specification (1.8.2)
@@ -176,6 +185,8 @@ The application includes these vulnerability categories:
 - Build workflow uses `crystallang/crystal` Docker image
 - Lint workflow uses `crystal-ameba/github-action@v0.8.0`
 - Docker images are published to `ghcr.io/hahwul/xssmaze:main`
+- Security analysis workflow uses OWASP Noir (`owasp-noir/noir@v0.24.0`) for endpoint discovery
+- SBOM generation workflow uses `hahwul/cyclonedx-cr@v1.0.0` for release artifacts
 
 ## Timing Expectations and Timeouts
 
