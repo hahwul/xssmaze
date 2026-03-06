@@ -42,12 +42,14 @@ load_json_xss
 load_advanced_xss
 load_polyglot_xss
 load_browser_state_xss
+load_opener_xss
 load_storage_event_xss
 load_stream_xss
 load_channel_xss
 load_service_worker_xss
 load_history_state_xss
 load_reparse_xss
+load_referrer_xss
 
 # Index
 list = Xssmaze.get
