@@ -224,4 +224,80 @@ def load_websocket_xss
     </script>
     </body></html>"
   end
+
+  Xssmaze.push("websocket-xss-level6", "/websocket/level6/?seed=a", "WebSocket onmessage bootstrap + innerHTML")
+  get "/websocket/level6/" do |_|
+    "<html><body>
+    <h1>WebSocket XSS Level 6</h1>
+    <div id='messages'></div>
+    <script>
+      const socket = new WebSocket('wss://example.invalid/xssmaze');
+      socket.onmessage = function(event) {
+        document.getElementById('messages').innerHTML = event.data;
+      };
+
+      const url = new URL(location.href);
+      const seed = url.searchParams.get('seed');
+      if (seed) {
+        socket.onmessage({ data: seed });
+      }
+    </script>
+    </body></html>"
+  end
+  get "/websocket/level6" do |_|
+    "<html><body>
+    <h1>WebSocket XSS Level 6</h1>
+    <div id='messages'></div>
+    <script>
+      const socket = new WebSocket('wss://example.invalid/xssmaze');
+      socket.onmessage = function(event) {
+        document.getElementById('messages').innerHTML = event.data;
+      };
+
+      const url = new URL(location.href);
+      const seed = url.searchParams.get('seed');
+      if (seed) {
+        socket.onmessage({ data: seed });
+      }
+    </script>
+    </body></html>"
+  end
+
+  Xssmaze.push("websocket-xss-level7", "/websocket/level7/?seed=a", "EventSource onmessage bootstrap + insertAdjacentHTML")
+  get "/websocket/level7/" do |_|
+    "<html><body>
+    <h1>WebSocket XSS Level 7</h1>
+    <div id='messages'></div>
+    <script>
+      const stream = new EventSource('/map/text');
+      stream.onmessage = function(event) {
+        document.getElementById('messages').insertAdjacentHTML('beforeend', event.data);
+      };
+
+      const url = new URL(location.href);
+      const seed = url.searchParams.get('seed');
+      if (seed) {
+        stream.onmessage({ data: seed });
+      }
+    </script>
+    </body></html>"
+  end
+  get "/websocket/level7" do |_|
+    "<html><body>
+    <h1>WebSocket XSS Level 7</h1>
+    <div id='messages'></div>
+    <script>
+      const stream = new EventSource('/map/text');
+      stream.onmessage = function(event) {
+        document.getElementById('messages').insertAdjacentHTML('beforeend', event.data);
+      };
+
+      const url = new URL(location.href);
+      const seed = url.searchParams.get('seed');
+      if (seed) {
+        stream.onmessage({ data: seed });
+      }
+    </script>
+    </body></html>"
+  end
 end

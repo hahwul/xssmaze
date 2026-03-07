@@ -40,6 +40,16 @@ load_template_injection
 load_websocket_xss
 load_json_xss
 load_advanced_xss
+load_polyglot_xss
+load_browser_state_xss
+load_opener_xss
+load_storage_event_xss
+load_stream_xss
+load_channel_xss
+load_service_worker_xss
+load_history_state_xss
+load_reparse_xss
+load_referrer_xss
 
 # Index
 list = Xssmaze.get
@@ -219,7 +229,7 @@ get "/" do
   <div class='header'>
     <h1>XSSMaze</h1>
     <p class='description'>XSSMaze is a web service configured to be vulnerable to XSS and is intended to measure and enhance the performance of security testing tools.</p>
-    <p class='description'>All vulnerable parameters are named <code>query</code>.</p>
+    <p class='description'>Most challenges use <code>query</code>, but some cases use parameters such as <code>callback</code>, <code>query2</code>, <code>seed</code>, <code>blob</code>, <code>url</code>, path segments, or request headers.</p>
     <p class='description'>You can find several vulnerable cases in the list below.</p>
     <div class='map-links'>
       <strong>Endpoint Map:</strong>
