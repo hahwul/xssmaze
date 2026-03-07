@@ -1,13 +1,6 @@
 def load_injs_xss
   Xssmaze.push("injs-xss-level1", "/injs/level1/?query=a", "injs-xss")
-  get "/injs/level1/" do |env|
-    query = env.params.query["query"]
-
-    "<script>
-        var data = #{query};
-    </script>"
-  end
-  get "/injs/level1" do |env|
+  maze_get "/injs/level1/" do |env|
     query = env.params.query["query"]
 
     "<script>
@@ -16,14 +9,7 @@ def load_injs_xss
   end
 
   Xssmaze.push("injs-xss-level2", "/injs/level2/?query=a", "injs-xss - in single quote")
-  get "/injs/level2/" do |env|
-    query = env.params.query["query"]
-
-    "<script>
-        var data = '#{query}';
-    </script>"
-  end
-  get "/injs/level2" do |env|
+  maze_get "/injs/level2/" do |env|
     query = env.params.query["query"]
 
     "<script>
@@ -32,14 +18,7 @@ def load_injs_xss
   end
 
   Xssmaze.push("injs-xss-level3", "/injs/level3/?query=a", "injs-xss - in double quote")
-  get "/injs/level3/" do |env|
-    query = env.params.query["query"]
-
-    "<script>
-        var data = \"#{query}\";
-    </script>"
-  end
-  get "/injs/level3" do |env|
+  maze_get "/injs/level3/" do |env|
     query = env.params.query["query"]
 
     "<script>
@@ -48,14 +27,7 @@ def load_injs_xss
   end
 
   Xssmaze.push("injs-xss-level4", "/injs/level4/?query=a", "injs-xss - in single quote and double quote")
-  get "/injs/level4/" do |env|
-    query = env.params.query["query"].gsub("'", "")
-
-    "<script>
-        var data = '#{query}' // this is '#{query}';
-    </script>"
-  end
-  get "/injs/level4" do |env|
+  maze_get "/injs/level4/" do |env|
     query = env.params.query["query"].gsub("'", "")
 
     "<script>
@@ -64,14 +36,7 @@ def load_injs_xss
   end
 
   Xssmaze.push("injs-xss-level5", "/injs/level5/?query=a", "injs-xss - in comments style 1")
-  get "/injs/level5/" do |env|
-    query = env.params.query["query"]
-
-    "<script>
-        /* this is '#{query}' */
-    </script>"
-  end
-  get "/injs/level5" do |env|
+  maze_get "/injs/level5/" do |env|
     query = env.params.query["query"]
 
     "<script>
@@ -80,14 +45,7 @@ def load_injs_xss
   end
 
   Xssmaze.push("injs-xss-level6", "/injs/level6/?query=a", "injs-xss - in comments style 2")
-  get "/injs/level6/" do |env|
-    query = env.params.query["query"]
-
-    "<script>
-        // this is '#{query}'
-    </script>"
-  end
-  get "/injs/level6" do |env|
+  maze_get "/injs/level6/" do |env|
     query = env.params.query["query"]
 
     "<script>

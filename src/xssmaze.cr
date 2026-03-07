@@ -1,4 +1,5 @@
 require "kemal"
+require "./route_helper"
 require "./maze"
 require "./mazes/**"
 require "./banner"
@@ -58,34 +59,27 @@ list = Xssmaze.get
 grouped_mazes = Hash(String, Array(Maze)).new
 
 list.each do |obj|
-  # Extract type from name (e.g., "basic-level1" -> "basic")
   parts = obj.name.split("-")
   type = parts.size > 0 ? parts[0] : "other"
   grouped_mazes[type] ||= [] of Maze
   grouped_mazes[type] << obj
 end
 
-# Sort types alphabetically
 sorted_types = grouped_mazes.keys.sort!
 
-# Build hierarchical HTML
-indexdata = "<div class='container'>
-  <ul class='list'>"
-
-sorted_types.each do |type|
-  indexdata += "<li>#{type}"
-
-  mazes = grouped_mazes[type]
-  indexdata += "<ul class='list'>"
-  mazes.each do |maze|
-    indexdata += "<li><a href='#{maze.url}'>#{maze.name}</a> - #{maze.desc}</li>"
+indexdata = String.build do |io|
+  io << "<div class='container'>\n  <ul class='list'>"
+  sorted_types.each do |type|
+    io << "<li>#{type}"
+    io << "<ul class='list'>"
+    grouped_mazes[type].each do |maze|
+      io << "<li><a href='#{maze.url}'>#{maze.name}</a> - #{maze.desc}</li>"
+    end
+    io << "</ul>"
+    io << "</li>"
   end
-  indexdata += "</ul>"
-
-  indexdata += "</li>"
+  io << "</ul></div>"
 end
-
-indexdata += "</ul></div>"
 
 get "/" do
   "<!DOCTYPE html>
@@ -244,23 +238,13 @@ end
 
 get "/map/text" do |env|
   env.response.content_type = "text/plain"
-  tmp = ""
-  list.each do |obj|
-    tmp += "#{obj.url}\n"
-  end
-
-  tmp
+  list.join("\n") { |obj| obj.url }
 end
 
 get "/map/json" do |env|
   env.response.content_type = "application/json"
-  tmp = "{\"endpoints\": ["
-  list.each do |obj|
-    tmp += "\"#{obj.url}\","
-  end
-  tmp = tmp[0...-1] + "]}"
-
-  tmp
+  endpoints = list.join(", ") { |obj| "\"#{obj.url}\"" }
+  "{\"endpoints\": [#{endpoints}]}"
 end
 
 Kemal.run
