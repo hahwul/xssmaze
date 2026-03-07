@@ -1,2 +1,4 @@
 require "spec"
-require "../src/xssmaze"
+require "json"
+require "../src/filters"
+require "../src/maze"

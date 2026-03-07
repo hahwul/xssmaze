@@ -5,4 +5,8 @@ class Maze
 
   def initialize(@name, @url, @desc)
   end
+
+  def type : String
+    @name.split("-").first? || "other"
+  end
 end

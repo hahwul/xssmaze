@@ -1,4 +1,6 @@
+require "json"
 require "kemal"
+require "./filters"
 require "./route_helper"
 require "./maze"
 require "./mazes/**"
@@ -16,79 +18,36 @@ module Xssmaze
   def self.get
     @@mazes
   end
-end
 
-banner
-
-# Routes
-load_basic
-load_dom
-load_header
-load_path
-load_post
-load_redirect
-load_decode
-load_hidden_xss
-load_injs_xss
-load_inframe_xss
-load_inattr_xss
-load_jf_xss
-load_eventhandler_xss
-load_csp_bypass
-load_svg_xss
-load_css_injection
-load_template_injection
-load_websocket_xss
-load_json_xss
-load_advanced_xss
-load_polyglot_xss
-load_browser_state_xss
-load_opener_xss
-load_storage_event_xss
-load_stream_xss
-load_channel_xss
-load_service_worker_xss
-load_history_state_xss
-load_reparse_xss
-load_referrer_xss
-
-# Index
-list = Xssmaze.get
-
-# Group mazes by type
-grouped_mazes = Hash(String, Array(Maze)).new
-
-list.each do |obj|
-  parts = obj.name.split("-")
-  type = parts.size > 0 ? parts[0] : "other"
-  grouped_mazes[type] ||= [] of Maze
-  grouped_mazes[type] << obj
-end
-
-sorted_types = grouped_mazes.keys.sort!
-
-indexdata = String.build do |io|
-  io << "<div class='container'>\n  <ul class='list'>"
-  sorted_types.each do |type|
-    io << "<li>#{type}"
-    io << "<ul class='list'>"
-    grouped_mazes[type].each do |maze|
-      io << "<li><a href='#{maze.url}'>#{maze.name}</a> - #{maze.desc}</li>"
+  def self.grouped_mazes : Hash(String, Array(Maze))
+    groups = Hash(String, Array(Maze)).new
+    @@mazes.each do |maze|
+      groups[maze.type] ||= [] of Maze
+      groups[maze.type] << maze
     end
-    io << "</ul>"
-    io << "</li>"
+    groups
   end
-  io << "</ul></div>"
-end
 
-get "/" do
-  "<!DOCTYPE html>
-<html lang='en'>
-<head>
-  <meta charset='UTF-8'>
-  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-  <title>XSSMaze</title>
-  <style>
+  def self.build_maze_list : String
+    groups = grouped_mazes
+    sorted_types = groups.keys.sort!
+
+    String.build do |io|
+      io << "<div class='container'>\n  <ul class='list'>"
+      sorted_types.each do |type|
+        io << "<li>#{type}"
+        io << "<ul class='list'>"
+        groups[type].each do |maze|
+          io << "<li><a href='#{maze.url}'>#{maze.name}</a> - #{maze.desc}</li>"
+        end
+        io << "</ul>"
+        io << "</li>"
+      end
+      io << "</ul></div>"
+    end
+  end
+
+  INDEX_CSS = <<-CSS
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       margin: 0;
@@ -217,6 +176,19 @@ get "/" do
         padding: 10px;
       }
     }
+  CSS
+
+  def self.index_html : String
+    maze_list = build_maze_list
+
+    "<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>XSSMaze</title>
+  <style>
+#{INDEX_CSS}
   </style>
 </head>
 <body>
@@ -231,9 +203,52 @@ get "/" do
       <a href='/map/json'>JSON</a>
     </div>
   </div>
-  #{indexdata}
+  #{maze_list}
 </body>
 </html>"
+  end
+end
+
+banner
+
+# Routes
+load_basic
+load_dom
+load_header
+load_path
+load_post
+load_redirect
+load_decode
+load_hidden_xss
+load_injs_xss
+load_inframe_xss
+load_inattr_xss
+load_jf_xss
+load_eventhandler_xss
+load_csp_bypass
+load_svg_xss
+load_css_injection
+load_template_injection
+load_websocket_xss
+load_json_xss
+load_advanced_xss
+load_polyglot_xss
+load_browser_state_xss
+load_opener_xss
+load_storage_event_xss
+load_stream_xss
+load_channel_xss
+load_service_worker_xss
+load_history_state_xss
+load_reparse_xss
+load_referrer_xss
+
+# Index (computed once at startup)
+cached_index = Xssmaze.index_html
+list = Xssmaze.get
+
+get "/" do
+  cached_index
 end
 
 get "/map/text" do |env|
@@ -243,8 +258,7 @@ end
 
 get "/map/json" do |env|
   env.response.content_type = "application/json"
-  endpoints = list.join(", ") { |obj| "\"#{obj.url}\"" }
-  "{\"endpoints\": [#{endpoints}]}"
+  {endpoints: list.map(&.url)}.to_json
 end
 
 Kemal.run
