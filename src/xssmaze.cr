@@ -253,7 +253,7 @@ end
 
 get "/map/text" do |env|
   env.response.content_type = "text/plain"
-  list.join("\n") { |obj| obj.url }
+  list.join("\n", &.url)
 end
 
 get "/map/json" do |env|
