@@ -11,7 +11,7 @@ def load_reparse_xss
     </script>"
   end
 
-  Xssmaze.push("reparse-level2", "/reparse/level2/?blob=query=a", "nested querystring reparse + template.content clone")
+  Xssmaze.push("reparse-level2", "/reparse/level2/?blob=query=a", "nested querystring reparse + template.content clone", "GET", ["blob"])
   maze_get "/reparse/level2/" do |_|
     "<div id='output'></div>
     <template id='wrapper'></template>
@@ -41,7 +41,7 @@ def load_reparse_xss
     </script>"
   end
 
-  Xssmaze.push("reparse-level4", "/reparse/level4/?blob=html=a", "nested blob reparse + srcdoc wrapper")
+  Xssmaze.push("reparse-level4", "/reparse/level4/?blob=html=a", "nested blob reparse + srcdoc wrapper", "GET", ["blob"])
   maze_get "/reparse/level4/" do |_|
     "<iframe id='preview'></iframe>
     <script>
@@ -56,7 +56,7 @@ def load_reparse_xss
     </script>"
   end
 
-  Xssmaze.push("reparse-level5", "/reparse/level5/?blob=outer=query=a", "double nested querystring reparse + innerHTML")
+  Xssmaze.push("reparse-level5", "/reparse/level5/?blob=outer=query=a", "double nested querystring reparse + innerHTML", "GET", ["blob"])
   maze_get "/reparse/level5/" do |_|
     "<div id='output'></div>
     <script>

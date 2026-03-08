@@ -1,5 +1,5 @@
 def load_storage_event_xss
-  Xssmaze.push("storage-event-level1", "/storage-event/level1/?seed=a", "storage event newValue + innerHTML")
+  Xssmaze.push("storage-event-level1", "/storage-event/level1/?seed=a", "storage event newValue + innerHTML", "GET", ["seed"])
   maze_get "/storage-event/level1/" do |_|
     "<div id='output'></div>
     <iframe id='listener' style='display:none'></iframe>
@@ -31,7 +31,7 @@ def load_storage_event_xss
     </script>"
   end
 
-  Xssmaze.push("storage-event-level2", "/storage-event/level2/?seed=a", "storage event oldValue + srcdoc")
+  Xssmaze.push("storage-event-level2", "/storage-event/level2/?seed=a", "storage event oldValue + srcdoc", "GET", ["seed"])
   maze_get "/storage-event/level2/" do |_|
     "<iframe id='preview'></iframe>
     <iframe id='listener' style='display:none'></iframe>

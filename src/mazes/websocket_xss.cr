@@ -117,7 +117,7 @@ def load_websocket_xss
     </body></html>"
   end
 
-  Xssmaze.push("websocket-xss-level6", "/websocket/level6/?seed=a", "WebSocket onmessage bootstrap + innerHTML")
+  Xssmaze.push("websocket-xss-level6", "/websocket/level6/?seed=a", "WebSocket onmessage bootstrap + innerHTML", "GET", ["seed"])
   maze_get "/websocket/level6/" do |_|
     "<html><body>
     <h1>WebSocket XSS Level 6</h1>
@@ -137,7 +137,7 @@ def load_websocket_xss
     </body></html>"
   end
 
-  Xssmaze.push("websocket-xss-level7", "/websocket/level7/?seed=a", "EventSource onmessage bootstrap + insertAdjacentHTML")
+  Xssmaze.push("websocket-xss-level7", "/websocket/level7/?seed=a", "EventSource onmessage bootstrap + insertAdjacentHTML", "GET", ["seed"])
   maze_get "/websocket/level7/" do |_|
     "<html><body>
     <h1>WebSocket XSS Level 7</h1>

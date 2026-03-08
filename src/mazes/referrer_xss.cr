@@ -1,5 +1,5 @@
 def load_referrer_xss
-  Xssmaze.push("referrer-level1", "/referrer/level1/?seed=a", "document.referrer reparse + createContextualFragment")
+  Xssmaze.push("referrer-level1", "/referrer/level1/?seed=a", "document.referrer reparse + createContextualFragment", "GET", ["seed"])
   maze_get "/referrer/level1/" do |_|
     "<div id='output'></div>
     <script>
@@ -12,7 +12,7 @@ def load_referrer_xss
     </script>"
   end
 
-  Xssmaze.push("referrer-level2", "/referrer/level2/?seed=a", "document.referrer reparse + template innerHTML clone")
+  Xssmaze.push("referrer-level2", "/referrer/level2/?seed=a", "document.referrer reparse + template innerHTML clone", "GET", ["seed"])
   maze_get "/referrer/level2/" do |_|
     "<div id='output'></div>
     <script>

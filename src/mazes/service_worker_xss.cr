@@ -1,5 +1,5 @@
 def load_service_worker_xss
-  Xssmaze.push("service-worker-level1", "/service-worker/level1/?seed=a", "ServiceWorker message bootstrap + innerHTML")
+  Xssmaze.push("service-worker-level1", "/service-worker/level1/?seed=a", "ServiceWorker message bootstrap + innerHTML", "GET", ["seed"])
   maze_get "/service-worker/level1/" do |_|
     "<div id='output'></div>
     <script>
@@ -20,7 +20,7 @@ def load_service_worker_xss
     </script>"
   end
 
-  Xssmaze.push("service-worker-level2", "/service-worker/level2/?seed=a", "ServiceWorker message JSON relay + srcdoc")
+  Xssmaze.push("service-worker-level2", "/service-worker/level2/?seed=a", "ServiceWorker message JSON relay + srcdoc", "GET", ["seed"])
   maze_get "/service-worker/level2/" do |_|
     "<iframe id='preview'></iframe>
     <script>

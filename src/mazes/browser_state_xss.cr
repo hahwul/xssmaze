@@ -1,5 +1,5 @@
 def load_browser_state_xss
-  Xssmaze.push("browser-state-level1", "/browser-state/level1/?seed=a", "window.name bootstrap + innerHTML")
+  Xssmaze.push("browser-state-level1", "/browser-state/level1/?seed=a", "window.name bootstrap + innerHTML", "GET", ["seed"])
   maze_get "/browser-state/level1/" do |_|
     "<div id='output'></div>
     <script>
@@ -16,7 +16,7 @@ def load_browser_state_xss
     </script>"
   end
 
-  Xssmaze.push("browser-state-level2", "/browser-state/level2/?seed=a", "localStorage relay + insertAdjacentHTML")
+  Xssmaze.push("browser-state-level2", "/browser-state/level2/?seed=a", "localStorage relay + insertAdjacentHTML", "GET", ["seed"])
   maze_get "/browser-state/level2/" do |_|
     "<div id='output'></div>
     <script>
@@ -34,7 +34,7 @@ def load_browser_state_xss
     </script>"
   end
 
-  Xssmaze.push("browser-state-level3", "/browser-state/level3/?seed=a", "sessionStorage relay + createContextualFragment")
+  Xssmaze.push("browser-state-level3", "/browser-state/level3/?seed=a", "sessionStorage relay + createContextualFragment", "GET", ["seed"])
   maze_get "/browser-state/level3/" do |_|
     "<div id='output'></div>
     <script>
@@ -54,7 +54,7 @@ def load_browser_state_xss
     </script>"
   end
 
-  Xssmaze.push("browser-state-level4", "/browser-state/level4/?seed=a", "postMessage relay + structured data + innerHTML")
+  Xssmaze.push("browser-state-level4", "/browser-state/level4/?seed=a", "postMessage relay + structured data + innerHTML", "GET", ["seed"])
   maze_get "/browser-state/level4/" do |_|
     "<div id='output'></div>
     <iframe id='relay' sandbox='allow-scripts' style='display:none'></iframe>
@@ -72,7 +72,7 @@ def load_browser_state_xss
     </script>"
   end
 
-  Xssmaze.push("browser-state-level5", "/browser-state/level5/?seed=a", "document.referrer bootstrap + document.write")
+  Xssmaze.push("browser-state-level5", "/browser-state/level5/?seed=a", "document.referrer bootstrap + document.write", "GET", ["seed"])
   maze_get "/browser-state/level5/" do |_|
     "<div id='output'></div>
     <iframe id='relay' style='display:none'></iframe>

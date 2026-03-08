@@ -1,19 +1,19 @@
 def load_dom
-  Xssmaze.push("dom-level1", "/dom/level1/", "dom write (location.href)")
+  Xssmaze.push("dom-level1", "/dom/level1/", "dom write (location.href)", "GET", ["#hash"])
   maze_get "/dom/level1/" do |_|
     "<script>
             document.write(decodeURI(location.href))
         </script>"
   end
 
-  Xssmaze.push("dom-level2", "/dom/level2/", "dom write (location.hash)")
+  Xssmaze.push("dom-level2", "/dom/level2/", "dom write (location.hash)", "GET", ["#hash"])
   maze_get "/dom/level2/" do |_|
     "<script>
             document.write(decodeURI(location.hash))
         </script>"
   end
 
-  Xssmaze.push("dom-level3", "/dom/level3/", "redirect (location.hash)")
+  Xssmaze.push("dom-level3", "/dom/level3/", "redirect (location.hash)", "GET", ["#hash"])
   maze_get "/dom/level3/" do |_|
     "<script>
             document.location.href = location.hash.replace('#','')
@@ -48,7 +48,7 @@ def load_dom
   end
 
   # Simple innerHTML manipulation
-  Xssmaze.push("dom-level7", "/dom/level7/", "innerHTML (location.hash)")
+  Xssmaze.push("dom-level7", "/dom/level7/", "innerHTML (location.hash)", "GET", ["#hash"])
   maze_get "/dom/level7/" do |_|
     "<div id='output'></div>
     <script>
@@ -89,7 +89,7 @@ def load_dom
   end
 
   # Element attribute manipulation - href
-  Xssmaze.push("dom-level11", "/dom/level11/", "anchor href (location.hash)")
+  Xssmaze.push("dom-level11", "/dom/level11/", "anchor href (location.hash)", "GET", ["#hash"])
   maze_get "/dom/level11/" do |_|
     "<a id='link'>Click here</a>
     <script>
@@ -98,7 +98,7 @@ def load_dom
   end
 
   # document.cookie reflection
-  Xssmaze.push("dom-level12", "/dom/level12/", "document.write (document.cookie)")
+  Xssmaze.push("dom-level12", "/dom/level12/", "document.write (document.cookie)", "GET", ["document.cookie"])
   maze_get "/dom/level12/" do |_|
     "<script>
         document.write(document.cookie)
@@ -106,7 +106,7 @@ def load_dom
   end
 
   # window.name reflection
-  Xssmaze.push("dom-level13", "/dom/level13/", "innerHTML (window.name)")
+  Xssmaze.push("dom-level13", "/dom/level13/", "innerHTML (window.name)", "GET", ["window.name"])
   maze_get "/dom/level13/" do |_|
     "<div id='output'></div>
     <script>
@@ -115,7 +115,7 @@ def load_dom
   end
 
   # document.referrer reflection
-  Xssmaze.push("dom-level14", "/dom/level14/", "document.write (document.referrer)")
+  Xssmaze.push("dom-level14", "/dom/level14/", "document.write (document.referrer)", "GET", ["document.referrer"])
   maze_get "/dom/level14/" do |_|
     "<script>
         document.write(document.referrer)
@@ -134,7 +134,7 @@ def load_dom
   end
 
   # outerHTML manipulation
-  Xssmaze.push("dom-level16", "/dom/level16/", "outerHTML (location.hash)")
+  Xssmaze.push("dom-level16", "/dom/level16/", "outerHTML (location.hash)", "GET", ["#hash"])
   maze_get "/dom/level16/" do |_|
     "<div id='output'>Original content</div>
     <script>
@@ -157,7 +157,7 @@ def load_dom
   end
 
   # iframe src manipulation
-  Xssmaze.push("dom-level18", "/dom/level18/", "iframe src (location.hash)")
+  Xssmaze.push("dom-level18", "/dom/level18/", "iframe src (location.hash)", "GET", ["#hash"])
   maze_get "/dom/level18/" do |_|
     "<iframe id='frame'></iframe>
     <script>
@@ -176,7 +176,7 @@ def load_dom
   end
 
   # setInterval with string
-  Xssmaze.push("dom-level20", "/dom/level20/", "setInterval (location.hash)")
+  Xssmaze.push("dom-level20", "/dom/level20/", "setInterval (location.hash)", "GET", ["#hash"])
   maze_get "/dom/level20/" do |_|
     "<script>
         const hash = location.hash.substring(1);
@@ -212,7 +212,7 @@ def load_dom
   end
 
   # postMessage receiver
-  Xssmaze.push("dom-level23", "/dom/level23/", "postMessage + innerHTML")
+  Xssmaze.push("dom-level23", "/dom/level23/", "postMessage + innerHTML", "GET", ["postMessage"])
   maze_get "/dom/level23/" do |_|
     "<div id='output'></div>
     <script>
@@ -247,7 +247,7 @@ def load_dom
   end
 
   # document.URL reflection
-  Xssmaze.push("dom-level26", "/dom/level26/", "document.write (document.URL)")
+  Xssmaze.push("dom-level26", "/dom/level26/", "document.write (document.URL)", "GET", ["document.URL"])
   maze_get "/dom/level26/" do |_|
     "<script>
         document.write(document.URL)
@@ -295,7 +295,7 @@ def load_dom
   end
 
   # Range.createContextualFragment
-  Xssmaze.push("dom-level31", "/dom/level31/", "createContextualFragment (location.hash)")
+  Xssmaze.push("dom-level31", "/dom/level31/", "createContextualFragment (location.hash)", "GET", ["#hash"])
   maze_get "/dom/level31/" do |_|
     "<div id='output'></div>
     <script>
@@ -319,7 +319,7 @@ def load_dom
   end
 
   # Multiple URL parameters concatenated
-  Xssmaze.push("dom-level33", "/dom/level33/", "multiple params concatenation")
+  Xssmaze.push("dom-level33", "/dom/level33/", "multiple params concatenation", "GET", ["query", "query2"])
   maze_get "/dom/level33/" do |_|
     "<div id='output'></div>
     <script>
@@ -343,7 +343,7 @@ def load_dom
   end
 
   # Array join
-  Xssmaze.push("dom-level35", "/dom/level35/", "array join innerHTML (location.hash)")
+  Xssmaze.push("dom-level35", "/dom/level35/", "array join innerHTML (location.hash)", "GET", ["#hash"])
   maze_get "/dom/level35/" do |_|
     "<div id='output'></div>
     <script>

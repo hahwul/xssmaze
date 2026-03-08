@@ -1,5 +1,5 @@
 def load_opener_xss
-  Xssmaze.push("opener-level1", "/opener/level1/?seed=a", "window.opener bootstrap + innerHTML")
+  Xssmaze.push("opener-level1", "/opener/level1/?seed=a", "window.opener bootstrap + innerHTML", "GET", ["seed"])
   maze_get "/opener/level1/" do |_|
     "<div id='output'></div>
     <script>
@@ -14,7 +14,7 @@ def load_opener_xss
     </script>"
   end
 
-  Xssmaze.push("opener-level2", "/opener/level2/?seed=a", "window.opener object relay + srcdoc")
+  Xssmaze.push("opener-level2", "/opener/level2/?seed=a", "window.opener object relay + srcdoc", "GET", ["seed"])
   maze_get "/opener/level2/" do |_|
     "<iframe id='preview'></iframe>
     <script>

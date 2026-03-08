@@ -10,8 +10,8 @@ module Xssmaze
   VERSION = "0.1.0"
   @@mazes = [] of Maze
 
-  def self.push(name : String, url : String, desc : String)
-    maze = Maze.new(name, url, desc)
+  def self.push(name : String, url : String, desc : String, method : String = "GET", params : Array(String) = ["query"])
+    maze = Maze.new(name, url, desc, method, params)
     @@mazes << maze
   end
 
@@ -242,6 +242,12 @@ load_service_worker_xss
 load_history_state_xss
 load_reparse_xss
 load_referrer_xss
+load_prototype_pollution_xss
+load_mxss
+load_stored_xss
+load_shadow_dom_xss
+load_csti_xss
+load_import_map_xss
 
 # Index (computed once at startup)
 cached_index = Xssmaze.index_html
@@ -258,7 +264,7 @@ end
 
 get "/map/json" do |env|
   env.response.content_type = "application/json"
-  {endpoints: list.map(&.url)}.to_json
+  {endpoints: list.map(&.to_json_object)}.to_json
 end
 
 Kemal.run

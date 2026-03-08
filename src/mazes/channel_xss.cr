@@ -1,5 +1,5 @@
 def load_channel_xss
-  Xssmaze.push("channel-level1", "/channel/level1/?seed=a", "BroadcastChannel relay + innerHTML")
+  Xssmaze.push("channel-level1", "/channel/level1/?seed=a", "BroadcastChannel relay + innerHTML", "GET", ["seed"])
   maze_get "/channel/level1/" do |_|
     "<div id='output'></div>
     <script>
@@ -17,7 +17,7 @@ def load_channel_xss
     </script>"
   end
 
-  Xssmaze.push("channel-level2", "/channel/level2/?seed=a", "MessageChannel port relay + insertAdjacentHTML")
+  Xssmaze.push("channel-level2", "/channel/level2/?seed=a", "MessageChannel port relay + insertAdjacentHTML", "GET", ["seed"])
   maze_get "/channel/level2/" do |_|
     "<div id='output'></div>
     <script>
@@ -34,7 +34,7 @@ def load_channel_xss
     </script>"
   end
 
-  Xssmaze.push("channel-level3", "/channel/level3/?seed=a", "Worker message relay + createContextualFragment")
+  Xssmaze.push("channel-level3", "/channel/level3/?seed=a", "Worker message relay + createContextualFragment", "GET", ["seed"])
   maze_get "/channel/level3/" do |_|
     "<div id='output'></div>
     <script>
@@ -59,7 +59,7 @@ def load_channel_xss
     </script>"
   end
 
-  Xssmaze.push("channel-level4", "/channel/level4/?seed=a", "BroadcastChannel JSON relay + srcdoc sink")
+  Xssmaze.push("channel-level4", "/channel/level4/?seed=a", "BroadcastChannel JSON relay + srcdoc sink", "GET", ["seed"])
   maze_get "/channel/level4/" do |_|
     "<iframe id='preview'></iframe>
     <script>

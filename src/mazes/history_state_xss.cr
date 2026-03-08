@@ -1,5 +1,5 @@
 def load_history_state_xss
-  Xssmaze.push("history-state-level1", "/history-state/level1/?seed=a", "history.replaceState bootstrap + innerHTML")
+  Xssmaze.push("history-state-level1", "/history-state/level1/?seed=a", "history.replaceState bootstrap + innerHTML", "GET", ["seed"])
   maze_get "/history-state/level1/" do |_|
     "<div id='output'></div>
     <script>
@@ -14,7 +14,7 @@ def load_history_state_xss
     </script>"
   end
 
-  Xssmaze.push("history-state-level2", "/history-state/level2/?seed=a", "history.replaceState object bootstrap + srcdoc sink")
+  Xssmaze.push("history-state-level2", "/history-state/level2/?seed=a", "history.replaceState object bootstrap + srcdoc sink", "GET", ["seed"])
   maze_get "/history-state/level2/" do |_|
     "<iframe id='preview'></iframe>
     <script>

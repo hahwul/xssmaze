@@ -1,5 +1,5 @@
 def load_stream_xss
-  Xssmaze.push("stream-level1", "/stream/level1/?seed=a", "EventSource message event + innerHTML")
+  Xssmaze.push("stream-level1", "/stream/level1/?seed=a", "EventSource message event + innerHTML", "GET", ["seed"])
   maze_get "/stream/level1/" do |_|
     "<div id='output'></div>
     <script>
@@ -17,7 +17,7 @@ def load_stream_xss
     </script>"
   end
 
-  Xssmaze.push("stream-level2", "/stream/level2/?seed=a", "WebSocket message event + JSON relay + srcdoc")
+  Xssmaze.push("stream-level2", "/stream/level2/?seed=a", "WebSocket message event + JSON relay + srcdoc", "GET", ["seed"])
   maze_get "/stream/level2/" do |_|
     "<iframe id='preview'></iframe>
     <script>
@@ -40,7 +40,7 @@ def load_stream_xss
     </script>"
   end
 
-  Xssmaze.push("stream-level3", "/stream/level3/?seed=a", "SharedWorker message relay + createContextualFragment")
+  Xssmaze.push("stream-level3", "/stream/level3/?seed=a", "SharedWorker message relay + createContextualFragment", "GET", ["seed"])
   maze_get "/stream/level3/" do |_|
     "<div id='output'></div>
     <script>
