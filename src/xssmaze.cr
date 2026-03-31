@@ -324,6 +324,36 @@ load_real_world_pattern_xss
 load_wrapper_context_xss
 load_complex_page_xss
 load_tag_attribute_mix_xss
+load_script_gadget_xss
+load_encoding_edge_xss
+load_multi_vector_xss
+load_sanitizer_edge_xss
+load_hidden_reflection_xss
+load_prototype_xss
+load_framework_output_xss
+load_payload_filter_xss
+load_late_reflection_xss
+load_api_response_xss
+load_attribute_event_xss
+load_url_param_context_xss
+load_seo_context_xss
+load_js_string_escape_xss
+load_custom_tag_xss
+load_embed_context_xss
+load_global_attr_xss
+load_error_handling_xss
+load_aria_attr_xss
+load_microdata_xss
+load_inline_style_xss
+load_numeric_context_xss
+load_boolean_attr_xss
+load_list_iteration_xss
+load_cms_pattern_xss
+load_ecommerce_xss
+load_dashboard_xss
+load_email_template_xss
+load_social_media_xss
+load_misc_context_xss
 
 # Index (computed once at startup)
 cached_index = Xssmaze.index_html

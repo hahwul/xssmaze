@@ -12,13 +12,13 @@ def load_conditional_reflect_xss
     end
   end
 
-  # Level 2: Reflects only if input contains letter 'a'
-  # Most payloads contain 'a' (alert, onerror, animate, etc.)
-  Xssmaze.push("condreflect-level2", "/condreflect/level2/?query=a", "reflects only if input contains letter a")
+  # Level 2: Reflects only if input contains a digit
+  # Most payloads and scanner markers contain digits
+  Xssmaze.push("condreflect-level2", "/condreflect/level2/?query=a", "reflects only if input contains a digit")
   maze_get "/condreflect/level2/" do |env|
     query = env.params.query["query"]
 
-    if query.includes?("a") || query.includes?("A")
+    if query.matches?(/[0-9]/)
       "<html><body><div>#{query}</div></body></html>"
     else
       "<html><body><div>No results</div></body></html>"
