@@ -294,6 +294,21 @@ load_nested_context_xss
 load_csp_bypass_xss
 load_dom_context_xss
 load_edge_filter_xss
+load_polyglot_context_xss
+load_whitespace_xss
+load_double_reflection_xss
+load_case_manipulation_xss
+load_json_context_xss
+load_error_page_xss
+load_partial_encode_xss
+load_data_attribute_xss
+load_mixed_method_xss
+load_table_context_xss
+load_media_context_xss
+load_special_char_xss
+load_semantic_tag_xss
+load_form_element_xss
+load_link_context_xss
 
 # Index (computed once at startup)
 cached_index = Xssmaze.index_html
