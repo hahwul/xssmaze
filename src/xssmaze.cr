@@ -279,6 +279,21 @@ load_template_injection_xss
 load_encoding_mix_xss
 load_waf_bypass_v2_xss
 load_context_escape_v2_xss
+load_fragment_xss
+load_header_injection_xss
+load_js_context_xss
+load_attribute_context_xss
+load_post_method_xss
+load_redirect_xss
+load_svg_context_xss
+load_obfuscation_xss
+load_multi_param_xss
+load_truncation_xss
+load_comment_injection_xss
+load_nested_context_xss
+load_csp_bypass_xss
+load_dom_context_xss
+load_edge_filter_xss
 
 # Index (computed once at startup)
 cached_index = Xssmaze.index_html
