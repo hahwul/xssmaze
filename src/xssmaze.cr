@@ -309,6 +309,21 @@ load_special_char_xss
 load_semantic_tag_xss
 load_form_element_xss
 load_link_context_xss
+load_xml_context_xss
+load_regex_filter_xss
+load_path_based_xss
+load_char_limit_filter_xss
+load_multiline_xss
+load_response_header_xss
+load_replacement_filter_xss
+load_input_transform_xss
+load_multiple_output_xss
+load_conditional_reflect_xss
+load_nested_filter_xss
+load_real_world_pattern_xss
+load_wrapper_context_xss
+load_complex_page_xss
+load_tag_attribute_mix_xss
 
 # Index (computed once at startup)
 cached_index = Xssmaze.index_html
