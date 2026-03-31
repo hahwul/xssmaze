@@ -248,6 +248,37 @@ load_stored_xss
 load_shadow_dom_xss
 load_csti_xss
 load_import_map_xss
+load_realworld
+load_realworld_encoding
+load_realworld_input
+load_multi_context_xss
+load_encoding_bypass_xss
+load_special_tag_xss
+load_filter_chain_xss
+load_context_escape_xss
+load_waf_bypass_xss
+load_sink_xss
+load_param_pollution_xss
+load_edge_case_xss
+load_modern_framework_xss
+load_response_split_xss
+load_sanitizer_bypass_xss
+load_callback_xss
+load_mutation_filter_xss
+load_race_condition_xss
+load_unicode_xss
+load_timing_xss
+load_double_encoding_xss
+load_nonce_bypass_xss
+load_content_type_xss
+load_multipart_xss
+load_recursive_filter_xss
+load_parser_differential_xss
+load_chained_filter_xss
+load_template_injection_xss
+load_encoding_mix_xss
+load_waf_bypass_v2_xss
+load_context_escape_v2_xss
 
 # Index (computed once at startup)
 cached_index = Xssmaze.index_html
