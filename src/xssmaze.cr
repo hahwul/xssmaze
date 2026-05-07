@@ -1,5 +1,6 @@
 require "json"
 require "compress/gzip"
+require "digest/sha1"
 require "kemal"
 require "./filters"
 require "./route_helper"
@@ -256,9 +257,9 @@ module Xssmaze
       io << "<!DOCTYPE html>\n<html lang='en'>\n<head>\n"
       io << "<meta charset='UTF-8'>\n"
       io << "<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n"
-      io << "<title>XSSMaze</title>\n<style>\n"
-      io << INDEX_CSS
-      io << "\n</style>\n</head>\n<body>\n"
+      io << "<title>XSSMaze</title>\n"
+      io << "<link rel='stylesheet' href='/assets/index.css'>\n"
+      io << "</head>\n<body>\n"
       io << "<div class='header'>\n"
       io << "<h1>XSSMaze</h1>\n"
       io << "<p class='description'>XSSMaze is a web service configured to be vulnerable to XSS and is intended to measure and enhance the performance of security testing tools.</p>\n"
@@ -282,7 +283,7 @@ module Xssmaze
       io << "<a href='/version'>version</a>\n"
       io << "</div>\n</div>\n"
       io << maze_list
-      io << "\n<script>\n" << INDEX_JS << "\n</script>\n"
+      io << "\n<script src='/assets/index.js' defer></script>\n"
       io << "</body>\n</html>"
     end
   end
@@ -538,6 +539,12 @@ load_worker_xss
 load_formaction_xss
 load_srcset_xss
 load_dataurl_xss
+load_manifest_xss
+load_template_tag_xss
+load_noscript_xss
+load_slot_xss
+load_mutation_observer_xss
+load_attrname_xss
 
 # Freeze maze list and pre-compute caches once at startup so /map/* and /
 # never rebuild HTML/JSON/text on the request hot path. Using locals (not
@@ -559,6 +566,63 @@ cached_openapi = Xssmaze.build_openapi(mazes)
 cached_sitemap = Xssmaze.build_sitemap(mazes)
 cached_version = {version: Xssmaze::VERSION, endpoints: mazes.size, categories: groups.size}.to_json
 
+# Distribution stats (counts by HTTP method and by primary param).
+methods_count = Hash(String, Int32).new(0)
+params_count = Hash(String, Int32).new(0)
+mazes.each do |m|
+  methods_count[m.method] += 1
+  m.params.each { |p| params_count[p] += 1 }
+end
+cached_stats = {
+  total:      mazes.size,
+  categories: groups.size,
+  methods:    methods_count,
+  params:     params_count.to_a.sort_by! { |(_, v)| -v }.to_h,
+}.to_json
+
+cached_payloads = {
+  description: "Reference XSS payloads for lab use only.",
+  payloads:    [
+    {label: "basic alert", value: "<script>alert(1)</script>"},
+    {label: "img onerror", value: "<img src=x onerror=alert(1)>"},
+    {label: "svg onload", value: "<svg onload=alert(1)>"},
+    {label: "javascript: scheme", value: "javascript:alert(1)"},
+    {label: "data: html", value: "data:text/html,<script>alert(1)</script>"},
+    {label: "iframe srcdoc", value: "<iframe srcdoc='<script>alert(1)</script>'>"},
+    {label: "details ontoggle", value: "<details open ontoggle=alert(1)>"},
+    {label: "input autofocus", value: "<input autofocus onfocus=alert(1)>"},
+    {label: "form action javascript", value: "<form action=javascript:alert(1)><button>x</button></form>"},
+    {label: "polyglot", value: "jaVasCript:/*-/*`/*\\`/*'/*\"/**/(/* */oNcliCk=alert() )//%0D%0A%0D%0A//</stYle/</titLe/</teXtarEa/</scRipt/--!>\\x3csVg/<sVg/oNloAd=alert()//>\\x3e"},
+  ],
+}.to_json
+
+# CSS / JS extracted as their own assets so the browser can cache them
+# separately from the (changes-on-startup) catalog HTML.
+css_body = Xssmaze::INDEX_CSS
+js_body = Xssmaze::INDEX_JS
+
+robots_body = "User-agent: *\nDisallow: /\n"
+
+# ETag is just a content hash. Catalog payloads are content-stable for the
+# lifetime of the process so we can compute it once.
+def make_etag(body : String) : String
+  %("#{Digest::SHA1.hexdigest(body)[0, 16]}")
+end
+
+etag_index = make_etag(cached_index)
+etag_map_text = make_etag(cached_map_text)
+etag_map_json = make_etag(cached_map_json)
+etag_map_md = make_etag(cached_map_md)
+etag_categories = make_etag(cached_categories)
+etag_openapi = make_etag(cached_openapi)
+etag_sitemap = make_etag(cached_sitemap)
+etag_version = make_etag(cached_version)
+etag_stats = make_etag(cached_stats)
+etag_payloads = make_etag(cached_payloads)
+etag_css = make_etag(css_body)
+etag_js = make_etag(js_body)
+etag_robots = make_etag(robots_body)
+
 # Pre-compress all catalog payloads once at startup. Compressed at level 9
 # because the work happens exactly once and the bandwidth savings on the
 # 200KB+ index pay for themselves immediately.
@@ -569,9 +633,15 @@ gz_map_md = Xssmaze.gzip(cached_map_md)
 gz_categories = Xssmaze.gzip(cached_categories)
 gz_openapi = Xssmaze.gzip(cached_openapi)
 gz_sitemap = Xssmaze.gzip(cached_sitemap)
+gz_version = Xssmaze.gzip(cached_version)
+gz_stats = Xssmaze.gzip(cached_stats)
+gz_payloads = Xssmaze.gzip(cached_payloads)
+gz_css = Xssmaze.gzip(css_body)
+gz_js = Xssmaze.gzip(js_body)
 
 start_time = Time.utc
 server_header = "XSSMaze/#{Xssmaze::VERSION}"
+last_modified = HTTP.format_time(start_time)
 
 before_all do |env|
   env.response.headers["Server"] = server_header
@@ -585,9 +655,22 @@ def with_catalog_headers(env)
   env.response.headers["Vary"] = "Accept-Encoding"
 end
 
-def serve_cached(env, body : String, body_gz : Bytes, content_type : String)
+# Serve a cached payload with conditional GET (ETag/304) and gzip support.
+# Returns "" when the response has already been written (304 or gzip path).
+def serve_cached(env, body : String, body_gz : Bytes, content_type : String,
+                 etag : String, last_modified : String, max_age : Int32 = 60)
   env.response.content_type = content_type
-  with_catalog_headers(env)
+  env.response.headers["Access-Control-Allow-Origin"] = "*"
+  env.response.headers["Cache-Control"] = "public, max-age=#{max_age}"
+  env.response.headers["Vary"] = "Accept-Encoding"
+  env.response.headers["ETag"] = etag
+  env.response.headers["Last-Modified"] = last_modified
+
+  if (inm = env.request.headers["If-None-Match"]?) && inm == etag
+    env.response.status_code = 304
+    return ""
+  end
+
   ae = env.request.headers["Accept-Encoding"]?
   if ae && ae.includes?("gzip")
     env.response.headers["Content-Encoding"] = "gzip"
@@ -599,29 +682,51 @@ def serve_cached(env, body : String, body_gz : Bytes, content_type : String)
 end
 
 get "/" do |env|
-  serve_cached(env, cached_index, gz_index, "text/html; charset=utf-8")
+  serve_cached(env, cached_index, gz_index, "text/html; charset=utf-8", etag_index, last_modified)
 end
 
 get "/health" do |env|
   env.response.content_type = "application/json"
   env.response.headers["Access-Control-Allow-Origin"] = "*"
+  env.response.headers["Cache-Control"] = "no-store"
+  uptime = (Time.utc - start_time).total_seconds.to_i
+  {status: "ok", uptime_seconds: uptime, endpoints: mazes.size}.to_json
+end
+
+# k8s-style alias.
+get "/healthz" do |env|
+  env.response.content_type = "application/json"
+  env.response.headers["Access-Control-Allow-Origin"] = "*"
+  env.response.headers["Cache-Control"] = "no-store"
   uptime = (Time.utc - start_time).total_seconds.to_i
   {status: "ok", uptime_seconds: uptime, endpoints: mazes.size}.to_json
 end
 
 get "/version" do |env|
-  serve_cached(env, cached_version, Xssmaze.gzip(cached_version), "application/json")
+  serve_cached(env, cached_version, gz_version, "application/json", etag_version, last_modified)
+end
+
+get "/stats" do |env|
+  serve_cached(env, cached_stats, gz_stats, "application/json", etag_stats, last_modified)
+end
+
+get "/payloads" do |env|
+  serve_cached(env, cached_payloads, gz_payloads, "application/json", etag_payloads, last_modified)
+end
+
+get "/robots.txt" do |env|
+  serve_cached(env, robots_body, Xssmaze.gzip(robots_body), "text/plain; charset=utf-8", etag_robots, last_modified, 3600)
 end
 
 get "/map/text" do |env|
-  serve_cached(env, cached_map_text, gz_map_text, "text/plain; charset=utf-8")
+  serve_cached(env, cached_map_text, gz_map_text, "text/plain; charset=utf-8", etag_map_text, last_modified)
 end
 
 get "/map/json" do |env|
   type = env.params.query["type"]?
   q = env.params.query["q"]?
   if type.nil? && q.nil?
-    next serve_cached(env, cached_map_json, gz_map_json, "application/json")
+    next serve_cached(env, cached_map_json, gz_map_json, "application/json", etag_map_json, last_modified)
   end
   # Filter the pre-materialized JSON objects rather than rebuilding tuples.
   with_catalog_headers(env)
@@ -642,19 +747,27 @@ get "/map/json" do |env|
 end
 
 get "/map/markdown" do |env|
-  serve_cached(env, cached_map_md, gz_map_md, "text/markdown; charset=utf-8")
+  serve_cached(env, cached_map_md, gz_map_md, "text/markdown; charset=utf-8", etag_map_md, last_modified)
 end
 
 get "/map/categories" do |env|
-  serve_cached(env, cached_categories, gz_categories, "application/json")
+  serve_cached(env, cached_categories, gz_categories, "application/json", etag_categories, last_modified)
 end
 
 get "/map/openapi" do |env|
-  serve_cached(env, cached_openapi, gz_openapi, "application/json")
+  serve_cached(env, cached_openapi, gz_openapi, "application/json", etag_openapi, last_modified)
 end
 
 get "/sitemap.xml" do |env|
-  serve_cached(env, cached_sitemap, gz_sitemap, "application/xml; charset=utf-8")
+  serve_cached(env, cached_sitemap, gz_sitemap, "application/xml; charset=utf-8", etag_sitemap, last_modified)
+end
+
+get "/assets/index.css" do |env|
+  serve_cached(env, css_body, gz_css, "text/css; charset=utf-8", etag_css, last_modified, 86400)
+end
+
+get "/assets/index.js" do |env|
+  serve_cached(env, js_body, gz_js, "application/javascript; charset=utf-8", etag_js, last_modified, 86400)
 end
 
 # Pick a random maze and 302 to it. Useful for lab demos and fuzzers that
