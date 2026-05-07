@@ -9,14 +9,21 @@ require "./banner"
 module Xssmaze
   VERSION = "0.1.0"
   @@mazes = [] of Maze
+  @@frozen = false
 
   def self.push(name : String, url : String, desc : String, method : String = "GET", params : Array(String) = ["query"])
+    raise "maze list is frozen" if @@frozen
     maze = Maze.new(name, url, desc, method, params)
     @@mazes << maze
   end
 
   def self.get
     @@mazes
+  end
+
+  def self.freeze!
+    @@frozen = true
+    @@mazes.sort_by!(&.name)
   end
 
   def self.grouped_mazes : Hash(String, Array(Maze))
@@ -28,23 +35,32 @@ module Xssmaze
     groups
   end
 
-  def self.build_maze_list : String
-    groups = grouped_mazes
-    sorted_types = groups.keys.sort!
+  def self.build_maze_list(groups : Hash(String, Array(Maze))) : String
+    sorted_types = groups.keys.sort
 
     String.build do |io|
-      io << "<div class='container'>\n  <ul class='list'>"
+      io << "<div class='container'>\n  <ul class='list' id='maze-list'>"
       sorted_types.each do |type|
-        io << "<li>#{type}"
+        type_mazes = groups[type]
+        io << "<li class='cat' data-cat='" << type << "'>"
+        io << "<span class='cat-name' id='cat-" << type << "'>" << type << "</span>"
+        io << " <span class='count'>(" << type_mazes.size << ")</span>"
         io << "<ul class='list'>"
-        groups[type].each do |maze|
-          io << "<li><a href='#{maze.url}'>#{maze.name}</a> - #{maze.desc}</li>"
+        type_mazes.each do |maze|
+          io << "<li class='maze' data-name='" << maze.name.downcase
+          io << "' data-desc='" << html_escape(maze.desc.downcase) << "'>"
+          io << "<a href='" << maze.url << "'>" << maze.name << "</a>"
+          io << " <span class='method'>" << maze.method << "</span>"
+          io << " - " << html_escape(maze.desc) << "</li>"
         end
-        io << "</ul>"
-        io << "</li>"
+        io << "</ul></li>"
       end
       io << "</ul></div>"
     end
+  end
+
+  def self.html_escape(s : String) : String
+    s.gsub('&', "&amp;").gsub('<', "&lt;").gsub('>', "&gt;").gsub('"', "&quot;").gsub('\'', "&#39;")
   end
 
   INDEX_CSS = <<-CSS
@@ -56,17 +72,10 @@ module Xssmaze
     }
     .header {
       max-width: 1200px;
-      margin: 0 auto 40px;
+      margin: 0 auto 20px;
     }
-    h1 {
-      color: #333;
-      margin-bottom: 10px;
-    }
-    .description {
-      color: #666;
-      line-height: 1.6;
-      margin-bottom: 10px;
-    }
+    h1 { color: #333; margin-bottom: 10px; }
+    .description { color: #666; line-height: 1.6; margin-bottom: 10px; }
     .description code {
       background-color: #f4f4f4;
       color: #c7254e;
@@ -74,23 +83,51 @@ module Xssmaze
       border-radius: 3px;
       font-family: 'Courier New', monospace;
     }
+    .stats {
+      display: flex;
+      gap: 18px;
+      margin: 14px 0;
+      flex-wrap: wrap;
+    }
+    .stats .stat {
+      background: #f5f5f5;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #333;
+    }
+    .stats .stat strong { color: #0366d6; }
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    #search {
+      flex: 1;
+      min-width: 240px;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
     .map-links {
-      margin-top: 20px;
-      padding-top: 20px;
+      margin-top: 14px;
+      padding-top: 14px;
       border-top: 1px solid #e0e0e0;
+      font-size: 0.92em;
     }
     .map-links a {
       color: #0366d6;
       text-decoration: none;
-      margin-right: 15px;
+      margin-right: 12px;
     }
-    .map-links a:hover {
-      text-decoration: underline;
-    }
+    .map-links a:hover { text-decoration: underline; }
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 50px 80px;
+      padding: 30px 60px;
       background-color: #F5F5F5;
       border-radius: 8px;
     }
@@ -129,9 +166,7 @@ module Xssmaze
       left: 0;
       top: -0.75em;
     }
-    .list li > .list {
-      position: relative;
-    }
+    .list li > .list { position: relative; }
     .list li > .list:before {
       content: '';
       display: block;
@@ -153,9 +188,7 @@ module Xssmaze
       left: -1.2em;
       top: -0.5em;
     }
-    .list li:last-of-type > .list:after {
-      content: none;
-    }
+    .list li:last-of-type > .list:after { content: none; }
     .list li > .list li {
       font-weight: normal;
       font-size: 0.95em;
@@ -164,48 +197,126 @@ module Xssmaze
       color: #0366d6;
       text-decoration: none;
     }
-    .list li > .list li a:hover {
-      text-decoration: underline;
+    .list li > .list li a:hover { text-decoration: underline; }
+    .count {
+      color: #888;
+      font-weight: normal;
+      font-size: 0.85em;
     }
+    .method {
+      display: inline-block;
+      font-size: 0.7em;
+      font-weight: 700;
+      color: #666;
+      background: #e7e7e7;
+      padding: 1px 6px;
+      border-radius: 3px;
+      margin-left: 4px;
+    }
+    .hidden { display: none !important; }
     @media (max-width: 768px) {
-      .container {
-        padding: 30px 20px;
-        margin: 0 10px;
-      }
-      body {
-        padding: 10px;
-      }
+      .container { padding: 20px 16px; margin: 0 8px; }
+      body { padding: 10px; }
     }
   CSS
 
-  def self.index_html : String
-    maze_list = build_maze_list
+  INDEX_JS = <<-JS
+    (function () {
+      var input = document.getElementById('search');
+      if (!input) return;
+      var mazes = document.querySelectorAll('.maze');
+      var cats = document.querySelectorAll('.cat');
+      var totalEl = document.getElementById('stat-visible');
+      input.addEventListener('input', function () {
+        var q = input.value.toLowerCase().trim();
+        var visible = 0;
+        mazes.forEach(function (el) {
+          var name = el.getAttribute('data-name') || '';
+          var desc = el.getAttribute('data-desc') || '';
+          var match = q === '' || name.indexOf(q) !== -1 || desc.indexOf(q) !== -1;
+          el.classList.toggle('hidden', !match);
+          if (match) visible++;
+        });
+        cats.forEach(function (cat) {
+          var any = cat.querySelectorAll('.maze:not(.hidden)').length > 0;
+          cat.classList.toggle('hidden', !any);
+        });
+        if (totalEl) totalEl.textContent = visible;
+      });
+    })();
+  JS
 
-    "<!DOCTYPE html>
-<html lang='en'>
-<head>
-  <meta charset='UTF-8'>
-  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-  <title>XSSMaze</title>
-  <style>
-#{INDEX_CSS}
-  </style>
-</head>
-<body>
-  <div class='header'>
-    <h1>XSSMaze</h1>
-    <p class='description'>XSSMaze is a web service configured to be vulnerable to XSS and is intended to measure and enhance the performance of security testing tools.</p>
-    <p class='description'>Most challenges use <code>query</code>, but some cases use parameters such as <code>callback</code>, <code>query2</code>, <code>seed</code>, <code>blob</code>, <code>url</code>, path segments, or request headers.</p>
-    <p class='description'>You can find several vulnerable cases in the list below.</p>
-    <div class='map-links'>
-      <strong>Endpoint Map:</strong>
-      <a href='/map/text'>Text</a>
-      <a href='/map/json'>JSON</a>
-    </div>
-  </div>
-  #{maze_list}
-</body>
-</html>"
+  def self.build_index_html(groups : Hash(String, Array(Maze))) : String
+    maze_list = build_maze_list(groups)
+    total = @@mazes.size
+    cat_count = groups.size
+
+    String.build do |io|
+      io << "<!DOCTYPE html>\n<html lang='en'>\n<head>\n"
+      io << "<meta charset='UTF-8'>\n"
+      io << "<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n"
+      io << "<title>XSSMaze</title>\n<style>\n"
+      io << INDEX_CSS
+      io << "\n</style>\n</head>\n<body>\n"
+      io << "<div class='header'>\n"
+      io << "<h1>XSSMaze</h1>\n"
+      io << "<p class='description'>XSSMaze is a web service configured to be vulnerable to XSS and is intended to measure and enhance the performance of security testing tools.</p>\n"
+      io << "<p class='description'>Most challenges use <code>query</code>, but some cases use parameters such as <code>callback</code>, <code>query2</code>, <code>seed</code>, <code>blob</code>, <code>url</code>, path segments, or request headers.</p>\n"
+      io << "<div class='stats'>\n"
+      io << "<span class='stat'><strong>" << total << "</strong> endpoints</span>\n"
+      io << "<span class='stat'><strong>" << cat_count << "</strong> categories</span>\n"
+      io << "<span class='stat'><strong id='stat-visible'>" << total << "</strong> visible</span>\n"
+      io << "<span class='stat'>v" << VERSION << "</span>\n"
+      io << "</div>\n"
+      io << "<div class='controls'>\n"
+      io << "<input id='search' type='search' placeholder='Filter by name or description (e.g. dom, csp, level3)'>\n"
+      io << "</div>\n"
+      io << "<div class='map-links'>\n"
+      io << "<strong>Endpoints:</strong>\n"
+      io << "<a href='/map/text'>text</a>\n"
+      io << "<a href='/map/json'>json</a>\n"
+      io << "<a href='/map/categories'>categories</a>\n"
+      io << "<a href='/map/markdown'>markdown</a>\n"
+      io << "<a href='/health'>health</a>\n"
+      io << "<a href='/version'>version</a>\n"
+      io << "</div>\n</div>\n"
+      io << maze_list
+      io << "\n<script>\n" << INDEX_JS << "\n</script>\n"
+      io << "</body>\n</html>"
+    end
+  end
+
+  def self.build_map_text(mazes : Array(Maze)) : String
+    String.build do |io|
+      mazes.each_with_index do |m, i|
+        io << '\n' if i > 0
+        io << m.url
+      end
+    end
+  end
+
+  def self.build_map_markdown(mazes : Array(Maze)) : String
+    String.build do |io|
+      io << "# XSSMaze Endpoints\n\n"
+      io << "Total: " << mazes.size << "\n\n"
+      io << "| Name | Method | URL | Params | Description |\n"
+      io << "|------|--------|-----|--------|-------------|\n"
+      mazes.each do |m|
+        io << "| " << m.name
+        io << " | " << m.method
+        io << " | `" << m.url << "`"
+        io << " | `" << m.params.join(",") << "`"
+        io << " | " << m.desc.gsub("|", "\\|")
+        io << " |\n"
+      end
+    end
+  end
+
+  def self.build_categories_json(groups : Hash(String, Array(Maze))) : String
+    arr = groups.keys.sort.map do |cat|
+      {category: cat, count: groups[cat].size}
+    end
+    {total: @@mazes.size, categories: arr}.to_json
   end
 end
 
@@ -354,23 +465,104 @@ load_dashboard_xss
 load_email_template_xss
 load_social_media_xss
 load_misc_context_xss
+load_dialog_xss
+load_meta_refresh_xss
+load_trusted_types_xss
+load_iframe_srcdoc_xss
+load_mathml_xss
+load_popover_xss
 
-# Index (computed once at startup)
-cached_index = Xssmaze.index_html
-list = Xssmaze.get
+# Freeze maze list and pre-compute caches once at startup so /map/* and /
+# never rebuild HTML/JSON/text on the request hot path. Using locals (not
+# top-level constants) because Crystal forbids constants from referencing
+# locals; Kemal's blocks close over these just fine.
+Xssmaze.freeze!
+mazes = Xssmaze.get
+groups = Xssmaze.grouped_mazes
 
-get "/" do
+cached_index = Xssmaze.build_index_html(groups)
+cached_map_text = Xssmaze.build_map_text(mazes)
+cached_map_json = {endpoints: mazes.map(&.to_json_object)}.to_json
+cached_map_md = Xssmaze.build_map_markdown(mazes)
+cached_categories = Xssmaze.build_categories_json(groups)
+cached_version = {version: Xssmaze::VERSION, endpoints: mazes.size, categories: groups.size}.to_json
+
+start_time = Time.utc
+
+# Add a few helpful headers (CORS for tooling; simple Cache-Control for the
+# static catalog). The maze endpoints themselves are intentionally untouched.
+def with_catalog_headers(env)
+  env.response.headers["Access-Control-Allow-Origin"] = "*"
+  env.response.headers["Cache-Control"] = "public, max-age=60"
+end
+
+get "/" do |env|
+  env.response.content_type = "text/html; charset=utf-8"
+  env.response.headers["Cache-Control"] = "public, max-age=60"
   cached_index
 end
 
+get "/health" do |env|
+  env.response.content_type = "application/json"
+  env.response.headers["Access-Control-Allow-Origin"] = "*"
+  uptime = (Time.utc - start_time).total_seconds.to_i
+  {status: "ok", uptime_seconds: uptime, endpoints: mazes.size}.to_json
+end
+
+get "/version" do |env|
+  env.response.content_type = "application/json"
+  with_catalog_headers(env)
+  cached_version
+end
+
 get "/map/text" do |env|
-  env.response.content_type = "text/plain"
-  list.join("\n", &.url)
+  env.response.content_type = "text/plain; charset=utf-8"
+  with_catalog_headers(env)
+  cached_map_text
 end
 
 get "/map/json" do |env|
   env.response.content_type = "application/json"
-  {endpoints: list.map(&.to_json_object)}.to_json
+  with_catalog_headers(env)
+  type = env.params.query["type"]?
+  q = env.params.query["q"]?
+  if type.nil? && q.nil?
+    next cached_map_json
+  end
+  filtered = mazes
+  if t = type
+    filtered = filtered.select { |m| m.type == t }
+  end
+  if needle = q
+    n = needle.downcase
+    filtered = filtered.select { |m| m.name.downcase.includes?(n) || m.desc.downcase.includes?(n) }
+  end
+  {endpoints: filtered.map(&.to_json_object), total: filtered.size}.to_json
+end
+
+get "/map/markdown" do |env|
+  env.response.content_type = "text/markdown; charset=utf-8"
+  with_catalog_headers(env)
+  cached_map_md
+end
+
+get "/map/categories" do |env|
+  env.response.content_type = "application/json"
+  with_catalog_headers(env)
+  cached_categories
+end
+
+# 404 — keep response body small and helpful for lab users hitting wrong paths.
+error 404 do |env|
+  env.response.content_type = "text/html; charset=utf-8"
+  path = env.request.path
+  "<!DOCTYPE html><html><head><meta charset='UTF-8'><title>404 - XSSMaze</title>" \
+  "<style>body{font-family:-apple-system,sans-serif;max-width:720px;margin:60px auto;padding:0 20px;color:#333}" \
+  "h1{margin-bottom:6px}.path{background:#f4f4f4;padding:2px 6px;border-radius:3px;font-family:monospace;color:#c7254e}" \
+  "a{color:#0366d6;text-decoration:none}a:hover{text-decoration:underline}</style></head><body>" \
+  "<h1>404</h1><p>No maze at <span class='path'>#{Xssmaze.html_escape(path)}</span>.</p>" \
+  "<p>Try the <a href='/'>index</a>, the <a href='/map/text'>text map</a>, or the " \
+  "<a href='/map/categories'>category list</a>.</p></body></html>"
 end
 
 Kemal.run

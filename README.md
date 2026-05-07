@@ -38,6 +38,12 @@ Options:
 
 ## Endpoint Map
 ```bash
-curl http://localhost:3000/map/text
-curl http://localhost:3000/map/json
+curl http://localhost:3000/map/text         # newline-separated URLs
+curl http://localhost:3000/map/json         # full metadata (also: ?type=dom or ?q=csp)
+curl http://localhost:3000/map/markdown     # markdown table
+curl http://localhost:3000/map/categories   # categories with counts
+curl http://localhost:3000/health           # liveness probe
+curl http://localhost:3000/version          # version + counts
 ```
+
+The index page (`/`) provides a client-side filter, per-category counts, and links to all of the maps above. Map endpoints serve a payload that is built once at startup and cached, so they're safe to poll from tooling.
