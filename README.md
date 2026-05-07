@@ -42,8 +42,11 @@ curl http://localhost:3000/map/text         # newline-separated URLs
 curl http://localhost:3000/map/json         # full metadata (also: ?type=dom or ?q=csp)
 curl http://localhost:3000/map/markdown     # markdown table
 curl http://localhost:3000/map/categories   # categories with counts
+curl http://localhost:3000/map/openapi      # OpenAPI 3.0 catalog
+curl http://localhost:3000/sitemap.xml      # sitemap of all maze paths
 curl http://localhost:3000/health           # liveness probe
 curl http://localhost:3000/version          # version + counts
+curl -L http://localhost:3000/random        # 302 to a random maze
 ```
 
-The index page (`/`) provides a client-side filter, per-category counts, and links to all of the maps above. Map endpoints serve a payload that is built once at startup and cached, so they're safe to poll from tooling.
+The index page (`/`) provides a client-side filter, per-category counts, and links to all of the maps above. Map endpoints serve a payload that is built once at startup, cached, and gzip pre-compressed (`Accept-Encoding: gzip` cuts the index payload by ~85%), so they're safe to poll from tooling.

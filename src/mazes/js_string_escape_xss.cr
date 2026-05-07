@@ -39,8 +39,8 @@ def load_js_string_escape_xss
   Xssmaze.push("jsescape-level4", "/jsescape/level4/?query=a", "JS string with backslash and quote both escaped but script tag not blocked")
   maze_get "/jsescape/level4/" do |env|
     query = env.params.query["query"]
-    query = query.gsub("\\", "\\\\")  # \ -> \\
-    query = query.gsub("\"", "\\\"")  # " -> \"
+    query = query.gsub("\\", "\\\\") # \ -> \\
+    query = query.gsub("\"", "\\\"") # " -> \"
 
     "<html><body><script>var msg = \"#{query}\";</script></body></html>"
   end

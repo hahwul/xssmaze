@@ -1,4 +1,5 @@
 require "json"
+require "compress/gzip"
 require "kemal"
 require "./filters"
 require "./route_helper"
@@ -318,6 +319,66 @@ module Xssmaze
     end
     {total: @@mazes.size, categories: arr}.to_json
   end
+
+  # Minimal OpenAPI 3.0 document so external tooling (Swagger UI, code
+  # generators, scanner runners) can ingest the catalog directly.
+  def self.build_openapi(mazes : Array(Maze)) : String
+    paths = Hash(String, Hash(String, Hash(String, JSON::Any))).new
+    mazes.each do |m|
+      # Strip query string from URL when keying paths.
+      path = m.url.split("?", 2).first
+      method = m.method.downcase
+      params_arr = m.params.map do |p|
+        loc = case p
+              when ":path" then "path"
+              when "Cookie", "Referer", "User-Agent", "Authorization"
+                "header"
+              else
+                "query"
+              end
+        JSON.parse({name: p, in: loc, required: false, description: "maze input", schema: {type: "string"}}.to_json)
+      end
+      op = {
+        "summary"     => JSON.parse(m.name.to_json),
+        "description" => JSON.parse(m.desc.to_json),
+        "tags"        => JSON.parse([m.type].to_json),
+        "parameters"  => JSON.parse(params_arr.to_json),
+        "responses"   => JSON.parse({"200" => {description: "ok"}}.to_json),
+      }
+      paths[path] ||= Hash(String, Hash(String, JSON::Any)).new
+      paths[path][method] = op
+    end
+
+    {
+      openapi: "3.0.0",
+      info:    {
+        title:       "XSSMaze",
+        version:     VERSION,
+        description: "Intentionally vulnerable XSS lab. Endpoints are reflective by design.",
+      },
+      paths: paths,
+    }.to_json
+  end
+
+  def self.build_sitemap(mazes : Array(Maze)) : String
+    String.build do |io|
+      io << %(<?xml version="1.0" encoding="UTF-8"?>\n)
+      io << %(<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n)
+      mazes.each do |m|
+        path = m.url.split("?", 2).first
+        io << "  <url><loc>" << path << "</loc></url>\n"
+      end
+      io << "</urlset>\n"
+    end
+  end
+
+  def self.gzip(body : String) : Bytes
+    io = IO::Memory.new
+    Compress::Gzip::Writer.open(io, level: Compress::Gzip::BEST_COMPRESSION) do |gz|
+      gz.write(body.to_slice)
+    end
+    io.to_slice.dup
+  end
 end
 
 banner
@@ -471,6 +532,12 @@ load_trusted_types_xss
 load_iframe_srcdoc_xss
 load_mathml_xss
 load_popover_xss
+load_clipboard_xss
+load_dragdrop_xss
+load_worker_xss
+load_formaction_xss
+load_srcset_xss
+load_dataurl_xss
 
 # Freeze maze list and pre-compute caches once at startup so /map/* and /
 # never rebuild HTML/JSON/text on the request hot path. Using locals (not
@@ -482,24 +549,57 @@ groups = Xssmaze.grouped_mazes
 
 cached_index = Xssmaze.build_index_html(groups)
 cached_map_text = Xssmaze.build_map_text(mazes)
-cached_map_json = {endpoints: mazes.map(&.to_json_object)}.to_json
+# Materialize maze JSON objects once; reuse for both the unfiltered cache
+# and any filtered request so /map/json never rebuilds the per-maze tuples.
+mazes_json_objs = mazes.map(&.to_json_object)
+cached_map_json = {endpoints: mazes_json_objs}.to_json
 cached_map_md = Xssmaze.build_map_markdown(mazes)
 cached_categories = Xssmaze.build_categories_json(groups)
+cached_openapi = Xssmaze.build_openapi(mazes)
+cached_sitemap = Xssmaze.build_sitemap(mazes)
 cached_version = {version: Xssmaze::VERSION, endpoints: mazes.size, categories: groups.size}.to_json
 
+# Pre-compress all catalog payloads once at startup. Compressed at level 9
+# because the work happens exactly once and the bandwidth savings on the
+# 200KB+ index pay for themselves immediately.
+gz_index = Xssmaze.gzip(cached_index)
+gz_map_text = Xssmaze.gzip(cached_map_text)
+gz_map_json = Xssmaze.gzip(cached_map_json)
+gz_map_md = Xssmaze.gzip(cached_map_md)
+gz_categories = Xssmaze.gzip(cached_categories)
+gz_openapi = Xssmaze.gzip(cached_openapi)
+gz_sitemap = Xssmaze.gzip(cached_sitemap)
+
 start_time = Time.utc
+server_header = "XSSMaze/#{Xssmaze::VERSION}"
+
+before_all do |env|
+  env.response.headers["Server"] = server_header
+end
 
 # Add a few helpful headers (CORS for tooling; simple Cache-Control for the
 # static catalog). The maze endpoints themselves are intentionally untouched.
 def with_catalog_headers(env)
   env.response.headers["Access-Control-Allow-Origin"] = "*"
   env.response.headers["Cache-Control"] = "public, max-age=60"
+  env.response.headers["Vary"] = "Accept-Encoding"
+end
+
+def serve_cached(env, body : String, body_gz : Bytes, content_type : String)
+  env.response.content_type = content_type
+  with_catalog_headers(env)
+  ae = env.request.headers["Accept-Encoding"]?
+  if ae && ae.includes?("gzip")
+    env.response.headers["Content-Encoding"] = "gzip"
+    env.response.write(body_gz)
+    ""
+  else
+    body
+  end
 end
 
 get "/" do |env|
-  env.response.content_type = "text/html; charset=utf-8"
-  env.response.headers["Cache-Control"] = "public, max-age=60"
-  cached_index
+  serve_cached(env, cached_index, gz_index, "text/html; charset=utf-8")
 end
 
 get "/health" do |env|
@@ -510,46 +610,59 @@ get "/health" do |env|
 end
 
 get "/version" do |env|
-  env.response.content_type = "application/json"
-  with_catalog_headers(env)
-  cached_version
+  serve_cached(env, cached_version, Xssmaze.gzip(cached_version), "application/json")
 end
 
 get "/map/text" do |env|
-  env.response.content_type = "text/plain; charset=utf-8"
-  with_catalog_headers(env)
-  cached_map_text
+  serve_cached(env, cached_map_text, gz_map_text, "text/plain; charset=utf-8")
 end
 
 get "/map/json" do |env|
-  env.response.content_type = "application/json"
-  with_catalog_headers(env)
   type = env.params.query["type"]?
   q = env.params.query["q"]?
   if type.nil? && q.nil?
-    next cached_map_json
+    next serve_cached(env, cached_map_json, gz_map_json, "application/json")
   end
-  filtered = mazes
+  # Filter the pre-materialized JSON objects rather than rebuilding tuples.
+  with_catalog_headers(env)
+  env.response.content_type = "application/json"
+  filtered_idx = (0...mazes.size).to_a
   if t = type
-    filtered = filtered.select { |m| m.type == t }
+    filtered_idx = filtered_idx.select { |i| mazes[i].type == t }
   end
   if needle = q
     n = needle.downcase
-    filtered = filtered.select { |m| m.name.downcase.includes?(n) || m.desc.downcase.includes?(n) }
+    filtered_idx = filtered_idx.select do |i|
+      m = mazes[i]
+      m.name.downcase.includes?(n) || m.desc.downcase.includes?(n)
+    end
   end
-  {endpoints: filtered.map(&.to_json_object), total: filtered.size}.to_json
+  filtered_objs = filtered_idx.map { |i| mazes_json_objs[i] }
+  {endpoints: filtered_objs, total: filtered_objs.size}.to_json
 end
 
 get "/map/markdown" do |env|
-  env.response.content_type = "text/markdown; charset=utf-8"
-  with_catalog_headers(env)
-  cached_map_md
+  serve_cached(env, cached_map_md, gz_map_md, "text/markdown; charset=utf-8")
 end
 
 get "/map/categories" do |env|
-  env.response.content_type = "application/json"
-  with_catalog_headers(env)
-  cached_categories
+  serve_cached(env, cached_categories, gz_categories, "application/json")
+end
+
+get "/map/openapi" do |env|
+  serve_cached(env, cached_openapi, gz_openapi, "application/json")
+end
+
+get "/sitemap.xml" do |env|
+  serve_cached(env, cached_sitemap, gz_sitemap, "application/xml; charset=utf-8")
+end
+
+# Pick a random maze and 302 to it. Useful for lab demos and fuzzers that
+# want to rotate targets without parsing the catalog.
+get "/random" do |env|
+  pick = mazes.sample
+  env.response.headers["Cache-Control"] = "no-store"
+  env.redirect pick.url
 end
 
 # 404 — keep response body small and helpful for lab users hitting wrong paths.
