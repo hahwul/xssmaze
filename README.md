@@ -28,7 +28,7 @@ docker run -p 3000:3000 ghcr.io/hahwul/xssmaze:main
 ./bin/xssmaze
 
 Options:
-  -b HOST, --bind HOST             Host to bind (defaults to 0.0.0.0)
+  -b HOST, --bind HOST             Host to bind (defaults to 127.0.0.1; pass 0.0.0.0 to expose on the network)
   -p PORT, --port PORT             Port to listen for connections (defaults to 3000)
   -s, --ssl                        Enables SSL
   --ssl-key-file FILE              SSL key file

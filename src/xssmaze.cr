@@ -639,6 +639,20 @@ gz_payloads = Xssmaze.gzip(cached_payloads)
 gz_css = Xssmaze.gzip(css_body)
 gz_js = Xssmaze.gzip(js_body)
 
+# Tighten Kemal defaults before any CLI parsing or server startup.
+#
+# 1. Kemal's built-in default binds to 0.0.0.0, which would expose this
+#    intentionally-vulnerable lab to the whole local network. Default to
+#    loopback; users who want network exposure (e.g. Docker port mapping)
+#    pass `-b 0.0.0.0` explicitly.
+# 2. Kemal's default env is "development", which makes the exception
+#    handler render verbose 500 pages with stack traces and source
+#    snippets. Every maze reflects user input, so any unexpected error
+#    during fuzzing would leak server source. Force production unless
+#    KEMAL_ENV is explicitly set.
+Kemal.config.host_binding = "127.0.0.1"
+Kemal.config.env = "production" unless ENV["KEMAL_ENV"]?
+
 start_time = Time.utc
 server_header = "XSSMaze/#{Xssmaze::VERSION}"
 last_modified = HTTP.format_time(start_time)

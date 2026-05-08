@@ -36,13 +36,14 @@ crystal spec
 ./bin/xssmaze
 
 # Alternative: Run with custom configuration
-./bin/xssmaze -b 127.0.0.1 -p 8080
+./bin/xssmaze -b 0.0.0.0 -p 8080
 
-# Default runs on http://0.0.0.0:3000
+# Default runs on http://127.0.0.1:3000 (loopback only).
+# Pass `-b 0.0.0.0` to expose the lab on the network.
 ```
 
 ### Command Line Options
-- `-b HOST, --bind HOST`: Host to bind (defaults to 0.0.0.0)
+- `-b HOST, --bind HOST`: Host to bind (defaults to 127.0.0.1; use `0.0.0.0` to expose to the network)
 - `-p PORT, --port PORT`: Port to listen for connections (defaults to 3000)
 - `-s, --ssl`: Enables SSL
 - `--ssl-key-file FILE`: SSL key file
