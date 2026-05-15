@@ -545,6 +545,12 @@ load_noscript_xss
 load_slot_xss
 load_mutation_observer_xss
 load_attrname_xss
+load_bugbounty_pattern_xss
+load_markdown_render_xss
+load_bounty_scanner_xss
+load_regex_bypass_xss
+load_multi_reflection_xss
+load_stored_pattern_xss
 
 # Freeze maze list and pre-compute caches once at startup so /map/* and /
 # never rebuild HTML/JSON/text on the request hot path. Using locals (not
