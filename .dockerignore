@@ -1,0 +1,27 @@
+# Build artifacts
+bin/
+lib/
+**/*.o
+**/*.dwarf
+
+# Git & VCS
+.git/
+.gitignore
+
+# Dev tooling
+.github/
+.claude/
+.ameba.yml
+.editorconfig
+AGENTS.md
+CONTRIBUTING.md
+CHANGELOG.md
+
+# Tests & docs
+spec/
+solutions/
+images/
+
+# Docker itself
+Dockerfile
+.dockerignore

@@ -1,10 +1,9 @@
-def load_complex_page_xss
-  # Level 1: Full page with header/nav/main/footer, query reflected in main content div
-  Xssmaze.push("complexpage-level1", "/complexpage/level1/?query=a", "full page with header/nav/footer, reflection in content div")
-  maze_get "/complexpage/level1/" do |env|
-    query = env.params.query["query"]
+# Level 1: Full page with header/nav/main/footer, query reflected in main content div
+Xssmaze.push("complexpage-level1", "/complexpage/level1/?query=a", "full page with header/nav/footer, reflection in content div")
+maze_get "/complexpage/level1/" do |env|
+  query = env.params.query["query"]
 
-    "<!DOCTYPE html>
+  "<!DOCTYPE html>
 <html lang=\"en\">
 <head><meta charset=\"UTF-8\"><title>Complex Page Level 1</title></head>
 <body>
@@ -16,14 +15,14 @@ def load_complex_page_xss
 <footer><p>Copyright 2026 Example Corp</p></footer>
 </body>
 </html>"
-  end
+end
 
-  # Level 2: Full page with sidebar, query reflected in search input value
-  Xssmaze.push("complexpage-level2", "/complexpage/level2/?query=a", "full page with sidebar, reflection in search input value")
-  maze_get "/complexpage/level2/" do |env|
-    query = env.params.query["query"]
+# Level 2: Full page with sidebar, query reflected in search input value
+Xssmaze.push("complexpage-level2", "/complexpage/level2/?query=a", "full page with sidebar, reflection in search input value")
+maze_get "/complexpage/level2/" do |env|
+  query = env.params.query["query"]
 
-    "<!DOCTYPE html>
+  "<!DOCTYPE html>
 <html lang=\"en\">
 <head><meta charset=\"UTF-8\"><title>Complex Page Level 2</title></head>
 <body>
@@ -39,14 +38,14 @@ def load_complex_page_xss
 <footer><p>Footer content</p></footer>
 </body>
 </html>"
-  end
+end
 
-  # Level 3: Full page with multiple scripts, query reflected in h2 title
-  Xssmaze.push("complexpage-level3", "/complexpage/level3/?query=a", "full page with multiple scripts, reflection in h2 title")
-  maze_get "/complexpage/level3/" do |env|
-    query = env.params.query["query"]
+# Level 3: Full page with multiple scripts, query reflected in h2 title
+Xssmaze.push("complexpage-level3", "/complexpage/level3/?query=a", "full page with multiple scripts, reflection in h2 title")
+maze_get "/complexpage/level3/" do |env|
+  query = env.params.query["query"]
 
-    "<!DOCTYPE html>
+  "<!DOCTYPE html>
 <html lang=\"en\">
 <head>
 <meta charset=\"UTF-8\"><title>Complex Page Level 3</title>
@@ -61,14 +60,14 @@ def load_complex_page_xss
 <script>document.addEventListener('DOMContentLoaded', function(){ console.log('ready'); });</script>
 </body>
 </html>"
-  end
+end
 
-  # Level 4: Full page with CSS, query reflected in paragraph description
-  Xssmaze.push("complexpage-level4", "/complexpage/level4/?query=a", "full page with CSS styles, reflection in description paragraph")
-  maze_get "/complexpage/level4/" do |env|
-    query = env.params.query["query"]
+# Level 4: Full page with CSS, query reflected in paragraph description
+Xssmaze.push("complexpage-level4", "/complexpage/level4/?query=a", "full page with CSS styles, reflection in description paragraph")
+maze_get "/complexpage/level4/" do |env|
+  query = env.params.query["query"]
 
-    "<!DOCTYPE html>
+  "<!DOCTYPE html>
 <html lang=\"en\">
 <head>
 <meta charset=\"UTF-8\"><title>Complex Page Level 4</title>
@@ -87,14 +86,14 @@ h1 { color: #333; border-bottom: 2px solid #0066cc; padding-bottom: 10px; }
 </div>
 </body>
 </html>"
-  end
+end
 
-  # Level 5: Full page with forms and tables, query reflected in table data cell
-  Xssmaze.push("complexpage-level5", "/complexpage/level5/?query=a", "full page with forms and tables, reflection in td element")
-  maze_get "/complexpage/level5/" do |env|
-    query = env.params.query["query"]
+# Level 5: Full page with forms and tables, query reflected in table data cell
+Xssmaze.push("complexpage-level5", "/complexpage/level5/?query=a", "full page with forms and tables, reflection in td element")
+maze_get "/complexpage/level5/" do |env|
+  query = env.params.query["query"]
 
-    "<!DOCTYPE html>
+  "<!DOCTYPE html>
 <html lang=\"en\">
 <head><meta charset=\"UTF-8\"><title>Complex Page Level 5</title></head>
 <body>
@@ -113,14 +112,14 @@ h1 { color: #333; border-bottom: 2px solid #0066cc; padding-bottom: 10px; }
 <p>Total records: 3</p>
 </body>
 </html>"
-  end
+end
 
-  # Level 6: Full page with lots of HTML (>1000 chars before reflection), query deep in page
-  Xssmaze.push("complexpage-level6", "/complexpage/level6/?query=a", "large page with reflection deep in HTML (>1000 chars before reflection)")
-  maze_get "/complexpage/level6/" do |env|
-    query = env.params.query["query"]
+# Level 6: Full page with lots of HTML (>1000 chars before reflection), query deep in page
+Xssmaze.push("complexpage-level6", "/complexpage/level6/?query=a", "large page with reflection deep in HTML (>1000 chars before reflection)")
+maze_get "/complexpage/level6/" do |env|
+  query = env.params.query["query"]
 
-    "<!DOCTYPE html>
+  "<!DOCTYPE html>
 <html lang=\"en\">
 <head>
 <meta charset=\"UTF-8\"><title>Complex Page Level 6</title>
@@ -171,5 +170,4 @@ body { font-family: Georgia, serif; margin: 0; padding: 0; }
 </div>
 </body>
 </html>"
-  end
 end

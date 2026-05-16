@@ -1,11 +1,10 @@
-def load_multi_vector_xss
-  # Level 1: Page has 3 forms, query reflected only in 2nd form's input value
-  # Scanner needs to identify the correct reflection point among multiple forms
-  Xssmaze.push("multivector-level1", "/multivector/level1/?query=a", "3 forms, reflection in 2nd form input value only")
-  maze_get "/multivector/level1/" do |env|
-    query = env.params.query["query"]
+# Level 1: Page has 3 forms, query reflected only in 2nd form's input value
+# Scanner needs to identify the correct reflection point among multiple forms
+Xssmaze.push("multivector-level1", "/multivector/level1/?query=a", "3 forms, reflection in 2nd form input value only")
+maze_get "/multivector/level1/" do |env|
+  query = env.params.query["query"]
 
-    "<!DOCTYPE html>
+  "<!DOCTYPE html>
 <html><body>
 <h1>Multi-Form Page</h1>
 <form id=\"form1\" action=\"/search\" method=\"get\">
@@ -21,29 +20,29 @@ def load_multi_vector_xss
 <button type=\"submit\">Sort</button>
 </form>
 </body></html>"
-  end
+end
 
-  # Level 2: Query reflected in both script context AND HTML body
-  # Two exploitable vectors on same page — scanner should find at least one
-  Xssmaze.push("multivector-level2", "/multivector/level2/?query=a", "dual reflection: script var + HTML body paragraph")
-  maze_get "/multivector/level2/" do |env|
-    query = env.params.query["query"]
+# Level 2: Query reflected in both script context AND HTML body
+# Two exploitable vectors on same page — scanner should find at least one
+Xssmaze.push("multivector-level2", "/multivector/level2/?query=a", "dual reflection: script var + HTML body paragraph")
+maze_get "/multivector/level2/" do |env|
+  query = env.params.query["query"]
 
-    "<!DOCTYPE html>
+  "<!DOCTYPE html>
 <html><body>
 <script>var x = \"#{query}\";</script>
 <h1>Welcome</h1>
 <p>Your search: #{query}</p>
 </body></html>"
-  end
+end
 
-  # Level 3: Query reflected in <option value=""> inside a <select> with 10 options
-  # Must break out of option/select context
-  Xssmaze.push("multivector-level3", "/multivector/level3/?query=a", "reflection in option value inside select with 10 options")
-  maze_get "/multivector/level3/" do |env|
-    query = env.params.query["query"]
+# Level 3: Query reflected in <option value=""> inside a <select> with 10 options
+# Must break out of option/select context
+Xssmaze.push("multivector-level3", "/multivector/level3/?query=a", "reflection in option value inside select with 10 options")
+maze_get "/multivector/level3/" do |env|
+  query = env.params.query["query"]
 
-    "<!DOCTYPE html>
+  "<!DOCTYPE html>
 <html><body>
 <h1>Choose an Option</h1>
 <select name=\"choice\" id=\"choices\">
@@ -59,15 +58,15 @@ def load_multi_vector_xss
 <option value=\"opt10\">Option 10</option>
 </select>
 </body></html>"
-  end
+end
 
-  # Level 4: Page has 5 input fields, query reflected only in the 3rd field's value
-  # Scanner must identify the correct injection point among many inputs
-  Xssmaze.push("multivector-level4", "/multivector/level4/?query=a", "5 input fields, reflection only in 3rd field value")
-  maze_get "/multivector/level4/" do |env|
-    query = env.params.query["query"]
+# Level 4: Page has 5 input fields, query reflected only in the 3rd field's value
+# Scanner must identify the correct injection point among many inputs
+Xssmaze.push("multivector-level4", "/multivector/level4/?query=a", "5 input fields, reflection only in 3rd field value")
+maze_get "/multivector/level4/" do |env|
+  query = env.params.query["query"]
 
-    "<!DOCTYPE html>
+  "<!DOCTYPE html>
 <html><body>
 <h1>User Profile</h1>
 <form>
@@ -79,15 +78,15 @@ def load_multi_vector_xss
 <button type=\"submit\">Save</button>
 </form>
 </body></html>"
-  end
+end
 
-  # Level 5: Triple reflection — query in <title>, <meta content>, and <div>
-  # All three contexts are exploitable in different ways
-  Xssmaze.push("multivector-level5", "/multivector/level5/?query=a", "triple reflection: title + meta content + div body")
-  maze_get "/multivector/level5/" do |env|
-    query = env.params.query["query"]
+# Level 5: Triple reflection — query in <title>, <meta content>, and <div>
+# All three contexts are exploitable in different ways
+Xssmaze.push("multivector-level5", "/multivector/level5/?query=a", "triple reflection: title + meta content + div body")
+maze_get "/multivector/level5/" do |env|
+  query = env.params.query["query"]
 
-    "<!DOCTYPE html>
+  "<!DOCTYPE html>
 <html>
 <head>
 <meta charset=\"UTF-8\">
@@ -98,15 +97,15 @@ def load_multi_vector_xss
 <h1>Page Title</h1>
 <div class=\"content\">#{query}</div>
 </body></html>"
-  end
+end
 
-  # Level 6: Complex page structure — query buried deep in nested article>section>div>p
-  # Scanner must handle deeply nested DOM to find the reflection
-  Xssmaze.push("multivector-level6", "/multivector/level6/?query=a", "deep nested reflection: article > section > div > p")
-  maze_get "/multivector/level6/" do |env|
-    query = env.params.query["query"]
+# Level 6: Complex page structure — query buried deep in nested article>section>div>p
+# Scanner must handle deeply nested DOM to find the reflection
+Xssmaze.push("multivector-level6", "/multivector/level6/?query=a", "deep nested reflection: article > section > div > p")
+maze_get "/multivector/level6/" do |env|
+  query = env.params.query["query"]
 
-    "<!DOCTYPE html>
+  "<!DOCTYPE html>
 <html lang=\"en\">
 <head>
 <meta charset=\"UTF-8\">
@@ -167,5 +166,4 @@ body { font-family: Arial, sans-serif; margin: 0; }
 </div>
 </body>
 </html>"
-  end
 end

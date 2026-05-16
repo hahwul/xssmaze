@@ -21,34 +21,32 @@ module EventHandlerHelper
   end
 end
 
-def load_eventhandler_xss
-  Xssmaze.push("eventhandler-xss-level1", "/eventhandler/level1/?query=a", "eventhandler-xss (basic)")
-  maze_get "/eventhandler/level1/" do |env|
-    query = env.params.query["query"]
-    EventHandlerHelper.build_html(query)
-  end
+Xssmaze.push("eventhandler-xss-level1", "/eventhandler/level1/?query=a", "eventhandler-xss (basic)")
+maze_get "/eventhandler/level1/" do |env|
+  query = env.params.query["query"]
+  EventHandlerHelper.build_html(query)
+end
 
-  Xssmaze.push("eventhandler-xss-level2", "/eventhandler/level2/?query=a", "eventhandler-xss (level 2)")
-  maze_get "/eventhandler/level2/" do |env|
-    query = EventHandlerHelper.sanitize(env.params.query["query"], 2)
-    EventHandlerHelper.build_html(query)
-  end
+Xssmaze.push("eventhandler-xss-level2", "/eventhandler/level2/?query=a", "eventhandler-xss (level 2)")
+maze_get "/eventhandler/level2/" do |env|
+  query = EventHandlerHelper.sanitize(env.params.query["query"], 2)
+  EventHandlerHelper.build_html(query)
+end
 
-  Xssmaze.push("eventhandler-xss-level3", "/eventhandler/level3/?query=a", "eventhandler-xss (level 3)")
-  maze_get "/eventhandler/level3/" do |env|
-    query = EventHandlerHelper.sanitize(env.params.query["query"], 3)
-    EventHandlerHelper.build_html(query)
-  end
+Xssmaze.push("eventhandler-xss-level3", "/eventhandler/level3/?query=a", "eventhandler-xss (level 3)")
+maze_get "/eventhandler/level3/" do |env|
+  query = EventHandlerHelper.sanitize(env.params.query["query"], 3)
+  EventHandlerHelper.build_html(query)
+end
 
-  Xssmaze.push("eventhandler-xss-level4", "/eventhandler/level4/?query=a", "eventhandler-xss (level 4)")
-  maze_get "/eventhandler/level4/" do |env|
-    query = EventHandlerHelper.sanitize(env.params.query["query"], 4)
-    EventHandlerHelper.build_html(query)
-  end
+Xssmaze.push("eventhandler-xss-level4", "/eventhandler/level4/?query=a", "eventhandler-xss (level 4)")
+maze_get "/eventhandler/level4/" do |env|
+  query = EventHandlerHelper.sanitize(env.params.query["query"], 4)
+  EventHandlerHelper.build_html(query)
+end
 
-  Xssmaze.push("eventhandler-xss-level5", "/eventhandler/level5/?query=a", "eventhandler-xss (level 5)")
-  maze_get "/eventhandler/level5/" do |env|
-    query = EventHandlerHelper.sanitize(env.params.query["query"], 5)
-    EventHandlerHelper.build_html(query)
-  end
+Xssmaze.push("eventhandler-xss-level5", "/eventhandler/level5/?query=a", "eventhandler-xss (level 5)")
+maze_get "/eventhandler/level5/" do |env|
+  query = EventHandlerHelper.sanitize(env.params.query["query"], 5)
+  EventHandlerHelper.build_html(query)
 end

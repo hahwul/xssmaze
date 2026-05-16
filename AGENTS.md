@@ -59,8 +59,8 @@ docker build -t xssmaze .
 # Run using pre-built image
 docker run -p 3000:3000 ghcr.io/hahwul/xssmaze:main
 
-# Build and run for ARM
-docker build -f Dockerfile.arm -t xssmaze-arm .
+# Multi-arch build (single Dockerfile supports amd64 + arm64)
+docker buildx build --platform linux/amd64,linux/arm64 -t xssmaze .
 ```
 
 ## Validation
