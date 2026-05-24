@@ -41,8 +41,8 @@ end
 
 maze_get "/xsleak/login" do |env|
   xsleak_no_store(env)
-  as = env.params.query["as"]?
-  role = as == "admin" ? "admin" : "guest"
+  as_param = env.params.query["as"]?
+  role = as_param == "admin" ? "admin" : "guest"
   env.response.cookies << HTTP::Cookie.new(XSLEAK_ROLE_COOKIE, role, path: "/xsleak/")
   env.redirect "/xsleak/"
   ""
@@ -131,7 +131,7 @@ maze_get "/xsleak/timing" do |env|
   env.response.content_type = "text/plain; charset=utf-8"
 
   admin = xsleak_admin?(env)
-  sleep(admin ? 0.01 : 0.25)
+  sleep(admin ? Time::Span.new(nanoseconds: 10_000_000) : Time::Span.new(nanoseconds: 250_000_000))
   "ok"
 end
 
@@ -157,4 +157,3 @@ maze_get "/xsleak/redirect/chain" do |env|
     "done"
   end
 end
-

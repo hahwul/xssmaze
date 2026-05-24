@@ -50,3 +50,51 @@ curl -L http://localhost:3000/random        # 302 to a random maze
 ```
 
 The index page (`/`) provides a client-side filter, per-category counts, and links to all of the maps above. Map endpoints serve a payload that is built once at startup, cached, and gzip pre-compressed (`Accept-Encoding: gzip` cuts the index payload by ~85%), so they're safe to poll from tooling.
+
+## XS-Leaks (Cross-Site Leaks)
+XS-Leaks are cross-origin side-channels that let an attacker infer state-dependent data without directly reading the response body. XSSMaze includes `xsleak-*` levels that intentionally vary response size, subresource composition, load/error behavior, timing, and redirect chains based on a "secret" state.
+
+The state can be controlled either by:
+- `q=admin` (simple stateless demos for scanners), or
+- the `xsleak_role=admin` cookie (set via `GET /xsleak/login?as=admin`).
+
+### Levels
+- `GET /xsleak/search?q=admin` (`xsleak-level1`): body-size oracle (admin returns more HTML/results)
+- `GET /xsleak/frame?q=admin` (`xsleak-level2`): frame-count oracle (admin includes more iframes)
+- `GET /xsleak/avatar.gif?q=admin` (`xsleak-level3`): load/error oracle (admin returns an image, guest is 404)
+- `GET /xsleak/timing?q=admin` (`xsleak-level4`): timing oracle (guest path sleeps longer)
+- `GET /xsleak/redirect?q=admin` (`xsleak-level5`): redirect-chain oracle (admin has more hops)
+
+### Measuring side-channels
+To validate dynamically, host an "attacker" page on a different origin and probe the victim endpoints using load/error handlers and timing:
+
+```html
+<script>
+  // Load/error oracle (200 vs 404)
+  const img = new Image();
+  img.onload = () => console.log("loaded");
+  img.onerror = () => console.log("error");
+  img.src = "http://127.0.0.1:3000/xsleak/avatar.gif?q=admin";
+
+  // Timing oracle (measure duration)
+  const t0 = performance.now();
+  fetch("http://127.0.0.1:3000/xsleak/timing?q=admin", { mode: "no-cors" })
+    .finally(() => console.log("ms:", performance.now() - t0));
+
+  // Frame-count oracle (browser-dependent)
+  const f = document.createElement("iframe");
+  f.src = "http://127.0.0.1:3000/xsleak/frame?q=admin";
+  f.onload = () => console.log("subframes:", f.contentWindow.length);
+  document.body.appendChild(f);
+</script>
+```
+
+You can also spot differences via CLI:
+```bash
+curl -i "http://localhost:3000/xsleak/avatar.gif?q=guest"   # 404
+curl -i "http://localhost:3000/xsleak/avatar.gif?q=admin"   # 200 image/gif
+curl -s "http://localhost:3000/xsleak/frame?q=guest" | wc -c
+curl -s "http://localhost:3000/xsleak/frame?q=admin" | wc -c
+curl -sL -o /dev/null -w "%{time_total}\n" "http://localhost:3000/xsleak/timing?q=guest"
+curl -sL -o /dev/null -w "%{time_total}\n" "http://localhost:3000/xsleak/timing?q=admin"
+```
