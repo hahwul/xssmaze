@@ -12,6 +12,10 @@ dependencies:
   kemal:
     github: kemalcr/kemal
 
+development_dependencies:
+  spec-kemal:
+    github: kemalcr/spec-kemal
+
 crystal: 1.8.2
 
 license: MIT
