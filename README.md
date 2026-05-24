@@ -36,6 +36,20 @@ Options:
   -h, --help                       Shows this help
 ```
 
+## Dynamic Security Headers (Query Params)
+For calibrating scanners against different defensive configurations, XSSMaze can override common security headers per-request via URL query parameters (works on any endpoint).
+
+- `set_csp`: sets `Content-Security-Policy` (URL-encode spaces/quotes)
+- `set_xcto`: sets `X-Content-Type-Options` (e.g. `nosniff`)
+- `set_xfo`: sets `X-Frame-Options` (e.g. `DENY`)
+
+Examples:
+```bash
+curl -i "http://localhost:3000/basic/level1/?query=a&set_xcto=nosniff"
+curl -i "http://localhost:3000/basic/level1/?query=a&set_xfo=deny"
+curl -i "http://localhost:3000/basic/level1/?query=a&set_csp=default-src%20%27self%27"
+```
+
 ## Endpoint Map
 ```bash
 curl http://localhost:3000/map/text         # newline-separated URLs

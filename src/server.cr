@@ -75,6 +75,10 @@ module Xssmaze::Server
       env.response.headers["Server"] = server_header
     end
 
+    after_all do |env|
+      Xssmaze::SecurityHeaders.apply_overrides(env.response.headers, env.params.query)
+    end
+
     STATIC_ROUTES.each do |route|
       path = route[:path]
       key = route[:key]
