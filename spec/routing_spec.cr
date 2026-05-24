@@ -110,4 +110,31 @@ describe "Kemal routing integration" do
     response.status_code.should eq 200
     response.body.should contain("x-init=alert(1)")
   end
+
+  it "serves modern-bypass level23 and reflects query before the CSP meta tag" do
+    payload = "<script>alert(1)</script>"
+    get "/modern-bypass/level23/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should contain("#{payload}\n  <meta http-equiv='Content-Security-Policy'")
+  end
+
+  it "serves modern-bypass level24 and evaluates CSTI in AngularJS container" do
+    payload = "{{constructor.constructor('alert(1)')()}}"
+    get "/modern-bypass/level24/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should contain("Search keyword: #{payload}")
+  end
+
+  it "serves modern-bypass level25 and reflects inside JS template literals" do
+    payload = "${alert(1)}"
+    get "/modern-bypass/level25/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should contain("var message = `User workspace initialized: #{payload}`;")
+  end
+
+  it "serves modern-bypass level26 and loads nesting parameters" do
+    get "/modern-bypass/level26/?config[__proto__][scriptUrl]=data:text/javascript,alert(1)"
+    response.status_code.should eq 200
+    response.body.should contain("Configuration Loader")
+  end
 end
