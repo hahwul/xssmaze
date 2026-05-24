@@ -255,3 +255,189 @@ maze_get "/modern-bypass/level8/" do |env|
   </script>
   </body></html>"
 end
+
+
+# Level 9: Event Handler in an Unquoted Attribute Context with Space Stripping (Requires Slash Delimiter)
+# Scanners check if they can inject attribute event handlers using alternative separators like `/` when spaces are stripped.
+Xssmaze.push("modern-bypass-level9", "/modern-bypass/level9/?query=a", "Event handler unquoted attribute with space stripping (requires slash separator)", "GET", ["query"])
+maze_get "/modern-bypass/level9/" do |env|
+  query = env.params.query.fetch("query", "")
+
+  # Strip ALL whitespace!
+  sanitized = query.gsub(/\s+/, "")
+
+  "<!doctype html><html><head><title>Unquoted Attribute</title></head><body>
+  <h1>Search Profile</h1>
+  <img src=x class=avatar title=user_profile #{sanitized}>
+  </body></html>"
+end
+
+
+# Level 10: Tag Injection in Nested <select> and <option> Elements
+# Tests if the scanner can properly identify single-quoted option attributes inside select contexts.
+Xssmaze.push("modern-bypass-level10", "/modern-bypass/level10/?query=a", "Nested select option attribute tag breakout", "GET", ["query"])
+maze_get "/modern-bypass/level10/" do |env|
+  query = env.params.query.fetch("query", "")
+
+  # Escapes double quotes inside option value attribute, but single quotes are unescaped
+  escaped = query.gsub("\"", "&quot;")
+
+  "<!doctype html><html><head><title>Drop-down Menu</title></head><body>
+  <h1>Select Option</h1>
+  <form>
+    <select name='theme'>
+      <option value='#{escaped}'>Custom Theme</option>
+    </select>
+  </form>
+  </body></html>"
+end
+
+
+# Level 11: Style Context with Dynamic CSS Variable to JS Execution
+# The user parameter is reflected inside a style block. Scanners trying to close style tags are blocked by WAF.
+# Scanners must understand the style evaluates inside a CSS variable as plain JS by the page scripts.
+Xssmaze.push("modern-bypass-level11", "/modern-bypass/level11/?query=a", "Style context CSS variable to dynamic JS execution", "GET", ["query"])
+maze_get "/modern-bypass/level11/" do |env|
+  query = env.params.query.fetch("query", "")
+
+  # Block style close tags to force CSS-native execution
+  if query.match(/<\/style/i)
+    halt env, status_code: 403, response: "WAF Blocked: Style close tag detected!"
+  end
+
+  "<!doctype html><html><head><title>Custom Style</title>
+  <style>
+    body {
+      --custom-theme-color: #{query};
+    }
+  </style>
+  </head><body>
+  <h1>Custom Styling</h1>
+  <div id='output'>Evaluating custom styles...</div>
+
+  <script>
+    setTimeout(function() {
+      // Dynamic engine parses custom styles and evaluates them (e.g. for custom JS theme scripting)
+      var style = getComputedStyle(document.body);
+      var payload = style.getPropertyValue('--custom-theme-color').trim();
+      if (payload) {
+        try {
+          var f = new Function(payload);
+          f();
+        } catch(e) {
+          console.error('Theme script error', e);
+        }
+      }
+    }, 500);
+  </script>
+  </body></html>"
+end
+
+
+# Level 12: Content Security Policy (CSP) Bypass using JSONP Whitelisted Origin
+# Restricts script-src to self and googleapis. Users can bypass CSP using JSONP callback dynamically.
+Xssmaze.push("modern-bypass-level12", "/modern-bypass/level12/?query=a", "CSP bypass via Whitelisted JSONP API Endpoint", "GET", ["query"])
+maze_get "/modern-bypass/level12/" do |env|
+  query = env.params.query.fetch("query", "")
+
+  # Restrict script-src to self and googleapis
+  env.response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' https://ajax.googleapis.com; object-src 'none';"
+
+  # The application reflects user query inside the script URL callback
+  "<!doctype html><html><head><title>Whitelisted Library Loader</title>
+  <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js?callback=#{query}'></script>
+  </head><body>
+  <h1>Library Loader</h1>
+  <p>Loading whitelist library with callback parameter...</p>
+  </body></html>"
+end
+
+
+# Level 13: SVG Path Attribute Custom Trigger Injection
+# Measures if the scanner can detect XSS in custom data attributes or SVG sub-properties.
+Xssmaze.push("modern-bypass-level13", "/modern-bypass/level13/?query=a", "SVG Path custom action trigger XSS", "GET", ["query"])
+maze_get "/modern-bypass/level13/" do |env|
+  query = env.params.query.fetch("query", "")
+
+  "<!doctype html><html><head><title>Vector Viewer</title></head><body>
+  <h1>SVG Path Viewer</h1>
+  <svg width='100' height='100'>
+    <path id='my-path' d='#{query}' fill='none' stroke='black'/>
+  </svg>
+
+  <script>
+    setTimeout(function() {
+      var path = document.getElementById('my-path');
+      if (path) {
+        var d = path.getAttribute('d');
+        if (d && d.indexOf('xss:') !== -1) {
+          var code = d.split('xss:')[1];
+          eval(code);
+        }
+      }
+    }, 500);
+  </script>
+  </body></html>"
+end
+
+
+# Level 14: Strict Event Denylist (Requires Obscure Event Handlers)
+# Blocks the 10 most common event handlers. Scanner must utilize obscure events like pointerover or pointerdown.
+Xssmaze.push("modern-bypass-level14", "/modern-bypass/level14/?query=a", "Strict event denylist (requires obscure HTML5 events)", "GET", ["query"])
+maze_get "/modern-bypass/level14/" do |env|
+  query = env.params.query.fetch("query", "")
+
+  # Block common events
+  if query.match(/onload|onerror|onclick|onmouseover|onfocus|onblur|onchange|onkeydown|onkeypress|onkeyup/i)
+    halt env, status_code: 403, response: "WAF Blocked: Common event handler detected!"
+  end
+
+  "<!doctype html><html><head><title>Obscure Events</title></head><body>
+  <h1>Profile Feed</h1>
+  <div title=\"#{query}\">Hover or scroll to trigger events...</div>
+  </body></html>"
+end
+
+
+# Level 15: Nested JSON String in Single-Quoted Attribute Context
+# Replaces double quotes but leaves single quotes intact. Breakout via single-quote attribute boundary.
+Xssmaze.push("modern-bypass-level15", "/modern-bypass/level15/?query=a", "Nested JSON inside single-quoted attribute breakout", "GET", ["query"])
+maze_get "/modern-bypass/level15/" do |env|
+  query = env.params.query.fetch("query", "")
+
+  # Naive escaping: replaces double quotes but leaves single quotes intact!
+  escaped = query.gsub("\"", "\\\"")
+
+  "<!doctype html><html><head><title>JSON data attribute</title></head><body>
+  <h1>User Profile</h1>
+  <div id='user' data-info='{\"name\": \"#{escaped}\"}'>Hover for metadata</div>
+
+  <script>
+    var el = document.getElementById('user');
+    var info = JSON.parse(el.getAttribute('data-info'));
+    // Dangerous innerHTML assignment of JSON attribute property
+    document.body.innerHTML += '<div>Loaded user: ' + info.name + '</div>';
+  </script>
+  </body></html>"
+end
+
+
+# Level 16: Multi-Context Variable Splitting XSS
+# First reflection is fully HTML-escaped. Second reflection is unquoted raw JS.
+Xssmaze.push("modern-bypass-level16", "/modern-bypass/level16/?query=a", "Multi-context unquoted JS variable splitting", "GET", ["query"])
+maze_get "/modern-bypass/level16/" do |env|
+  query = env.params.query.fetch("query", "")
+
+  "<!doctype html><html><head><title>Multi-Context</title></head><body>
+  <h1>Workspace Settings</h1>
+
+  <script>
+    // Double reflection: first is single-quoted JS variable
+    var configName = '#{HTML.escape(query)}';
+
+    // Second is unquoted raw reflection
+    var configId = #{query};
+  </script>
+  </body></html>"
+end
+
