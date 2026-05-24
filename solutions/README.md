@@ -132,7 +132,7 @@ working payload for one or more maze levels.
 | [mixed-method](mixed-method.md) | Endpoints with varied HTTP methods and parameter names; reflections are mostly raw. |
 | [mobserver](mobserver.md) | MutationObserver re-applies content into unsafe sinks; DOM-based. |
 | [modern](modern.md) | Modern framework / SaaS XSS shapes: dangerouslySetInnerHTML, markdown, hydration mismatch, etc. |
-| [modern-bypass](modern-bypass.md) | Modern real-world XSS bypasses: multi-step state, DOM clobbering config, Vue.js CSTI tag bypass, client prototype pollution, SVG direct load, iframe srcdoc, Unicode NFKC, and flawed regex whitelists. |
+| [modern-bypass](modern-bypass.md) | Modern real-world XSS bypasses: multi-step state, DOM clobbering config, Vue.js CSTI tag bypass, client prototype pollution, SVG direct load, iframe srcdoc, Unicode NFKC, flawed regex whitelists, closed shadow roots, slots, postMessage regex bypass, double-decoding, JSON script injection, and Alpine.js. |
 | [multicontext](multicontext.md) | Same input lands in multiple contexts; at least one is exploitable. |
 | [multiline](multiline.md) | Reflections in contexts where newlines or block-element nesting matter. |
 | [multiparam](multiparam.md) | Multiple parameters; requires correct param combination to reach the reflection. |

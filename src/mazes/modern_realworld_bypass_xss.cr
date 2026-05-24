@@ -469,3 +469,105 @@ maze_get "/modern-bypass/level18/" do |_env|
   </script>
   </body></html>"
 end
+
+# Level 19: Web Messaging (postMessage) Origin RegExp Bypass
+# Evaluates event data from postMessage listeners where origin validation has weak unanchored RegExp.
+Xssmaze.push("modern-bypass-level19", "/modern-bypass/level19/", "Web Messaging (postMessage) origin RegExp bypass", "GET", [] of String)
+maze_get "/modern-bypass/level19/" do |_env|
+  "<!doctype html><html><head><meta charset='utf-8'><title>PostMessage Portal</title></head><body>
+  <h1>Modern Bypass Level 19</h1>
+  <p>This portal communicates with parent frames. It securely executes actions sent via <code>postMessage</code>, verifying the sender's origin is <code>xssmaze.com</code>.</p>
+  <div id='output'>Awaiting handshake...</div>
+
+  <script>
+    window.addEventListener('message', function(event) {
+      // Weak origin validation: unanchored RegExp allowing domains like https://xssmaze.com.attacker.com
+      if (/https://xssmaze.com/.test(event.origin)) {
+        var data = event.data;
+        if (data && data.action === 'execute') {
+          // Dynamic execution of message payload code
+          try {
+            eval(data.code);
+            document.getElementById('output').textContent = 'Executed dynamic task!';
+          } catch (e) {
+            document.getElementById('output').textContent = 'Error executing task: ' + e.message;
+          }
+        }
+      } else {
+        console.warn('Blocked message from unauthorized origin:', event.origin);
+      }
+    });
+  </script>
+  </body></html>"
+end
+
+# Level 20: Double URL Decoding / Double Escape Bypass
+# The application uses explicit second URL decoding after passing input through a WAF rule checking first-level tags.
+Xssmaze.push("modern-bypass-level20", "/modern-bypass/level20/?query=a", "Double URL decoding / double escape bypass", "GET", ["query"])
+maze_get "/modern-bypass/level20/" do |env|
+  query = env.params.query.fetch("query", "")
+
+  # WAF rule: block raw script tags, angle brackets, or onload/onerror attributes in first-decoded query
+  if query.match(/<|>|onload|onerror/i)
+    halt env, status_code: 403, response: "WAF Blocked: Dangerous characters detected in query!"
+  end
+
+  # Application double-decodes explicitly to support nested/legacy API serialization
+  double_decoded = URI.decode_www_form(query)
+
+  "<!doctype html><html><head><meta charset='utf-8'><title>Search Dashboard</title></head><body>
+  <h1>Double Decode Search</h1>
+  <p>Double URL decoded output returned safely:</p>
+  <div class='result-box'>#{double_decoded}</div>
+  </body></html>"
+end
+
+# Level 21: Context-Breaking JSON Script Tag Injection (Auto-Escaping Failure)
+# The application serializes a Crystal Hash to JSON and reflects it raw in a script block.
+# An attacker closes the script block with </script> and opens a new one, breaking JS parser rules.
+Xssmaze.push("modern-bypass-level21", "/modern-bypass/level21/?query=a", "Context-breaking JSON script tag injection", "GET", ["query"])
+maze_get "/modern-bypass/level21/" do |env|
+  query = env.params.query.fetch("query", "")
+
+  # The application serializes user-submitted data to a JSON configuration object
+  config_data = {
+    "username" => query,
+    "role"     => "guest",
+    "status"   => "active",
+  }
+
+  "<!doctype html><html><head><meta charset='utf-8'><title>Workspace Configuration</title></head><body>
+  <h1>System Workspace Settings</h1>
+  <p>Check the console for initialized configurations.</p>
+
+  <script>
+    // Config data serialized raw into the script block:
+    var globalConfig = #{config_data.to_json};
+    console.log('Successfully loaded config:', globalConfig);
+  </script>
+  </body></html>"
+end
+
+# Level 22: Alpine.js Directive Injection (Attribute Context)
+# Input is placed directly inside a div element's tag body as a custom attribute. Quotes are HTML-escaped to prevent attribute breakout.
+# Evaluated via Alpine.js directives (like x-init) which do not require quotes to run code in HTML.
+Xssmaze.push("modern-bypass-level22", "/modern-bypass/level22/?query=a", "Alpine.js directive attribute injection", "GET", ["query"])
+maze_get "/modern-bypass/level22/" do |env|
+  query = env.params.query.fetch("query", "")
+
+  # Escape double and single quotes to prevent breaking out of attribute parameters
+  escaped = HTML.escape(query)
+
+  "<!doctype html><html><head><meta charset='utf-8'>
+  <title>Component Showcase</title>
+  <script src='https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js' defer></script>
+  </head><body>
+  <h1>Interactive Component Dashboard</h1>
+  <p>The system renders user-defined attributes on this showcase component:</p>
+
+  <!-- Injection context: inside the element tag directly. Quotes are escaped but Alpine evaluates injected directives -->
+  <div id='interactive-component' #{escaped}>
+    Toggle Component Options
+  </div>
+  </body></html>"
+end

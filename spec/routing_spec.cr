@@ -84,4 +84,30 @@ describe "Kemal routing integration" do
     response.status_code.should eq 200
     response.body.should contain(%("whitelisted-module": "data:text/javascript,alert(1)"))
   end
+
+  it "serves modern-bypass level19 postMessage portal" do
+    get "/modern-bypass/level19/"
+    response.status_code.should eq 200
+    response.body.downcase.should contain("handshake")
+  end
+
+  it "blocks modern-bypass level20 first-level tag reflection via WAF" do
+    get "/modern-bypass/level20/?query=%3Cscript%3E"
+    response.status_code.should eq 403
+    response.body.should contain("WAF Blocked")
+  end
+
+  it "serves modern-bypass level21 and serializes config raw inside script block" do
+    payload = "guest"
+    get "/modern-bypass/level21/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should contain(%("username":"guest"))
+  end
+
+  it "serves modern-bypass level22 and reflects escaped Alpine attributes" do
+    payload = "x-init=alert(1)"
+    get "/modern-bypass/level22/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should contain("x-init=alert(1)")
+  end
 end

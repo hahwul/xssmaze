@@ -129,3 +129,28 @@ Modern real-world XSS bypasses: multi-step state, DOM clobbering config, Vue.js 
 
 - payload: `<svg onload=alert(1)>`
 - context: Client-side JS writes the query value into the host's light DOM using `innerHTML`, while a **closed** ShadowRoot renders it via `<slot>`. Tools must execute JS and account for slotting into closed shadow trees.
+
+### modern-bypass-level19
+
+`/modern-bypass/level19/`
+- payload: `window.opener.postMessage({action: 'execute', code: 'alert(1)'}, '*')`
+- context: Client-side `message` listener uses a weak, unanchored RegExp (`/https:\/\/xssmaze\.com/`) to validate sender origin. An attacker hosting a page on a domain like `https://xssmaze.com.attacker.com` can pass origin checks and send execution payloads.
+
+### modern-bypass-level20
+
+`/modern-bypass/level20/?query=%253Cscript%253Ealert(1)%253C/script%253E`
+- payload: `%3Cscript%3Ealert(1)%3C/script%3E`
+- context: First-level WAF checking for tags `<` or `>` passes because input is url-encoded twice. The application then performs an explicit second URL-decode (`URI.decode_www_form`) rendering the raw script tag.
+
+### modern-bypass-level21
+
+`/modern-bypass/level21/?query=%3C/script%3E%3Cscript%3Ealert(1)%3C/script%3E`
+- payload: `</script><script>alert(1)</script>`
+- context: Serialized raw as JSON into an inline script block. Since Crystal's `.to_json` doesn't escape script tags, an attacker injects a closing script tag to terminate the block and open a new one.
+
+### modern-bypass-level22
+
+`/modern-bypass/level22/?query=x-init=alert(1)`
+- payload: `x-init=alert(1)`
+- context: Attribute injection context with quote escaping. Attacker injects the Alpine.js framework attribute `x-init=alert(1)` to trigger code execution on page initialization without needing single or double quotes.
+
