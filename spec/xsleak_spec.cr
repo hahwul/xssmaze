@@ -24,4 +24,3 @@ describe "XS-Leaks scenarios" do
     end
   end
 end
-

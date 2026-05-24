@@ -47,4 +47,3 @@ describe Xssmaze::SecurityHeaders do
     headers.has_key?("X-Frame-Options").should be_false
   end
 end
-

@@ -43,7 +43,6 @@ maze_get "/modern-bypass/level1/preview" do |env|
   end
 end
 
-
 # Level 2: DOM Clobbering to XSS via Global Config Override
 # Scanners lack the static/dynamic tracing engines to detect when a reflected attribute
 # overrides global namespaces, which are subsequently loaded into dynamic script tags.
@@ -53,8 +52,8 @@ maze_get "/modern-bypass/level2/" do |env|
 
   # Strip standard tag vectors and event handlers but keep anchor tags, ids, names, and hrefs intact!
   sanitized = query.gsub(/<(script|iframe|object|embed)[^>]*>([\s\S]*?)<\/\1>/i, "")
-                   .gsub(/<\/?(script|iframe|object|embed)[^>]*>/i, "")
-                   .gsub(/\bon[a-z]+=/i, "data-blocked-event=")
+    .gsub(/<\/?(script|iframe|object|embed)[^>]*>/i, "")
+    .gsub(/\bon[a-z]+=/i, "data-blocked-event=")
 
   "<!doctype html><html><head><title>Profile Page</title></head><body>
   <h1>User Profile</h1>
@@ -77,7 +76,6 @@ maze_get "/modern-bypass/level2/" do |env|
   </script>
   </body></html>"
 end
-
 
 # Level 3: Vue.js Client-Side Template Injection (CSTI) Bypassing Tag Filters
 # Scanners check for HTML injection by looking for tags like <script> or <img onerror>.
@@ -106,7 +104,6 @@ maze_get "/modern-bypass/level3/" do |env|
   </script>
   </body></html>"
 end
-
 
 # Level 4: Client-Side JavaScript Prototype Pollution to DOM XSS
 # Scanners do not test dynamic client-side hash parsing (#) or prototype poisoning.
@@ -160,7 +157,6 @@ maze_get "/modern-bypass/level4/" do |env|
   </body></html>"
 end
 
-
 # Level 5: SVG Content-Type Reflection with Script Tag Stripping
 # Scanners assume SVG is safe when `<script>` is deleted, ignoring element-level event triggers like `<svg onload="...">`.
 Xssmaze.push("modern-bypass-level5", "/modern-bypass/level5/?svg=a", "SVG reflection with script tag stripping (requires direct navigation)", "GET", ["svg"])
@@ -169,12 +165,11 @@ maze_get "/modern-bypass/level5/" do |env|
 
   # Strip script tags recursively
   sanitized = svg.gsub(/<script[^>]*>([\s\S]*?)<\/script>/i, "")
-                 .gsub(/<\/?script[^>]*>/i, "")
+    .gsub(/<\/?script[^>]*>/i, "")
 
   env.response.content_type = "image/svg+xml"
   sanitized
 end
-
 
 # Level 6: Entity Decoding inside Iframe `srcdoc` Attribute Context
 # Scanners check if `<script>` is escaped to `&lt;script&gt;` and report safe.
@@ -195,7 +190,6 @@ maze_get "/modern-bypass/level6/" do |env|
   <iframe srcdoc=\"#{escaped_query}\" style='border: 1px solid #ccc; width: 400px; height: 200px;'></iframe>
   </body></html>"
 end
-
 
 # Level 7: Unicode Normalization (NFKC) Filter Bypass
 # DAST scanners rarely send Unicode homoglyphs to check normalization side-effects.
@@ -223,7 +217,6 @@ maze_get "/modern-bypass/level7/" do |env|
   </script>
   </body></html>"
 end
-
 
 # Level 8: Flawed Regex Host Whitelist for Dynamic Scripts
 # Scanners do not test subdomain/credential validation bypasses of whitelist patterns.
@@ -256,7 +249,6 @@ maze_get "/modern-bypass/level8/" do |env|
   </body></html>"
 end
 
-
 # Level 9: Event Handler in an Unquoted Attribute Context with Space Stripping (Requires Slash Delimiter)
 # Scanners check if they can inject attribute event handlers using alternative separators like `/` when spaces are stripped.
 Xssmaze.push("modern-bypass-level9", "/modern-bypass/level9/?query=a", "Event handler unquoted attribute with space stripping (requires slash separator)", "GET", ["query"])
@@ -271,7 +263,6 @@ maze_get "/modern-bypass/level9/" do |env|
   <img src=x class=avatar title=user_profile #{sanitized}>
   </body></html>"
 end
-
 
 # Level 10: Tag Injection in Nested <select> and <option> Elements
 # Tests if the scanner can properly identify single-quoted option attributes inside select contexts.
@@ -291,7 +282,6 @@ maze_get "/modern-bypass/level10/" do |env|
   </form>
   </body></html>"
 end
-
 
 # Level 11: Style Context with Dynamic CSS Variable to JS Execution
 # The user parameter is reflected inside a style block. Scanners trying to close style tags are blocked by WAF.
@@ -333,7 +323,6 @@ maze_get "/modern-bypass/level11/" do |env|
   </body></html>"
 end
 
-
 # Level 12: Content Security Policy (CSP) Bypass using JSONP Whitelisted Origin
 # Restricts script-src to self and googleapis. Users can bypass CSP using JSONP callback dynamically.
 Xssmaze.push("modern-bypass-level12", "/modern-bypass/level12/?query=a", "CSP bypass via Whitelisted JSONP API Endpoint", "GET", ["query"])
@@ -351,7 +340,6 @@ maze_get "/modern-bypass/level12/" do |env|
   <p>Loading whitelist library with callback parameter...</p>
   </body></html>"
 end
-
 
 # Level 13: SVG Path Attribute Custom Trigger Injection
 # Measures if the scanner can detect XSS in custom data attributes or SVG sub-properties.
@@ -380,7 +368,6 @@ maze_get "/modern-bypass/level13/" do |env|
   </body></html>"
 end
 
-
 # Level 14: Strict Event Denylist (Requires Obscure Event Handlers)
 # Blocks the 10 most common event handlers. Scanner must utilize obscure events like pointerover or pointerdown.
 Xssmaze.push("modern-bypass-level14", "/modern-bypass/level14/?query=a", "Strict event denylist (requires obscure HTML5 events)", "GET", ["query"])
@@ -397,7 +384,6 @@ maze_get "/modern-bypass/level14/" do |env|
   <div title=\"#{query}\">Hover or scroll to trigger events...</div>
   </body></html>"
 end
-
 
 # Level 15: Nested JSON String in Single-Quoted Attribute Context
 # Replaces double quotes but leaves single quotes intact. Breakout via single-quote attribute boundary.
@@ -421,7 +407,6 @@ maze_get "/modern-bypass/level15/" do |env|
   </body></html>"
 end
 
-
 # Level 16: Multi-Context Variable Splitting XSS
 # First reflection is fully HTML-escaped. Second reflection is unquoted raw JS.
 Xssmaze.push("modern-bypass-level16", "/modern-bypass/level16/?query=a", "Multi-context unquoted JS variable splitting", "GET", ["query"])
@@ -440,7 +425,6 @@ maze_get "/modern-bypass/level16/" do |env|
   </script>
   </body></html>"
 end
-
 
 # Level 17: Shadow DOM (Closed Root) Reflection via Client-Side Query Parsing
 # Static HTML response contains no user input; the sink is reached only after JS execution.
@@ -462,7 +446,6 @@ maze_get "/modern-bypass/level17/" do |_env|
   </script>
   </body></html>"
 end
-
 
 # Level 18: Closed ShadowRoot + Slot-Based Injection
 # The shadow DOM uses a slot, while the light DOM is populated via client-side innerHTML.

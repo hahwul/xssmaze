@@ -47,7 +47,7 @@ describe "Kemal routing integration" do
   it "implements XS-Leaks size oracle distinguishing admin from guest" do
     get "/xsleak/search?q=admin"
     admin_size = response.body.size
-    
+
     get "/xsleak/search?q=guest"
     guest_size = response.body.size
 
@@ -85,4 +85,3 @@ describe "Kemal routing integration" do
     response.body.should contain(%("whitelisted-module": "data:text/javascript,alert(1)"))
   end
 end
-

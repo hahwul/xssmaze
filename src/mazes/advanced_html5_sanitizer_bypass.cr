@@ -62,10 +62,10 @@ maze_get "/html5-sanitizer/level1/" do |env|
 
   # Naive sanitizer: only strips dangerous HTML tags, doesn't understand namespaces
   sanitized = query
-    .gsub(/<script[^>]*>.*?<\/script>/im, "")  # Remove script tags
-    .gsub(/<iframe(?![^>]*srcdoc)[^>]*>.*?<\/iframe>/im, "")  # Remove plain iframes (but misses srcdoc check)
-    .gsub(/<object[^>]*>.*?<\/object>/im, "")  # Remove object tags
-    .gsub(/on\w+\s*=/i, "")  # Remove event handlers
+    .gsub(/<script[^>]*>.*?<\/script>/im, "")                # Remove script tags
+    .gsub(/<iframe(?![^>]*srcdoc)[^>]*>.*?<\/iframe>/im, "") # Remove plain iframes (but misses srcdoc check)
+    .gsub(/<object[^>]*>.*?<\/object>/im, "")                # Remove object tags
+    .gsub(/on\w+\s*=/i, "")                                  # Remove event handlers
 
   # The sanitizer leaves MathML and XML tags untouched (mistake!)
   # Solution: Use MathML namespace context to bypass
