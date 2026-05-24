@@ -36,6 +36,20 @@ Options:
   -h, --help                       Shows this help
 ```
 
+## Dynamic Security Headers (Query Params)
+For calibrating scanners against different defensive configurations, XSSMaze can override common security headers per-request via URL query parameters (works on any endpoint).
+
+- `set_csp`: sets `Content-Security-Policy` (URL-encode spaces/quotes)
+- `set_xcto`: sets `X-Content-Type-Options` (e.g. `nosniff`)
+- `set_xfo`: sets `X-Frame-Options` (e.g. `DENY`)
+
+Examples:
+```bash
+curl -i "http://localhost:3000/basic/level1/?query=a&set_xcto=nosniff"
+curl -i "http://localhost:3000/basic/level1/?query=a&set_xfo=deny"
+curl -i "http://localhost:3000/basic/level1/?query=a&set_csp=default-src%20%27self%27"
+```
+
 ## Endpoint Map
 ```bash
 curl http://localhost:3000/map/text         # newline-separated URLs
@@ -97,4 +111,105 @@ curl -s "http://localhost:3000/xsleak/frame?q=guest" | wc -c
 curl -s "http://localhost:3000/xsleak/frame?q=admin" | wc -c
 curl -sL -o /dev/null -w "%{time_total}\n" "http://localhost:3000/xsleak/timing?q=guest"
 curl -sL -o /dev/null -w "%{time_total}\n" "http://localhost:3000/xsleak/timing?q=admin"
+```
+
+## Benchmarking Scanner Tools
+
+XSSMaze includes an automated benchmark tool to measure how well XSS scanners perform against the lab's diverse vulnerability scenarios. The tool retrieves all endpoints from `/map/json`, runs scanner tools against them, and generates a detection scorecard.
+
+### Requirements
+
+- Python 3.x
+- `requests` library (`pip install requests`)
+- Scanner tools (e.g., [Nuclei](https://github.com/projectdiscovery/nuclei))
+
+### Quick Start
+
+```bash
+# Start XSSMaze (in one terminal)
+./bin/xssmaze -b 0.0.0.0
+
+# Run benchmark (in another terminal)
+cd scripts
+./benchmark.sh http://localhost:3000
+```
+
+### Usage Examples
+
+```bash
+# Basic benchmark with console output
+python3 benchmark.py http://localhost:3000
+
+# Verbose mode (shows detailed progress)
+python3 benchmark.py http://localhost:3000 -v
+
+# Generate markdown report
+python3 benchmark.py http://localhost:3000 -o report.md
+
+# Run specific scanner only
+python3 benchmark.py http://localhost:3000 --scanner nuclei
+
+# Use a custom scanner command
+python3 benchmark.py http://localhost:3000 \
+  --custom-scanner "myxss {URL}" \
+  --custom-scanner-name "MyXSSScanner"
+```
+
+### Output Format
+
+The benchmark tool provides:
+
+- **Console Scorecard**: Summary table showing detection rates for each scanner
+- **Detailed Statistics**:
+  - Total registered endpoints
+  - Endpoints successfully detected (True Positives)
+  - Endpoints missed (False Negatives)
+  - Overall detection rate percentage
+  - Breakdown of missed detections by category
+- **Markdown Report** (optional): Exportable report with full benchmark results
+
+Example output:
+```
+======================================================================
+XSSMaze Scanner Benchmark Results
+======================================================================
+
+Target: http://localhost:3000
+Total Registered Endpoints: 450
+Categories: 45
+
+Scanner              Detected     Missed       Rate         Time (s)
+----------------------------------------------------------------------
+Nuclei               234          216          52.0%        125.3s
+
+--- Nuclei Detailed Results ---
+✓ True Positives: 234/450
+✗ False Negatives (Missed): 216/450
+
+Missed by category:
+  advanced: 6/6 missed
+  csp-bypass: 5/5 missed
+  template-injection: 6/6 missed
+```
+
+### Supported Scanners
+
+The benchmark tool currently supports:
+
+- **Nuclei**: Uses XSS-related templates from the Nuclei template library
+- **Custom Scanners**: Any tool that can accept a URL and output results
+
+### Adding New Scanners
+
+To add support for a new scanner:
+
+1. Use the `--custom-scanner` option with command template
+2. Or extend `benchmark.py` with a new scanner method
+
+Example for adding a scanner permanently:
+```python
+def run_my_scanner(self) -> ScannerResult:
+    # Implementation here
+    pass
+```
 ```
