@@ -107,8 +107,8 @@ end
 
 # Level 4: Client-Side JavaScript Prototype Pollution to DOM XSS
 # Scanners do not test dynamic client-side hash parsing (#) or prototype poisoning.
-Xssmaze.push("modern-bypass-level4", %q{/modern-bypass/level4/#{"__proto__":{"scriptUrl":"data:text/javascript,alert(1)"}}}, "Client-side Prototype Pollution to DOM XSS via hash parsing", "GET", [] of String)
-maze_get "/modern-bypass/level4/" do |env|
+Xssmaze.push("modern-bypass-level4", %q(/modern-bypass/level4/#{"__proto__":{"scriptUrl":"data:text/javascript,alert(1)"}}), "Client-side Prototype Pollution to DOM XSS via hash parsing", "GET", [] of String)
+maze_get "/modern-bypass/level4/" do |_env|
   "<!doctype html><html><head><title>Dashboard</title></head><body>
   <h1>Modern Dashboard</h1>
   <div id='output'>Initializing theme...</div>
@@ -635,9 +635,7 @@ end
 # Level 26: Nested Query Parameter Prototype Pollution XSS
 # Simulates deep query string key parsing where __proto__ allows poisoning object prototypes.
 Xssmaze.push("modern-bypass-level26", "/modern-bypass/level26/?query=a", "Query parameter recursive parsing prototype pollution to DOM XSS", "GET", ["query"])
-maze_get "/modern-bypass/level26/" do |env|
-  query = env.params.query.fetch("query", "")
-
+maze_get "/modern-bypass/level26/" do |_env|
   "<!doctype html><html><head><meta charset='utf-8'><title>Admin Config Console</title></head><body>
   <h1>Configuration Loader</h1>
   <div id='status'>Loading configuration modules...</div>
