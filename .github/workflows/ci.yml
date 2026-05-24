@@ -1,0 +1,33 @@
+---
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Ameba linter
+        uses: crystal-ameba/github-action@master
+
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        crystal-version: [1.8.2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: crystal-lang/install-crystal@v1
+        with:
+          crystal: ${{ matrix.crystal-version }}
+      - name: Install dependencies
+        run: shards install
+      - name: Build binary
+        run: shards build
+      - name: Run tests
+        run: crystal spec
