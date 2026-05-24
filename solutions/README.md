@@ -104,6 +104,7 @@ working payload for one or more maze levels.
 | [globalattr](globalattr.md) | Reflection in various global HTML attributes (`id`, `class`, `accesskey`, `spellcheck`, `draggable`, `lang`) — all double-quoted, break out and inject. |
 | [header](header.md) | Raw header values reflected as the entire response body — set the header to a script payload. |
 | [headerinj](headerinj.md) | Various request headers (Referer, User-Agent, X-Forwarded-For, Cookie, Accept-Language, X-Debug) reflected into HTML body/attributes/comments. |
+| [headless](headless.md) | Headless browser PDF/Image generator simulated sinks: raw HTML/SVG rendering, basic tag filtering bypass, SSRF resource loading, and JS callback logging. |
 | [hidden](hidden.md) | Reflection in hidden / non-visible sinks: `<input type=hidden>`, meta refresh, data attributes, JSON/CSS/noscript blocks. |
 | [history-state](history-state.md) | DOM sinks where `?seed` is stored via `history.replaceState` and then read back into `innerHTML` / `srcdoc`. |
 | [hpp](hpp.md) | HTTP parameter pollution: duplicate names, array suffixes, and dot-notation reflections. |
