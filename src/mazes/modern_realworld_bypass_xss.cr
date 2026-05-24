@@ -441,3 +441,48 @@ maze_get "/modern-bypass/level16/" do |env|
   </body></html>"
 end
 
+
+# Level 17: Shadow DOM (Closed Root) Reflection via Client-Side Query Parsing
+# Static HTML response contains no user input; the sink is reached only after JS execution.
+# Many crawlers and simple DAST tools won't execute JS or inspect closed shadow roots.
+Xssmaze.push("modern-bypass-level17", "/modern-bypass/level17/?query=a", "Closed ShadowRoot innerHTML reflection via URLSearchParams (client-side only)", "GET", ["query"])
+maze_get "/modern-bypass/level17/" do |_env|
+  "<!doctype html><html><head><meta charset='utf-8'><title>Shadow DOM (closed) Reflection</title></head><body>
+  <h1>Modern Bypass Level 17</h1>
+  <p>This page reads <code>?query=...</code> on the client and injects it into a <strong>closed</strong> ShadowRoot via <code>innerHTML</code>.</p>
+  <div id='host'></div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const input = params.get('query') || '';
+
+    const el = document.getElementById('host');
+    const shadowRoot = el.attachShadow({mode: 'closed'});
+    shadowRoot.innerHTML = '<div>Reflected: ' + input + '</div>';
+  </script>
+  </body></html>"
+end
+
+
+# Level 18: Closed ShadowRoot + Slot-Based Injection
+# The shadow DOM uses a slot, while the light DOM is populated via client-side innerHTML.
+Xssmaze.push("modern-bypass-level18", "/modern-bypass/level18/?query=a", "Closed ShadowRoot slot renders light DOM populated via client-side innerHTML", "GET", ["query"])
+maze_get "/modern-bypass/level18/" do |_env|
+  "<!doctype html><html><head><meta charset='utf-8'><title>Shadow DOM Slot (closed)</title></head><body>
+  <h1>Modern Bypass Level 18</h1>
+  <p>Client-side code writes <code>?query=...</code> into the host's light DOM using <code>innerHTML</code>; a <strong>closed</strong> ShadowRoot renders it via <code>&lt;slot&gt;</code>.</p>
+  <div id='host'></div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const input = params.get('query') || '';
+
+    const host = document.getElementById('host');
+    const shadowRoot = host.attachShadow({mode: 'closed'});
+    shadowRoot.innerHTML = '<div>Slotted content:</div><div class=\"slot-wrap\"><slot></slot></div>';
+
+    // Light DOM injection that becomes visible inside the closed shadow root via slotting.
+    host.innerHTML = input;
+  </script>
+  </body></html>"
+end
