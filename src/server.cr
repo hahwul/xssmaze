@@ -50,7 +50,7 @@ module Xssmaze::Server
   end
 
   # Wire up every "catalog" route plus the small handful of dynamic ones.
-  def self.start!
+  def self.start!(run_server : Bool = true)
     # 1. Tighten Kemal defaults BEFORE Kemal.run parses CLI flags.
     #
     #    Kemal's built-in default binds to 0.0.0.0, which would expose this
@@ -150,6 +150,10 @@ module Xssmaze::Server
       "<a href='/map/categories'>category list</a>.</p></body></html>"
     end
 
-    Kemal.run
+    # spec-kemal expects Kemal's handler chain to be wired even when we
+    # don't call Kemal.run (test mode).
+    Kemal.config.setup
+
+    Kemal.run if run_server
   end
 end

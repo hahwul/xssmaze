@@ -13,5 +13,8 @@ require "./banner"
 require "./mazes/**"
 require "./server"
 
-banner
-Xssmaze::Server.start!
+# Keep spec output clean and avoid boot-time side effects during tests.
+banner unless ENV["KEMAL_ENV"]? == "test"
+# In specs we set KEMAL_ENV=test and use spec-kemal to exercise routes
+# without binding a real TCP socket.
+Xssmaze::Server.start!(run_server: ENV["KEMAL_ENV"]? != "test")
