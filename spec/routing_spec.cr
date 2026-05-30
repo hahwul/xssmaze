@@ -137,4 +137,26 @@ describe "Kemal routing integration" do
     response.status_code.should eq 200
     response.body.should contain("Configuration Loader")
   end
+
+  it "serves jquery level2 and reflects query into a $.parseHTML sink" do
+    payload = "<img src=x onerror=alert(1)>"
+    get "/jquery/level2/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should contain("var raw = '#{payload}';")
+    response.body.should contain("$.parseHTML(raw)")
+  end
+
+  it "serves jquery level4 and reflects a javascript: URL into .attr('href')" do
+    payload = "javascript:alert(1)"
+    get "/jquery/level4/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should contain(".attr('href', '#{payload}')")
+  end
+
+  it "serves jquery level1 as a static page with a location.hash selector sink" do
+    get "/jquery/level1/"
+    response.status_code.should eq 200
+    response.body.should contain("location.hash.slice(1)")
+    response.body.should contain("$(target).appendTo")
+  end
 end
