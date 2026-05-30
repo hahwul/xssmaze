@@ -195,4 +195,27 @@ describe "Kemal routing integration" do
     response.body.should contain("history.replaceState({ note: note }")
     response.body.should contain("innerHTML = st.note")
   end
+
+  it "serves apidom level1 page that fetches its echo API into innerHTML" do
+    get "/apidom/level1/?q=a"
+    response.status_code.should eq 200
+    response.body.should contain("fetch('/apidom/level1/api?q='")
+    response.body.should contain("innerHTML = t")
+  end
+
+  it "echoes the q param raw from the apidom level1 API as text/plain" do
+    payload = "<img src=x onerror=alert(1)>"
+    get "/apidom/level1/api?q=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    (response.headers["Content-Type"]? || "").should contain("text/plain")
+    response.body.should contain(payload)
+  end
+
+  it "echoes the q param raw inside JSON from the apidom level2 API" do
+    payload = "<img src=x onerror=alert(1)>"
+    get "/apidom/level2/api?q=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    (response.headers["Content-Type"]? || "").should contain("application/json")
+    response.body.should contain(%({"html":"#{payload}"}))
+  end
 end
