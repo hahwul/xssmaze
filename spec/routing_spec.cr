@@ -181,4 +181,18 @@ describe "Kemal routing integration" do
     response.status_code.should eq 200
     response.body.should contain("var src = '#{payload}';")
   end
+
+  it "serves clientstate level1 with a localStorage seed-and-read innerHTML sink" do
+    get "/clientstate/level1/?pref=a"
+    response.status_code.should eq 200
+    response.body.should contain("localStorage.setItem('pref', pref)")
+    response.body.should contain("innerHTML = localStorage.getItem('pref')")
+  end
+
+  it "serves clientstate level5 with a history.state innerHTML sink" do
+    get "/clientstate/level5/?note=a"
+    response.status_code.should eq 200
+    response.body.should contain("history.replaceState({ note: note }")
+    response.body.should contain("innerHTML = st.note")
+  end
 end
