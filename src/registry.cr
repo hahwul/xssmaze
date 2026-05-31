@@ -3,7 +3,9 @@ require "compress/gzip"
 # Catalog of every maze endpoint plus a few shared helpers used by maze
 # definitions and the catalog/server layers.
 module Xssmaze
-  VERSION = "0.1.0"
+  # Single source of truth: read the version straight from shard.yml at compile
+  # time so it can never drift from the released version again.
+  VERSION = {{ read_file("#{__DIR__}/../shard.yml").lines.find(&.starts_with?("version:")).split(":")[1].strip }}
 
   @@mazes = [] of Maze
   @@frozen = false
