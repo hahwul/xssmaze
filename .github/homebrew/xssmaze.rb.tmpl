@@ -1,0 +1,58 @@
+# typed: strict
+# frozen_string_literal: true
+
+# This file is rendered by xssmaze's release pipeline (.github/workflows/publish-homebrew.yml).
+# DO NOT EDIT by hand.
+class Xssmaze < Formula
+  desc "Intentionally vulnerable XSS testing lab web server (Crystal/Kemal)"
+  homepage "https://github.com/hahwul/xssmaze"
+  version "__VERSION__"
+  license "MIT"
+
+  on_macos do
+    # macOS binaries are dynamically linked; openssl@3 is the only non-system
+    # dependency (enforced by an otool guard in release-binary.yml).
+    depends_on "openssl@3"
+
+    on_arm do
+      url "https://github.com/hahwul/xssmaze/releases/download/v__VERSION__/xssmaze-v__VERSION__-osx-arm64"
+      sha256 "__SHA_OSX_ARM64__"
+    end
+    on_intel do
+      url "https://github.com/hahwul/xssmaze/releases/download/v__VERSION__/xssmaze-v__VERSION__-osx-x86_64"
+      sha256 "__SHA_OSX_X86_64__"
+    end
+  end
+
+  on_linux do
+    # Linux release binaries are statically linked (musl), so they are self-contained.
+    on_arm do
+      url "https://github.com/hahwul/xssmaze/releases/download/v__VERSION__/xssmaze-v__VERSION__-linux-arm64"
+      sha256 "__SHA_LINUX_ARM64__"
+    end
+    on_intel do
+      url "https://github.com/hahwul/xssmaze/releases/download/v__VERSION__/xssmaze-v__VERSION__-linux-x86_64"
+      sha256 "__SHA_LINUX_X86_64__"
+    end
+  end
+
+  def install
+    bin.install Dir["xssmaze-v__VERSION__-*"].first => "xssmaze"
+  end
+
+  def caveats
+    <<~EOS
+      xssmaze is an intentionally vulnerable XSS lab for security testing.
+      It binds to 127.0.0.1 by default; start it with, e.g.:
+        xssmaze -b 127.0.0.1 -p 3000
+      Do not expose it on an untrusted network.
+    EOS
+  end
+
+  test do
+    # Run the boot path used by the project's own specs (KEMAL_ENV=test builds
+    # the catalog and exits without binding a TCP socket).
+    ENV["KEMAL_ENV"] = "test"
+    system bin/"xssmaze"
+  end
+end
