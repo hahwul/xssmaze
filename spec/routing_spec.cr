@@ -219,3 +219,86 @@ describe "Kemal routing integration" do
     response.body.should contain(%({"html":"#{payload}"}))
   end
 end
+
+describe "WAF facade levels" do
+  it "level1 Cloudflare block page reflects the blocked payload raw" do
+    payload = "<script>alert(1)</script>"
+    get "/waf-facade/level1/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 403
+    response.body.should contain("Cloudflare")
+    response.body.should contain(payload)
+  end
+
+  it "level1 escapes the reflection on the non-blocked (200) path" do
+    get "/waf-facade/level1/?query=#{URI.encode_www_form("hello world")}"
+    response.status_code.should eq 200
+    response.body.should contain("Results for: hello world")
+  end
+
+  it "level2 AWS WAF only inspects the first 100 bytes, so a padded payload slips through" do
+    payload = ("a" * 100) + "<svg onload=alert(1)>"
+    get "/waf-facade/level2/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should contain("<svg onload=alert(1)>")
+  end
+
+  it "level2 AWS WAF blocks a vector that lands inside the inspection window" do
+    get "/waf-facade/level2/?query=#{URI.encode_www_form("<svg onload=alert(1)>")}"
+    response.status_code.should eq 403
+    response.body.should contain("AWS WAF")
+  end
+
+  it "level3 CRS scoring lets an un-scored vector under the threshold through" do
+    payload = "<input autofocus onfocus=confirm(1)>"
+    get "/waf-facade/level3/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should contain(payload)
+  end
+
+  it "level3 CRS scoring blocks a high-score payload with mod_security branding" do
+    get "/waf-facade/level3/?query=#{URI.encode_www_form("<svg onload=alert(1)>")}"
+    response.status_code.should eq 406
+    response.body.should contain("Mod_Security")
+  end
+
+  it "level4 Akamai reflects the User-Agent header raw while guarding the query" do
+    payload = "<img src=x onerror=alert(1)>"
+    headers = HTTP::Headers{"User-Agent" => payload}
+    get "/waf-facade/level4/?query=a", headers: headers
+    response.status_code.should eq 200
+    response.body.should contain(payload)
+  end
+
+  it "level5 F5 ASM denylist is case-sensitive, so a case-folded vector slips past" do
+    payload = "<SvG OnLoad=alert(1)>"
+    get "/waf-facade/level5/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should contain(payload)
+  end
+
+  it "level5 F5 ASM blocks the lowercase literal and shows a support ID" do
+    get "/waf-facade/level5/?query=#{URI.encode_www_form("<svg onload=alert(1)>")}"
+    response.status_code.should eq 403
+    response.body.should contain("support ID")
+  end
+
+  it "level6 Incapsula tag rules miss a JS-string breakout" do
+    payload = "';alert(1)//"
+    get "/waf-facade/level6/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should contain("var user = '';alert(1)//';")
+  end
+
+  it "level6 Incapsula blocks a tag payload with an incident ID" do
+    get "/waf-facade/level6/?query=#{URI.encode_www_form("<img src=x>")}"
+    response.status_code.should eq 403
+    response.body.should contain("Incapsula incident ID")
+  end
+
+  it "level7 cosmetic client-side WAF still reflects raw in the server response" do
+    payload = "<img src=x onerror=alert(1)>"
+    get "/waf-facade/level7/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should contain(%(<div id='preview'>#{payload}</div>))
+  end
+end
