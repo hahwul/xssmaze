@@ -4,7 +4,7 @@ Per-category exploit notes for every endpoint in the lab. The lab itself runs
 `./bin/xssmaze` (default `http://127.0.0.1:3000`); each entry below shows a
 working payload for one or more maze levels.
 
-**Total**: 162 categories · 942 levels.
+**Total**: 163 categories · 951 levels.
 
 ## How to read an entry
 
@@ -108,6 +108,7 @@ working payload for one or more maze levels.
 | [hidden](hidden.md) | Reflection in hidden / non-visible sinks: `<input type=hidden>`, meta refresh, data attributes, JSON/CSS/noscript blocks. |
 | [history-state](history-state.md) | DOM sinks where `?seed` is stored via `history.replaceState` and then read back into `innerHTML` / `srcdoc`. |
 | [hpp](hpp.md) | HTTP parameter pollution: duplicate names, array suffixes, and dot-notation reflections. |
+| [htmlunsafe](htmlunsafe.md) | The 2024 native unsafe HTML-parsing sinks (`Element.setHTMLUnsafe` / `Document.parseHTMLUnsafe` / `ShadowRoot.setHTMLUnsafe`) fed from hash / query / reflected / fetch sources. |
 | [import-map](import-map.md) | Reflection into `<script type="importmap">` JSON or dynamic `import()` specifier. A user-controlled module URL can return JS that the browser executes. |
 | [inattr](inattr.md) | Reflection inside a `<div class>` attribute under various quoting and filter combinations. |
 | [inframe](inframe.md) | Reflection into `<iframe src='...'>` with progressively stronger filters on quotes / `javascript:` / `alert`. |

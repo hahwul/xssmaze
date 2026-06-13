@@ -218,6 +218,48 @@ describe "Kemal routing integration" do
     (response.headers["Content-Type"]? || "").should contain("application/json")
     response.body.should contain(%({"html":"#{payload}"}))
   end
+
+  it "serves htmlunsafe level1 as a static page with a setHTMLUnsafe(location.hash) sink" do
+    get "/htmlunsafe/level1/"
+    response.status_code.should eq 200
+    response.body.should contain("location.hash.slice(1)")
+    response.body.should contain(".setHTMLUnsafe(html)")
+  end
+
+  it "serves htmlunsafe level3 and reflects the query into a setHTMLUnsafe() string" do
+    payload = "<img src=x onerror=alert(1)>"
+    get "/htmlunsafe/level3/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should contain("var msg = '#{payload}';")
+    response.body.should contain(".setHTMLUnsafe(msg)")
+  end
+
+  it "serves htmlunsafe level6 page that parses its fetch response via parseHTMLUnsafe" do
+    get "/htmlunsafe/level6/?query=a"
+    response.status_code.should eq 200
+    response.body.should contain("fetch('/htmlunsafe/level6/api?query='")
+    response.body.should contain("Document.parseHTMLUnsafe(t)")
+  end
+
+  it "echoes the query param raw from the htmlunsafe level6 API as text/html" do
+    payload = "<img src=x onerror=alert(1)>"
+    get "/htmlunsafe/level6/api?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    (response.headers["Content-Type"]? || "").should contain("text/html")
+    response.body.should contain(payload)
+  end
+
+  it "serves dom level36 with an iframe srcdoc property sink from location.hash" do
+    get "/dom/level36/"
+    response.status_code.should eq 200
+    response.body.should contain(".srcdoc = decodeURIComponent(location.hash.substring(1))")
+  end
+
+  it "serves dom level38 with an iframe srcdoc setAttribute sink from the query param" do
+    get "/dom/level38/"
+    response.status_code.should eq 200
+    response.body.should contain(".setAttribute('srcdoc', query)")
+  end
 end
 
 describe "WAF facade levels" do

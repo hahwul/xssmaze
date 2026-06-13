@@ -350,3 +350,36 @@ maze_get "/dom/level35/" do |_|
       document.getElementById('output').innerHTML = parts.join('')
   </script>"
 end
+
+# iframe srcdoc property assignment (location.hash) — a full HTML document is
+# parsed inside the frame, so an inline <script> here actually executes.
+Xssmaze.push("dom-level36", "/dom/level36/", "iframe srcdoc property (location.hash)", "GET", ["#hash"])
+maze_get "/dom/level36/" do |_|
+  "<iframe id='frame'></iframe>
+  <script>
+      document.getElementById('frame').srcdoc = decodeURIComponent(location.hash.substring(1))
+  </script>"
+end
+
+# iframe srcdoc property assignment (query param)
+Xssmaze.push("dom-level37", "/dom/level37/", "iframe srcdoc property (query param)")
+maze_get "/dom/level37/" do |_|
+  "<iframe id='frame'></iframe>
+  <script>
+      const urlParams = new URL(location.href).searchParams;
+      const query = urlParams.get('query');
+      document.getElementById('frame').srcdoc = query
+  </script>"
+end
+
+# iframe srcdoc via setAttribute (query param) — the attribute-name path some
+# scanners model separately from the .srcdoc property assignment.
+Xssmaze.push("dom-level38", "/dom/level38/", "iframe srcdoc via setAttribute (query param)")
+maze_get "/dom/level38/" do |_|
+  "<iframe id='frame'></iframe>
+  <script>
+      const urlParams = new URL(location.href).searchParams;
+      const query = urlParams.get('query');
+      document.getElementById('frame').setAttribute('srcdoc', query)
+  </script>"
+end
