@@ -4,7 +4,7 @@ Per-category exploit notes for every endpoint in the lab. The lab itself runs
 `./bin/xssmaze` (default `http://127.0.0.1:3000`); each entry below shows a
 working payload for one or more maze levels.
 
-**Total**: 163 categories · 951 levels.
+**Total**: 164 categories · 957 levels.
 
 ## How to read an entry
 
@@ -143,6 +143,7 @@ working payload for one or more maze levels.
 | [multivector](multivector.md) | Multiple sinks/forms/inputs on a single page; identify the reflection point. |
 | [mutfilter](mutfilter.md) | Reflections with mutation/regex filters that can be bypassed. |
 | [mxss](mxss.md) | Mutation XSS via innerHTML round-trip / DOMParser / template / namespace switching. |
+| [navsink](navsink.md) | Navigation sinks (`window.open` / `location.assign` / `location.replace`) fed a `javascript:` URL from hash / query / reflected sources. |
 | [nestedctx](nestedctx.md) | Reflections inside nested HTML/JS/CSS contexts; break out of the inner context. |
 | [nestedfilter](nestedfilter.md) | Layered/sequential filters where one filter's output enables a bypass that survives the next. |
 | [nonce](nonce.md) | CSP nonce-based protections bypassed via injection inside trusted contexts. |

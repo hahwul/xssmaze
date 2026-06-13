@@ -260,6 +260,35 @@ describe "Kemal routing integration" do
     response.status_code.should eq 200
     response.body.should contain(".setAttribute('srcdoc', query)")
   end
+
+  it "serves navsink level1 as a static page with a window.open(location.hash) sink" do
+    get "/navsink/level1/"
+    response.status_code.should eq 200
+    response.body.should contain("location.hash.slice(1)")
+    response.body.should contain("window.open(target)")
+  end
+
+  it "serves navsink level3 with a location.assign(location.search) sink" do
+    get "/navsink/level3/?query=a"
+    response.status_code.should eq 200
+    response.body.should contain("location.assign(next)")
+  end
+
+  it "serves navsink level5 and reflects the query into a window.open() string" do
+    payload = "javascript:alert(1)"
+    get "/navsink/level5/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should contain("var url = '#{payload}';")
+    response.body.should contain("window.open(url)")
+  end
+
+  it "serves navsink level6 and reflects the query into a location.assign() string" do
+    payload = "javascript:alert(1)"
+    get "/navsink/level6/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should contain("var dest = '#{payload}';")
+    response.body.should contain("location.assign(dest)")
+  end
 end
 
 describe "WAF facade levels" do
