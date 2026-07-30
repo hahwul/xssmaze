@@ -1,4 +1,5 @@
-Xssmaze.push("slot-level1", "/slot/level1/?query=a", "shadow DOM <slot> content unfiltered (light DOM reflection)")
+Xssmaze.push("slot-level1", "/slot/level1/?query=a", "shadow DOM <slot> content unfiltered (light DOM reflection)",
+  vuln: "reflected-html", delivery: ["query"], note: "light-DOM content slotted into an open shadow root")
 maze_get "/slot/level1/" do |env|
   query = env.params.query["query"]
   "<x-card>#{query}</x-card>
@@ -12,7 +13,8 @@ maze_get "/slot/level1/" do |env|
    </script>"
 end
 
-Xssmaze.push("slot-level2", "/slot/level2/?query=a", "named slot reflected into element attribute")
+Xssmaze.push("slot-level2", "/slot/level2/?query=a", "named slot reflected into element attribute",
+  vuln: "reflected-attr", delivery: ["query"], note: "reflected into a single-quoted slot= attribute")
 maze_get "/slot/level2/" do |env|
   query = env.params.query["query"]
   "<x-tab><span slot='#{query}'>tab body</span></x-tab>
@@ -26,7 +28,8 @@ maze_get "/slot/level2/" do |env|
    </script>"
 end
 
-Xssmaze.push("slot-level3", "/slot/level3/?query=a", "slotchange handler innerHTMLs assignedNodes")
+Xssmaze.push("slot-level3", "/slot/level3/?query=a", "slotchange handler innerHTMLs assignedNodes",
+  vuln: "reflected-html", sources: ["textContent"], sinks: ["innerHTML"], delivery: ["query"], note: "the light-DOM reflection already fires; a slotchange handler additionally relays textContent into shadow innerHTML")
 maze_get "/slot/level3/" do |env|
   query = env.params.query["query"]
   "<x-list>#{query}</x-list>
@@ -45,7 +48,8 @@ maze_get "/slot/level3/" do |env|
    </script>"
 end
 
-Xssmaze.push("slot-level4", "/slot/level4/?query=a", "shadow root opens with mode=open, host innerHTML sink")
+Xssmaze.push("slot-level4", "/slot/level4/?query=a", "shadow root opens with mode=open, host innerHTML sink",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["attachShadow.innerHTML"], delivery: ["query"], note: "query.to_json blocks JS-string breakout, but the value still reaches innerHTML as raw HTML")
 maze_get "/slot/level4/" do |env|
   query = env.params.query["query"]
   "<x-host></x-host>

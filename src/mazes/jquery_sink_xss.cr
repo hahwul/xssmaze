@@ -7,7 +7,8 @@
 # Level 1: $(htmlString) — a string starting with "<" makes jQuery build
 # DOM nodes instead of running a selector. Classic scroll-to / tab plugins
 # do $(location.hash.slice(1)), turning the fragment into live HTML.
-Xssmaze.push("jquery-level1", "/jquery/level1/", "jQuery $() selector turns location.hash into HTML (element creation)", "GET", ["#hash"])
+Xssmaze.push("jquery-level1", "/jquery/level1/", "jQuery $() selector turns location.hash into HTML (element creation)", "GET", ["#hash"],
+  vuln: "dom", sources: ["location.hash"], sinks: ["jquery.selector"], delivery: ["fragment"])
 maze_get "/jquery/level1/" do |_env|
   "<html><head><script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js'></script></head>
   <body>
@@ -24,7 +25,8 @@ end
 # Level 2: $.parseHTML() explicitly parses a string into DOM nodes. The
 # query lands in a single-quoted JS string and is then parsed + appended,
 # so <img onerror> fires without any quote breakout.
-Xssmaze.push("jquery-level2", "/jquery/level2/?query=a", "jQuery $.parseHTML() of reflected string then append")
+Xssmaze.push("jquery-level2", "/jquery/level2/?query=a", "jQuery $.parseHTML() of reflected string then append",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["jquery.parseHTML"], delivery: ["query"])
 maze_get "/jquery/level2/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -44,7 +46,8 @@ end
 # Level 3: .append() DOM-insertion sink fed from location.search read on
 # the client. Covers the whole .html/.append/.prepend/.before/.after/
 # .replaceWith family that all route through jQuery's HTML parser.
-Xssmaze.push("jquery-level3", "/jquery/level3/?query=a", "jQuery .append() of location.search value (DOM insertion)")
+Xssmaze.push("jquery-level3", "/jquery/level3/?query=a", "jQuery .append() of location.search value (DOM insertion)",
+  vuln: "dom", sources: ["location.search"], sinks: ["jquery.append"], delivery: ["query"])
 maze_get "/jquery/level3/" do |_env|
   "<html><head><script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js'></script></head>
   <body>
@@ -61,7 +64,8 @@ end
 # Level 4: .attr('href', ...) lets a javascript: URL reach a navigable
 # anchor. The query is reflected into a JS string and assigned as href;
 # clicking (or auto-trigger) runs the scheme.
-Xssmaze.push("jquery-level4", "/jquery/level4/?query=a", "jQuery .attr('href', ...) sets javascript: URL on an anchor")
+Xssmaze.push("jquery-level4", "/jquery/level4/?query=a", "jQuery .attr('href', ...) sets javascript: URL on an anchor",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["jquery.attr"], delivery: ["query"], note: "requires a user click on the anchor")
 maze_get "/jquery/level4/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -78,7 +82,8 @@ end
 
 # Level 5: $.globalEval() is jQuery's wrapper around eval in the global
 # scope. Reflected text handed straight to it executes as JavaScript.
-Xssmaze.push("jquery-level5", "/jquery/level5/?query=a", "jQuery $.globalEval() executes reflected string as JS")
+Xssmaze.push("jquery-level5", "/jquery/level5/?query=a", "jQuery $.globalEval() executes reflected string as JS",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["jquery.globalEval"], delivery: ["query"])
 maze_get "/jquery/level5/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -98,7 +103,8 @@ end
 # jQuery treats keys matching jQuery.fn methods specially. The `html` key
 # calls .html(value), so it becomes an innerHTML sink even though the
 # value looks like a harmless attribute map.
-Xssmaze.push("jquery-level6", "/jquery/level6/?query=a", "jQuery $('<tag>', {html: ...}) property-object innerHTML sink")
+Xssmaze.push("jquery-level6", "/jquery/level6/?query=a", "jQuery $('<tag>', {html: ...}) property-object innerHTML sink",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["jquery.html"], delivery: ["query"])
 maze_get "/jquery/level6/" do |env|
   query = env.params.query.fetch("query", "")
 

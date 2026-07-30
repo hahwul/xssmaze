@@ -1,4 +1,5 @@
-Xssmaze.push("shadow-dom-level1", "/shadow-dom/level1/?query=a", "open shadow root + innerHTML")
+Xssmaze.push("shadow-dom-level1", "/shadow-dom/level1/?query=a", "open shadow root + innerHTML",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["attachShadow.innerHTML"], delivery: ["query"])
 maze_get "/shadow-dom/level1/" do |env|
   query = env.params.query["query"]
 
@@ -13,7 +14,8 @@ maze_get "/shadow-dom/level1/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("shadow-dom-level2", "/shadow-dom/level2/?query=a", "closed shadow root + innerHTML via getter")
+Xssmaze.push("shadow-dom-level2", "/shadow-dom/level2/?query=a", "closed shadow root + innerHTML via getter",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["attachShadow.innerHTML"], delivery: ["query"], note: "closed shadow root: not inspectable from outside, but the injection still executes")
 maze_get "/shadow-dom/level2/" do |env|
   query = env.params.query["query"]
 
@@ -29,7 +31,8 @@ maze_get "/shadow-dom/level2/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("shadow-dom-level3", "/shadow-dom/level3/?query=a", "shadow DOM + slot injection")
+Xssmaze.push("shadow-dom-level3", "/shadow-dom/level3/?query=a", "shadow DOM + slot injection",
+  vuln: "reflected-html", delivery: ["query"], note: "light-DOM reflection that is then slotted into the shadow root")
 maze_get "/shadow-dom/level3/" do |env|
   query = env.params.query["query"]
 
@@ -45,7 +48,8 @@ maze_get "/shadow-dom/level3/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("shadow-dom-level4", "/shadow-dom/level4/?query=a", "shadow DOM + declarative shadow DOM")
+Xssmaze.push("shadow-dom-level4", "/shadow-dom/level4/?query=a", "shadow DOM + declarative shadow DOM",
+  vuln: "reflected-html", delivery: ["query"], note: "declarative shadow DOM (<template shadowrootmode>); modern browsers only")
 maze_get "/shadow-dom/level4/" do |env|
   query = env.params.query["query"]
 
@@ -59,7 +63,8 @@ maze_get "/shadow-dom/level4/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("shadow-dom-level5", "/shadow-dom/level5/?query=a", "shadow DOM + adoptedStyleSheets CSS injection")
+Xssmaze.push("shadow-dom-level5", "/shadow-dom/level5/?query=a", "shadow DOM + adoptedStyleSheets CSS injection",
+  vuln: "non-xss-control", sources: ["server-reflected"], sinks: ["adoptedStyleSheets"], delivery: ["query"], exploitable: false, note: "CSSStyleSheet.replaceSync accepts CSS only and there is no script-executing CSS sink; this is a CSS-injection control, not XSS")
 maze_get "/shadow-dom/level5/" do |env|
   query = env.params.query["query"]
 

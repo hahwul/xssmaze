@@ -1,4 +1,5 @@
-Xssmaze.push("storage-event-level1", "/storage-event/level1/?seed=a", "storage event newValue + innerHTML", "GET", ["seed"])
+Xssmaze.push("storage-event-level1", "/storage-event/level1/?seed=a", "storage event newValue + innerHTML", "GET", ["seed"],
+  vuln: "dom", sources: ["storage-event"], sinks: ["innerHTML"], delivery: ["query"])
 maze_get "/storage-event/level1/" do |_|
   "<div id='output'></div>
   <iframe id='listener' style='display:none'></iframe>
@@ -30,7 +31,8 @@ maze_get "/storage-event/level1/" do |_|
   </script>"
 end
 
-Xssmaze.push("storage-event-level2", "/storage-event/level2/?seed=a", "storage event oldValue + srcdoc", "GET", ["seed"])
+Xssmaze.push("storage-event-level2", "/storage-event/level2/?seed=a", "storage event oldValue + srcdoc", "GET", ["seed"],
+  vuln: "dom", sources: ["storage-event"], sinks: ["srcdoc"], delivery: ["query"])
 maze_get "/storage-event/level2/" do |_|
   "<iframe id='preview'></iframe>
   <iframe id='listener' style='display:none'></iframe>

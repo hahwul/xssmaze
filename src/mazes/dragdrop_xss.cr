@@ -1,6 +1,7 @@
 # Genuine drag-and-drop XSS: the channel is the sink, no shortcut path.
 
-Xssmaze.push("dragdrop-level1", "/dragdrop/level1/?query=a", "drop handler innerHTMLs dataTransfer.getData('text/html') (reflected prefix)")
+Xssmaze.push("dragdrop-level1", "/dragdrop/level1/?query=a", "drop handler innerHTMLs dataTransfer.getData('text/html') (reflected prefix)",
+  vuln: "dom", sources: ["dataTransfer"], sinks: ["innerHTML"], delivery: ["query"], note: "the reflected prefix only reaches innerHTML when the user drops content on the zone")
 maze_get "/dragdrop/level1/" do |env|
   query = env.params.query["query"]
   "<div id='zone' style='border:1px dashed #999;padding:30px'>drop here</div>
@@ -16,7 +17,8 @@ maze_get "/dragdrop/level1/" do |env|
    </script>"
 end
 
-Xssmaze.push("dragdrop-level2", "/dragdrop/level2/?query=a", "dragstart sets reflected text/html (XSS fires in target page)")
+Xssmaze.push("dragdrop-level2", "/dragdrop/level2/?query=a", "dragstart sets reflected text/html (XSS fires in target page)",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["dataTransfer.setData"], delivery: ["query"], note: "requires a user drag; execution happens in the drop-target page, not here")
 maze_get "/dragdrop/level2/" do |env|
   query = env.params.query["query"]
   "<div id='src' draggable='true' style='cursor:move;padding:8px;border:1px solid #ccc'>drag me</div>
@@ -28,7 +30,8 @@ maze_get "/dragdrop/level2/" do |env|
    </script>"
 end
 
-Xssmaze.push("dragdrop-level3", "/dragdrop/level3/?query=a", "drop builds <a href> from dropped text/uri-list (no escaping)")
+Xssmaze.push("dragdrop-level3", "/dragdrop/level3/?query=a", "drop builds <a href> from dropped text/uri-list (no escaping)",
+  vuln: "dom", sources: ["dataTransfer"], sinks: ["innerHTML"], delivery: ["query"], note: "requires a user drop; the dropped URI is concatenated into an unquoted <a href>")
 maze_get "/dragdrop/level3/" do |env|
   query = env.params.query["query"]
   "<div id='zone' style='padding:30px;border:1px solid #ccc'>drop link</div>
@@ -45,7 +48,8 @@ maze_get "/dragdrop/level3/" do |env|
    </script>"
 end
 
-Xssmaze.push("dragdrop-level4", "/dragdrop/level4/?query=a", "drop reads files[0] as text/html via FileReader.innerHTML")
+Xssmaze.push("dragdrop-level4", "/dragdrop/level4/?query=a", "drop reads files[0] as text/html via FileReader.innerHTML",
+  vuln: "dom", sources: ["dataTransfer"], sinks: ["innerHTML"], delivery: ["query"], note: "requires the user to drop a file; the FileReader result is concatenated into innerHTML")
 maze_get "/dragdrop/level4/" do |env|
   query = env.params.query["query"]
   "<div id='zone' style='padding:30px;border:1px solid #ccc'>drop file</div>

@@ -1,4 +1,5 @@
-Xssmaze.push("service-worker-level1", "/service-worker/level1/?seed=a", "ServiceWorker message bootstrap + innerHTML", "GET", ["seed"])
+Xssmaze.push("service-worker-level1", "/service-worker/level1/?seed=a", "ServiceWorker message bootstrap + innerHTML", "GET", ["seed"],
+  vuln: "dom", sources: ["serviceworker-message"], sinks: ["innerHTML"], delivery: ["query"], note: "dispatches a synthetic MessageEvent on navigator.serviceWorker; no real ServiceWorker is registered")
 maze_get "/service-worker/level1/" do |_|
   "<div id='output'></div>
   <script>
@@ -19,7 +20,8 @@ maze_get "/service-worker/level1/" do |_|
   </script>"
 end
 
-Xssmaze.push("service-worker-level2", "/service-worker/level2/?seed=a", "ServiceWorker message JSON relay + srcdoc", "GET", ["seed"])
+Xssmaze.push("service-worker-level2", "/service-worker/level2/?seed=a", "ServiceWorker message JSON relay + srcdoc", "GET", ["seed"],
+  vuln: "dom", sources: ["serviceworker-message"], sinks: ["srcdoc"], delivery: ["query"], note: "dispatches a synthetic MessageEvent on navigator.serviceWorker; no real ServiceWorker is registered")
 maze_get "/service-worker/level2/" do |_|
   "<iframe id='preview'></iframe>
   <script>

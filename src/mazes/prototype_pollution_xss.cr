@@ -1,4 +1,5 @@
-Xssmaze.push("prototype-pollution-level1", "/prototype-pollution/level1/?query=a", "prototype pollution via __proto__ + innerHTML gadget")
+Xssmaze.push("prototype-pollution-level1", "/prototype-pollution/level1/?query=a", "prototype pollution via __proto__ + innerHTML gadget",
+  vuln: "prototype-pollution", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "JSON merged into Object.prototype; the polluted `html` key is the innerHTML gadget")
 maze_get "/prototype-pollution/level1/" do |env|
   query = env.params.query["query"]
 
@@ -34,7 +35,8 @@ maze_get "/prototype-pollution/level1/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("prototype-pollution-level2", "/prototype-pollution/level2/?query=a", "prototype pollution via constructor.prototype + src gadget")
+Xssmaze.push("prototype-pollution-level2", "/prototype-pollution/level2/?query=a", "prototype pollution via constructor.prototype + src gadget",
+  vuln: "prototype-pollution", sources: ["server-reflected"], sinks: ["script.src"], delivery: ["query"], note: "the polluted `src` key becomes the src of a dynamically created <script>")
 maze_get "/prototype-pollution/level2/" do |env|
   query = env.params.query["query"]
 
@@ -69,7 +71,8 @@ maze_get "/prototype-pollution/level2/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("prototype-pollution-level3", "/prototype-pollution/level3/?query=a", "prototype pollution via Object.assign + srcdoc gadget")
+Xssmaze.push("prototype-pollution-level3", "/prototype-pollution/level3/?query=a", "prototype pollution via Object.assign + srcdoc gadget",
+  vuln: "prototype-pollution", sources: ["server-reflected"], sinks: ["srcdoc"], delivery: ["query"], note: "the polluted `srcdoc` key reaches an iframe srcdoc")
 maze_get "/prototype-pollution/level3/" do |env|
   query = env.params.query["query"]
 
@@ -106,7 +109,8 @@ maze_get "/prototype-pollution/level3/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("prototype-pollution-level4", "/prototype-pollution/level4/?query=a", "prototype pollution via URL hash JSON + eval gadget")
+Xssmaze.push("prototype-pollution-level4", "/prototype-pollution/level4/?query=a", "prototype pollution via URL hash JSON + eval gadget",
+  vuln: "prototype-pollution", sources: ["location.search"], sinks: ["Function"], delivery: ["query"], note: "the polluted `onInit` key is executed with new Function()")
 maze_get "/prototype-pollution/level4/" do |_|
   "<html><body>
   <h1>Prototype Pollution Level 4</h1>

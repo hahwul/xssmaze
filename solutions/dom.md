@@ -63,14 +63,18 @@ Client-side DOM sinks driven by URL, hash, query, name, referrer, postMessage.
 `/dom/level9/?query=alert(1)`
 
 - payload: `alert(1)`
-- context: scriptTag.innerText = query — does not execute by default; payload becomes script body but innerText set after script already inserted — note: scriptTag is inert; this lab is generally non-exploitable in modern browsers but content is detectable in response
+- context: `scriptTag.innerText = query`. The inline `<script>` is *empty*, so
+  prepare-a-script bailed out before setting the already-started flag; mutating
+  its text re-runs prepare and the code executes. Verified in Chrome 150.
 
 ### dom-level10
 
 `/dom/level10/?query=javascript:alert(1)`
 
 - payload: `javascript:alert(1)`
-- context: img.src = query; modern browsers ignore js: on img, but the URL is reflected — limited; treat as detectable taint sink
+- context: `img.src = query`. Control / true negative: no modern browser
+  executes a `javascript:` URL from an image src, so the taint reaches a sink
+  but nothing runs. Marked `exploitable: false` in `/map/json`.
 
 ### dom-level11
 

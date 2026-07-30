@@ -1,6 +1,7 @@
 # Level 1: Reflected in <div data-value="QUERY">
 # Bypass: " onfocus=alert(1) autofocus x="
-Xssmaze.push("dataattr-level1", "/data-attribute/level1/?query=a", "reflected in data-value double-quoted attribute")
+Xssmaze.push("dataattr-level1", "/data-attribute/level1/?query=a", "reflected in data-value double-quoted attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/data-attribute/level1/" do |env|
   query = env.params.query["query"]
 
@@ -9,7 +10,8 @@ end
 
 # Level 2: Reflected in single-quoted attribute with JSON content
 # Bypass: ' onfocus=alert(1) autofocus x='
-Xssmaze.push("dataattr-level2", "/data-attribute/level2/?query=a", "reflected in single-quoted data-config JSON attribute")
+Xssmaze.push("dataattr-level2", "/data-attribute/level2/?query=a", "reflected in single-quoted data-config JSON attribute",
+  vuln: "reflected-attr", delivery: ["query"], note: "single-quoted data-config attribute holding JSON")
 maze_get "/data-attribute/level2/" do |env|
   query = env.params.query["query"]
 
@@ -18,7 +20,8 @@ end
 
 # Level 3: Reflected in <span data-tooltip="QUERY" class="tip">
 # Bypass: " onfocus=alert(1) autofocus x="
-Xssmaze.push("dataattr-level3", "/data-attribute/level3/?query=a", "reflected in data-tooltip double-quoted attribute")
+Xssmaze.push("dataattr-level3", "/data-attribute/level3/?query=a", "reflected in data-tooltip double-quoted attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/data-attribute/level3/" do |env|
   query = env.params.query["query"]
 
@@ -27,7 +30,8 @@ end
 
 # Level 4: Reflected in <button data-action="click->controller#QUERY">
 # Bypass: " onfocus=alert(1) autofocus x="
-Xssmaze.push("dataattr-level4", "/data-attribute/level4/?query=a", "reflected in data-action Stimulus-style attribute")
+Xssmaze.push("dataattr-level4", "/data-attribute/level4/?query=a", "reflected in data-action Stimulus-style attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/data-attribute/level4/" do |env|
   query = env.params.query["query"]
 
@@ -36,7 +40,8 @@ end
 
 # Level 5: Reflected in single-quoted <div data-src='QUERY'> where ' is NOT encoded
 # Bypass: ' onfocus=alert(1) autofocus x='
-Xssmaze.push("dataattr-level5", "/data-attribute/level5/?query=a", "reflected in single-quoted data-src (double-quote encoded only)")
+Xssmaze.push("dataattr-level5", "/data-attribute/level5/?query=a", "reflected in single-quoted data-src (double-quote encoded only)",
+  vuln: "reflected-attr", delivery: ["query"], note: "double quotes are encoded; the attribute is single-quoted")
 maze_get "/data-attribute/level5/" do |env|
   query = env.params.query["query"]
   encoded = query.gsub("\"", "&quot;")
@@ -46,7 +51,8 @@ end
 
 # Level 6: Reflected in <tr data-url="QUERY"> inside a table
 # Bypass: " onfocus=alert(1) autofocus x="
-Xssmaze.push("dataattr-level6", "/data-attribute/level6/?query=a", "reflected in data-url attribute inside table row")
+Xssmaze.push("dataattr-level6", "/data-attribute/level6/?query=a", "reflected in data-url attribute inside table row",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/data-attribute/level6/" do |env|
   query = env.params.query["query"]
 

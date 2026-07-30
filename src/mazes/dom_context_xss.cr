@@ -1,5 +1,6 @@
 # Level 1: Query reflected inside <div id="output">QUERY</div> with no filtering - basic HTML injection
-Xssmaze.push("domctx-level1", "/domctx/level1/?query=a", "reflection in div body with no filtering")
+Xssmaze.push("domctx-level1", "/domctx/level1/?query=a", "reflection in div body with no filtering",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/domctx/level1/" do |env|
   query = env.params.query["query"]
 
@@ -10,7 +11,8 @@ maze_get "/domctx/level1/" do |env|
 end
 
 # Level 2: Query reflected in document.write("QUERY") inside script - close script tag and inject
-Xssmaze.push("domctx-level2", "/domctx/level2/?query=a", "reflection in document.write JS string")
+Xssmaze.push("domctx-level2", "/domctx/level2/?query=a", "reflection in document.write JS string",
+  vuln: "reflected-js", delivery: ["query"])
 maze_get "/domctx/level2/" do |env|
   query = env.params.query["query"]
 
@@ -23,7 +25,8 @@ maze_get "/domctx/level2/" do |env|
 end
 
 # Level 3: Query reflected in .innerHTML = "QUERY" inside script - close script tag and inject
-Xssmaze.push("domctx-level3", "/domctx/level3/?query=a", "reflection in innerHTML assignment JS string")
+Xssmaze.push("domctx-level3", "/domctx/level3/?query=a", "reflection in innerHTML assignment JS string",
+  vuln: "reflected-js", delivery: ["query"])
 maze_get "/domctx/level3/" do |env|
   query = env.params.query["query"]
 
@@ -37,7 +40,8 @@ maze_get "/domctx/level3/" do |env|
 end
 
 # Level 4: Query reflected as JSON value in <script>var config = {"name":"QUERY"};</script> - close script tag and inject
-Xssmaze.push("domctx-level4", "/domctx/level4/?query=a", "reflection in JSON object inside script tag")
+Xssmaze.push("domctx-level4", "/domctx/level4/?query=a", "reflection in JSON object inside script tag",
+  vuln: "reflected-js", delivery: ["query"])
 maze_get "/domctx/level4/" do |env|
   query = env.params.query["query"]
 
@@ -48,7 +52,8 @@ maze_get "/domctx/level4/" do |env|
 end
 
 # Level 5: Query URL-decoded then reflected in <div>QUERY</div> (server does URI.decode) - send URL-encoded payload
-Xssmaze.push("domctx-level5", "/domctx/level5/?query=a", "server URL-decodes then reflects in div body")
+Xssmaze.push("domctx-level5", "/domctx/level5/?query=a", "server URL-decodes then reflects in div body",
+  vuln: "reflected-html", delivery: ["query"], note: "the server URL-decodes once before reflecting")
 maze_get "/domctx/level5/" do |env|
   query = env.params.query["query"]
   decoded = URI.decode(query)
@@ -60,7 +65,8 @@ maze_get "/domctx/level5/" do |env|
 end
 
 # Level 6: Query reflected in eval("QUERY") inside script - close script tag and inject
-Xssmaze.push("domctx-level6", "/domctx/level6/?query=a", "reflection in eval string inside script tag")
+Xssmaze.push("domctx-level6", "/domctx/level6/?query=a", "reflection in eval string inside script tag",
+  vuln: "reflected-js", delivery: ["query"])
 maze_get "/domctx/level6/" do |env|
   query = env.params.query["query"]
 

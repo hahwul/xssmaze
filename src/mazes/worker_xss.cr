@@ -2,7 +2,8 @@
 # the worker is a relay: attacker payload travels through the worker
 # boundary and the *page* unsafely consumes the worker's output.
 
-Xssmaze.push("worker-level1", "/worker/level1/?query=a", "page innerHTMLs whatever the worker postMessages back")
+Xssmaze.push("worker-level1", "/worker/level1/?query=a", "page innerHTMLs whatever the worker postMessages back",
+  vuln: "dom", sources: ["worker-message"], sinks: ["innerHTML"], delivery: ["query"])
 maze_get "/worker/level1/" do |env|
   query = env.params.query["query"]
   "<div id='out'></div>
@@ -14,7 +15,8 @@ maze_get "/worker/level1/" do |env|
    </script>"
 end
 
-Xssmaze.push("worker-level2", "/worker/level2/?query=a", "Worker source built by string concat (untrusted code in worker)")
+Xssmaze.push("worker-level2", "/worker/level2/?query=a", "Worker source built by string concat (untrusted code in worker)",
+  vuln: "dom", sources: ["worker-message"], sinks: ["worker-source", "innerHTML"], delivery: ["query"], note: "the value is concatenated into the Worker source, so it also runs as JS inside the worker")
 maze_get "/worker/level2/" do |env|
   query = env.params.query["query"]
   "<div id='out'></div>
@@ -28,7 +30,8 @@ maze_get "/worker/level2/" do |env|
    </script>"
 end
 
-Xssmaze.push("worker-level3", "/worker/level3/?query=a", "importScripts() with attacker-controlled URL")
+Xssmaze.push("worker-level3", "/worker/level3/?query=a", "importScripts() with attacker-controlled URL",
+  vuln: "dom", sources: ["worker-message"], sinks: ["importScripts", "innerHTML"], delivery: ["query"], note: "the worker importScripts() an attacker URL; its postMessage output lands in page innerHTML")
 maze_get "/worker/level3/" do |env|
   query = env.params.query["query"]
   "<div id='out'></div>
@@ -42,7 +45,8 @@ maze_get "/worker/level3/" do |env|
    </script>"
 end
 
-Xssmaze.push("worker-level4", "/worker/level4/?query=a", "worker eval gadget: page posts query, worker eval()s, returns to innerHTML")
+Xssmaze.push("worker-level4", "/worker/level4/?query=a", "worker eval gadget: page posts query, worker eval()s, returns to innerHTML",
+  vuln: "dom", sources: ["worker-message"], sinks: ["eval", "innerHTML"], delivery: ["query"])
 maze_get "/worker/level4/" do |env|
   query = env.params.query["query"]
   "<div id='out'></div>

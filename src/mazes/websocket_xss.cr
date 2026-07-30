@@ -1,4 +1,5 @@
-Xssmaze.push("websocket-xss-level1", "/websocket/level1/?query=a", "WebSocket message XSS (basic)")
+Xssmaze.push("websocket-xss-level1", "/websocket/level1/?query=a", "WebSocket message XSS (basic)",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "simulated socket message: the value is server-inlined into a JS string, not received over a real WebSocket")
 maze_get "/websocket/level1/" do |env|
   query = env.params.query["query"]
 
@@ -18,7 +19,8 @@ maze_get "/websocket/level1/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("websocket-xss-level2", "/websocket/level2/?query=a", "WebSocket JSON message XSS")
+Xssmaze.push("websocket-xss-level2", "/websocket/level2/?query=a", "WebSocket JSON message XSS",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "simulated socket message laundered through a JSON.parse round-trip")
 maze_get "/websocket/level2/" do |env|
   query = env.params.query["query"]
 
@@ -39,7 +41,8 @@ maze_get "/websocket/level2/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("websocket-xss-level3", "/websocket/level3/?query=a", "WebSocket with HTML message rendering")
+Xssmaze.push("websocket-xss-level3", "/websocket/level3/?query=a", "WebSocket with HTML message rendering",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "simulated socket message concatenated into innerHTML")
 maze_get "/websocket/level3/" do |env|
   query = env.params.query["query"]
 
@@ -66,7 +69,8 @@ maze_get "/websocket/level3/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("websocket-xss-level4", "/websocket/level4/?query=a", "WebSocket with eval-based message processing")
+Xssmaze.push("websocket-xss-level4", "/websocket/level4/?query=a", "WebSocket with eval-based message processing",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["eval", "innerHTML"], delivery: ["query"], note: "simulated socket command passed to eval")
 maze_get "/websocket/level4/" do |env|
   query = env.params.query["query"]
 
@@ -90,7 +94,8 @@ maze_get "/websocket/level4/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("websocket-xss-level5", "/websocket/level5/?query=a", "WebSocket with DOM manipulation")
+Xssmaze.push("websocket-xss-level5", "/websocket/level5/?query=a", "WebSocket with DOM manipulation",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["setAttribute", "event-handler-attribute"], delivery: ["query"], note: "sets an onclick attribute from a JSON-parsed message; requires a user click")
 maze_get "/websocket/level5/" do |env|
   query = env.params.query["query"]
 
@@ -116,7 +121,8 @@ maze_get "/websocket/level5/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("websocket-xss-level6", "/websocket/level6/?seed=a", "WebSocket onmessage bootstrap + innerHTML", "GET", ["seed"])
+Xssmaze.push("websocket-xss-level6", "/websocket/level6/?seed=a", "WebSocket onmessage bootstrap + innerHTML", "GET", ["seed"],
+  vuln: "dom", sources: ["websocket-message"], sinks: ["innerHTML"], delivery: ["query"], note: "onmessage is invoked synthetically; the socket itself never connects")
 maze_get "/websocket/level6/" do |_|
   "<html><body>
   <h1>WebSocket XSS Level 6</h1>
@@ -136,7 +142,8 @@ maze_get "/websocket/level6/" do |_|
   </body></html>"
 end
 
-Xssmaze.push("websocket-xss-level7", "/websocket/level7/?seed=a", "EventSource onmessage bootstrap + insertAdjacentHTML", "GET", ["seed"])
+Xssmaze.push("websocket-xss-level7", "/websocket/level7/?seed=a", "EventSource onmessage bootstrap + insertAdjacentHTML", "GET", ["seed"],
+  vuln: "dom", sources: ["eventsource-message"], sinks: ["insertAdjacentHTML"], delivery: ["query"], note: "onmessage is invoked synthetically; the EventSource stream is not a real SSE feed")
 maze_get "/websocket/level7/" do |_|
   "<html><body>
   <h1>WebSocket XSS Level 7</h1>
