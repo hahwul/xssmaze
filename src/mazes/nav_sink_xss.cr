@@ -10,7 +10,8 @@
 
 # Level 1: window.open(location.hash) — "open in new tab" helper. A
 # javascript: fragment runs in the freshly opened window.
-Xssmaze.push("navsink-level1", "/navsink/level1/", "window.open() of location.hash (javascript: scheme)", "GET", ["#hash"])
+Xssmaze.push("navsink-level1", "/navsink/level1/", "window.open() of location.hash (javascript: scheme)", "GET", ["#hash"],
+  vuln: "dom", sources: ["location.hash"], sinks: ["window.open"], delivery: ["fragment"])
 maze_get "/navsink/level1/" do |_env|
   "<html><body>
   <h1>Open Link</h1>
@@ -23,7 +24,8 @@ maze_get "/navsink/level1/" do |_env|
 end
 
 # Level 2: window.open() of a location.search value.
-Xssmaze.push("navsink-level2", "/navsink/level2/?query=a", "window.open() of a location.search value (javascript: scheme)")
+Xssmaze.push("navsink-level2", "/navsink/level2/?query=a", "window.open() of a location.search value (javascript: scheme)",
+  vuln: "dom", sources: ["location.search"], sinks: ["window.open"], delivery: ["query"])
 maze_get "/navsink/level2/" do |_env|
   "<html><body>
   <h1>Preview</h1>
@@ -36,7 +38,8 @@ end
 
 # Level 3: location.assign() — the method form of a same-frame navigation.
 # A javascript: URL executes in the current document.
-Xssmaze.push("navsink-level3", "/navsink/level3/?query=a", "location.assign() of a location.search value (javascript: scheme)")
+Xssmaze.push("navsink-level3", "/navsink/level3/?query=a", "location.assign() of a location.search value (javascript: scheme)",
+  vuln: "dom", sources: ["location.search"], sinks: ["location-nav"], delivery: ["query"])
 maze_get "/navsink/level3/" do |_env|
   "<html><body>
   <h1>Redirecting...</h1>
@@ -49,7 +52,8 @@ maze_get "/navsink/level3/" do |_env|
 end
 
 # Level 4: location.replace() of location.hash — SPA bounce/replace flow.
-Xssmaze.push("navsink-level4", "/navsink/level4/", "location.replace() of location.hash (javascript: scheme)", "GET", ["#hash"])
+Xssmaze.push("navsink-level4", "/navsink/level4/", "location.replace() of location.hash (javascript: scheme)", "GET", ["#hash"],
+  vuln: "dom", sources: ["location.hash"], sinks: ["location-nav"], delivery: ["fragment"])
 maze_get "/navsink/level4/" do |_env|
   "<html><body>
   <h1>Loading route...</h1>
@@ -62,7 +66,8 @@ end
 
 # Level 5: window.open() with a server-reflected URL inlined into a JS string.
 # The reflection is visible in the served HTML source.
-Xssmaze.push("navsink-level5", "/navsink/level5/?query=a", "server-reflected URL passed to window.open()")
+Xssmaze.push("navsink-level5", "/navsink/level5/?query=a", "server-reflected URL passed to window.open()",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["window.open"], delivery: ["query"])
 maze_get "/navsink/level5/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -77,7 +82,8 @@ end
 
 # Level 6: location.assign() with a server-reflected URL inlined into a JS
 # string.
-Xssmaze.push("navsink-level6", "/navsink/level6/?query=a", "server-reflected URL passed to location.assign()")
+Xssmaze.push("navsink-level6", "/navsink/level6/?query=a", "server-reflected URL passed to location.assign()",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["location-nav"], delivery: ["query"])
 maze_get "/navsink/level6/" do |env|
   query = env.params.query.fetch("query", "")
 

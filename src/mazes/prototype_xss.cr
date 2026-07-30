@@ -1,5 +1,6 @@
 # Level 1: WordPress-style settings form — attribute breakout from input value
-Xssmaze.push("prototype-pattern-level1", "/prototype-pattern/level1/?query=a", "WordPress-style input value reflection")
+Xssmaze.push("prototype-pattern-level1", "/prototype-pattern/level1/?query=a", "WordPress-style input value reflection",
+  vuln: "reflected-attr", delivery: ["query"], note: "despite the category name this is a framework-shaped server-side reflection, not prototype pollution; WordPress-style input value")
 maze_get "/prototype-pattern/level1/" do |env|
   query = env.params.query["query"]
 
@@ -15,7 +16,8 @@ maze_get "/prototype-pattern/level1/" do |env|
 end
 
 # Level 2: PHP error-style — raw HTML injection in error message
-Xssmaze.push("prototype-pattern-level2", "/prototype-pattern/level2/?query=a", "PHP error message reflection (raw injection)")
+Xssmaze.push("prototype-pattern-level2", "/prototype-pattern/level2/?query=a", "PHP error message reflection (raw injection)",
+  vuln: "reflected-html", delivery: ["query"], note: "despite the category name this is a framework-shaped server-side reflection, not prototype pollution; PHP warning text")
 maze_get "/prototype-pattern/level2/" do |env|
   query = env.params.query["query"]
 
@@ -27,7 +29,8 @@ maze_get "/prototype-pattern/level2/" do |env|
 end
 
 # Level 3: ASP.NET-style error label — raw HTML injection in span
-Xssmaze.push("prototype-pattern-level3", "/prototype-pattern/level3/?query=a", "ASP.NET-style error label reflection")
+Xssmaze.push("prototype-pattern-level3", "/prototype-pattern/level3/?query=a", "ASP.NET-style error label reflection",
+  vuln: "reflected-html", delivery: ["query"], note: "despite the category name this is a framework-shaped server-side reflection, not prototype pollution; ASP.NET error label")
 maze_get "/prototype-pattern/level3/" do |env|
   query = env.params.query["query"]
 
@@ -44,7 +47,8 @@ maze_get "/prototype-pattern/level3/" do |env|
 end
 
 # Level 4: Angular-style template — raw HTML injection (server-side rendered)
-Xssmaze.push("prototype-pattern-level4", "/prototype-pattern/level4/?query=a", "Angular-style ng-app reflection (raw injection)")
+Xssmaze.push("prototype-pattern-level4", "/prototype-pattern/level4/?query=a", "Angular-style ng-app reflection (raw injection)",
+  vuln: "reflected-html", delivery: ["query"], note: "despite the category name this is a framework-shaped server-side reflection, not prototype pollution; Angular-shaped markup with no Angular loaded")
 maze_get "/prototype-pattern/level4/" do |env|
   query = env.params.query["query"]
 
@@ -59,7 +63,8 @@ maze_get "/prototype-pattern/level4/" do |env|
 end
 
 # Level 5: React-style server-rendered — raw HTML injection in data-reactroot div
-Xssmaze.push("prototype-pattern-level5", "/prototype-pattern/level5/?query=a", "React-style server-rendered reflection (raw injection)")
+Xssmaze.push("prototype-pattern-level5", "/prototype-pattern/level5/?query=a", "React-style server-rendered reflection (raw injection)",
+  vuln: "reflected-html", delivery: ["query"], note: "despite the category name this is a framework-shaped server-side reflection, not prototype pollution; React-shaped server-rendered markup")
 maze_get "/prototype-pattern/level5/" do |env|
   query = env.params.query["query"]
 
@@ -70,7 +75,8 @@ maze_get "/prototype-pattern/level5/" do |env|
 end
 
 # Level 6: Flask/Jinja-style — no template escaping, raw injection in welcome message
-Xssmaze.push("prototype-pattern-level6", "/prototype-pattern/level6/?query=a", "Flask/Jinja-style unescaped reflection")
+Xssmaze.push("prototype-pattern-level6", "/prototype-pattern/level6/?query=a", "Flask/Jinja-style unescaped reflection",
+  vuln: "reflected-html", delivery: ["query"], note: "despite the category name this is a framework-shaped server-side reflection, not prototype pollution; Flask/Jinja-shaped welcome message")
 maze_get "/prototype-pattern/level6/" do |env|
   query = env.params.query["query"]
 

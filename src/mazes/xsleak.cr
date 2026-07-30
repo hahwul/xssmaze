@@ -62,7 +62,8 @@ maze_get "/xsleak/empty" do |env|
 end
 
 # Level 1: Body size oracle (admin vs guest)
-Xssmaze.push("xsleak-level1", "/xsleak/search?q=admin", "body size oracle (admin returns more results)", "GET", ["q"])
+Xssmaze.push("xsleak-level1", "/xsleak/search?q=admin", "body size oracle (admin returns more results)", "GET", ["q"],
+  vuln: "non-xss-control", delivery: ["query"], exploitable: false, note: "cross-site leak, not XSS: a response-size oracle. There is no injection sink here, so reporting no XSS is the correct result")
 maze_get "/xsleak/search" do |env|
   xsleak_no_store(env)
   env.response.content_type = "text/html; charset=utf-8"
@@ -90,7 +91,8 @@ maze_get "/xsleak/search" do |env|
 end
 
 # Level 2: Frame-count oracle (admin includes more subframes)
-Xssmaze.push("xsleak-level2", "/xsleak/frame?q=admin", "frame-count oracle (admin includes more iframes)", "GET", ["q"])
+Xssmaze.push("xsleak-level2", "/xsleak/frame?q=admin", "frame-count oracle (admin includes more iframes)", "GET", ["q"],
+  vuln: "non-xss-control", delivery: ["query"], exploitable: false, note: "cross-site leak, not XSS: a frame-count oracle. There is no injection sink here, so reporting no XSS is the correct result")
 maze_get "/xsleak/frame" do |env|
   xsleak_no_store(env)
   env.response.content_type = "text/html; charset=utf-8"
@@ -110,7 +112,8 @@ maze_get "/xsleak/frame" do |env|
 end
 
 # Level 3: Load/error oracle (image 200 vs 404)
-Xssmaze.push("xsleak-level3", "/xsleak/avatar.gif?q=admin", "image load oracle (admin returns valid image, guest 404)", "GET", ["q"])
+Xssmaze.push("xsleak-level3", "/xsleak/avatar.gif?q=admin", "image load oracle (admin returns valid image, guest 404)", "GET", ["q"],
+  vuln: "non-xss-control", delivery: ["query"], exploitable: false, note: "cross-site leak, not XSS: an image load/error oracle. There is no injection sink here, so reporting no XSS is the correct result")
 maze_get "/xsleak/avatar.gif" do |env|
   xsleak_no_store(env)
   if xsleak_admin?(env)
@@ -125,7 +128,8 @@ maze_get "/xsleak/avatar.gif" do |env|
 end
 
 # Level 4: Timing oracle (guest path is slower)
-Xssmaze.push("xsleak-level4", "/xsleak/timing?q=admin", "timing oracle (guest responds slower)", "GET", ["q"])
+Xssmaze.push("xsleak-level4", "/xsleak/timing?q=admin", "timing oracle (guest responds slower)", "GET", ["q"],
+  vuln: "non-xss-control", delivery: ["query"], exploitable: false, note: "cross-site leak, not XSS: a response-timing oracle. There is no injection sink here, so reporting no XSS is the correct result")
 maze_get "/xsleak/timing" do |env|
   xsleak_no_store(env)
   env.response.content_type = "text/plain; charset=utf-8"
@@ -136,7 +140,8 @@ maze_get "/xsleak/timing" do |env|
 end
 
 # Level 5: Redirect-chain oracle (admin has more hops)
-Xssmaze.push("xsleak-level5", "/xsleak/redirect?q=admin", "redirect-chain oracle (admin follows more redirects)", "GET", ["q"])
+Xssmaze.push("xsleak-level5", "/xsleak/redirect?q=admin", "redirect-chain oracle (admin follows more redirects)", "GET", ["q"],
+  vuln: "non-xss-control", delivery: ["query"], exploitable: false, note: "cross-site leak, not XSS: a redirect-chain-length oracle. There is no injection sink here, so reporting no XSS is the correct result")
 maze_get "/xsleak/redirect" do |env|
   xsleak_no_store(env)
   hops = xsleak_admin?(env) ? 5 : 1

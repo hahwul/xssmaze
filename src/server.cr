@@ -43,6 +43,35 @@ module Xssmaze::Server
     end
   end
 
+  # Narrow the catalog by the /map/json filter params. Returns the surviving
+  # indices so the caller can reuse the pre-materialized JSON objects instead
+  # of rebuilding them.
+  def self.filter_indices(mazes : Array(Maze), env) : Array(Int32)
+    idx = (0...mazes.size).to_a
+    if type = env.params.query["type"]?
+      idx = idx.select { |i| mazes[i].type == type }
+    end
+    if needle = env.params.query["q"]?
+      n = needle.downcase
+      idx = idx.select do |i|
+        mazes[i].name.downcase.includes?(n) || mazes[i].desc.downcase.includes?(n)
+      end
+    end
+    if vuln = env.params.query["vuln"]?
+      idx = idx.select { |i| mazes[i].vuln == vuln }
+    end
+    if reach = env.params.query["reach"]?
+      idx = idx.select { |i| mazes[i].reach == reach }
+    end
+    if exploitable = env.params.query["exploitable"]?
+      want = exploitable != "false" && exploitable != "0"
+      idx = idx.select { |i| mazes[i].exploitable? == want }
+    end
+    idx
+  end
+
+  FILTER_PARAMS = %w[type q vuln reach exploitable]
+
   def self.json_no_store(env)
     env.response.content_type = "application/json"
     env.response.headers["Access-Control-Allow-Origin"] = "*"
@@ -104,9 +133,7 @@ module Xssmaze::Server
     # Filter the pre-materialized JSON objects rather than rebuilding tuples.
     map_json_entry = catalog["map_json"]
     get "/map/json" do |env|
-      type = env.params.query["type"]?
-      q = env.params.query["q"]?
-      if type.nil? && q.nil?
+      if FILTER_PARAMS.none? { |p| env.params.query[p]? }
         next Xssmaze::Server.serve(env, map_json_entry, last_modified)
       end
 
@@ -115,18 +142,7 @@ module Xssmaze::Server
       env.response.headers["Cache-Control"] = "public, max-age=60"
       env.response.headers["Vary"] = "Accept-Encoding"
 
-      filtered_idx = (0...mazes.size).to_a
-      if t = type
-        filtered_idx = filtered_idx.select { |i| mazes[i].type == t }
-      end
-      if needle = q
-        n = needle.downcase
-        filtered_idx = filtered_idx.select do |i|
-          maze = mazes[i]
-          maze.name.downcase.includes?(n) || maze.desc.downcase.includes?(n)
-        end
-      end
-      filtered_objs = filtered_idx.map { |i| maze_json_objs[i] }
+      filtered_objs = Xssmaze::Server.filter_indices(mazes, env).map { |i| maze_json_objs[i] }
       {endpoints: filtered_objs, total: filtered_objs.size}.to_json
     end
 

@@ -7,7 +7,8 @@
 
 # Level 1: dynamic import() of a location.search value. A leading data: or
 # https: specifier loads and runs an attacker-controlled ES module.
-Xssmaze.push("codeexec-level1", "/codeexec/level1/?query=a", "dynamic import() of a location.search value (ESM module load)")
+Xssmaze.push("codeexec-level1", "/codeexec/level1/?query=a", "dynamic import() of a location.search value (ESM module load)",
+  vuln: "dom", sources: ["location.search"], sinks: ["dynamic-import"], delivery: ["query"])
 maze_get "/codeexec/level1/" do |_env|
   "<html><body>
   <h1>Dynamic Module Loader</h1>
@@ -28,7 +29,8 @@ end
 
 # Level 2: dynamic import() with a server-reflected specifier inlined into the
 # import() call. A data: URL runs directly; a quote also breaks the JS string.
-Xssmaze.push("codeexec-level2", "/codeexec/level2/?query=a", "dynamic import() with server-reflected module specifier")
+Xssmaze.push("codeexec-level2", "/codeexec/level2/?query=a", "dynamic import() with server-reflected module specifier",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["dynamic-import"], delivery: ["query"])
 maze_get "/codeexec/level2/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -46,7 +48,8 @@ end
 
 # Level 3: inline <script> body taken from location.hash. Assigning to
 # script.text and appending the element executes the code as JavaScript.
-Xssmaze.push("codeexec-level3", "/codeexec/level3/", "inline script element text from location.hash (createElement+append)", "GET", ["#hash"])
+Xssmaze.push("codeexec-level3", "/codeexec/level3/", "inline script element text from location.hash (createElement+append)", "GET", ["#hash"],
+  vuln: "dom", sources: ["location.hash"], sinks: ["script.text"], delivery: ["fragment"])
 maze_get "/codeexec/level3/" do |_env|
   "<html><body>
   <h1>Hash Script Runner</h1>
@@ -64,7 +67,8 @@ end
 
 # Level 4: server-reflected snippet assigned to an inline script element body.
 # The reflected value becomes the script source text and runs verbatim.
-Xssmaze.push("codeexec-level4", "/codeexec/level4/?query=a", "server-reflected text injected into an inline script element")
+Xssmaze.push("codeexec-level4", "/codeexec/level4/?query=a", "server-reflected text injected into an inline script element",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["script.text"], delivery: ["query"])
 maze_get "/codeexec/level4/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -81,7 +85,8 @@ end
 
 # Level 5: DOM event-handler attribute set from a reflected value via
 # setAttribute('onclick', ...). Programmatically clicking fires the handler.
-Xssmaze.push("codeexec-level5", "/codeexec/level5/?query=a", "DOM event-handler attribute set via setAttribute('onclick', ...)")
+Xssmaze.push("codeexec-level5", "/codeexec/level5/?query=a", "DOM event-handler attribute set via setAttribute('onclick', ...)",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["setAttribute", "event-handler-attribute"], delivery: ["query"], note: "the handler is fired programmatically 200ms after load")
 maze_get "/codeexec/level5/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -100,7 +105,8 @@ end
 
 # Level 6: dynamic external script whose src comes from a reflected value.
 # An attacker-controlled URL (//host/x.js or data:) loads and runs as script.
-Xssmaze.push("codeexec-level6", "/codeexec/level6/?query=a", "dynamic external script src from reflected value")
+Xssmaze.push("codeexec-level6", "/codeexec/level6/?query=a", "dynamic external script src from reflected value",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["script.src"], delivery: ["query"])
 maze_get "/codeexec/level6/" do |env|
   query = env.params.query.fetch("query", "")
 

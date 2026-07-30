@@ -4,7 +4,7 @@
 [![Crystal Lint](https://github.com/hahwul/xssmaze/actions/workflows/crystal_lint.yml/badge.svg)](https://github.com/hahwul/xssmaze/actions/workflows/crystal_lint.yml)
 [![Docker](https://github.com/hahwul/xssmaze/actions/workflows/ghcr.yml/badge.svg)](https://github.com/hahwul/xssmaze/actions/workflows/ghcr.yml)
 
-XSSMaze is an intentionally vulnerable web application for measuring and improving XSS detection in security testing tools. It covers a wide range of XSS contexts: basic reflection, DOM, header, path, POST, redirect, decode, hidden input, in-JS, in-attribute, in-frame, event handler, CSP bypass, SVG, CSS injection, template injection, WebSocket, JSON, advanced techniques, polyglot, browser-state, opener, storage-event, stream, channel, service-worker, history-state, reparse, referrer, jQuery DOM sinks, dynamic code/module execution sinks, client-state (web storage/cookie/history) sinks, async fetch/XHR API DOM sinks, the 2024 native unsafe HTML-parsing sinks (setHTMLUnsafe/parseHTMLUnsafe), iframe srcdoc property sinks, and navigation sinks (window.open/location.assign/location.replace).
+XSSMaze is an intentionally vulnerable web application for measuring and improving XSS detection in security testing tools. It covers a wide range of XSS contexts: basic reflection, DOM, header, path, POST, redirect, decode, hidden input, in-JS, in-attribute, in-frame, event handler, CSP bypass, SVG, CSS injection, template injection, WebSocket, JSON, advanced techniques, polyglot, browser-state, opener, storage-event, stream, channel, service-worker, history-state, reparse, referrer, jQuery DOM sinks, dynamic code/module execution sinks, client-state (web storage/cookie/history) sinks, async fetch/XHR API DOM sinks, the 2024 native unsafe HTML-parsing sinks (setHTMLUnsafe/parseHTMLUnsafe), iframe srcdoc property sinks, navigation sinks (window.open/location.assign/location.replace), under-covered DOM sources (IndexedDB, hash-as-querystring, popstate, document.currentScript.src, Permissions API callbacks, CSS custom properties, a real same-origin WebSocket), under-covered DOM sinks (createHTMLDocument/importNode, DOMParser/adoptNode, indirect eval, Reflect.apply(eval), map(eval), Object.assign(location), setAttributeNS, form.action+submit), and taint-propagation shapes that defeat naive analyzers (JSON round-trip, Proxy traps, class getters, await, Promise.all, structuredClone, tagged templates, replacer functions).
 
 ![](images/showcase.png)
 
@@ -55,7 +55,12 @@ curl -i "http://localhost:3000/basic/level1/?query=a&set_csp=default-src%20%27se
 curl http://localhost:3000/map/text         # newline-separated URLs
 curl http://localhost:3000/map/json         # full metadata (also: ?type=dom or ?q=csp)
 curl http://localhost:3000/map/markdown     # markdown table
-curl http://localhost:3000/map/categories   # categories with counts
+curl http://localhost:3000/map/categories   # categories with counts + class/reach rollups
+
+# Structured vulnerability metadata (see "Vulnerability metadata" below)
+curl "http://localhost:3000/map/json?vuln=dom"           # only DOM flows
+curl "http://localhost:3000/map/json?reach=server"       # payload fits in an HTTP request
+curl "http://localhost:3000/map/json?exploitable=false"  # deliberate true negatives
 curl http://localhost:3000/map/openapi      # OpenAPI 3.0 catalog
 curl http://localhost:3000/sitemap.xml      # sitemap of all maze paths
 curl http://localhost:3000/health           # liveness probe
@@ -64,6 +69,54 @@ curl -L http://localhost:3000/random        # 302 to a random maze
 ```
 
 The index page (`/`) provides a client-side filter, per-category counts, and links to all of the maps above. Map endpoints serve a payload that is built once at startup, cached, and gzip pre-compressed (`Accept-Encoding: gzip` cuts the index payload by ~85%), so they're safe to poll from tooling.
+
+## Vulnerability metadata
+Every endpoint in `/map/json` carries a `vuln` object so tooling can score per
+vulnerability class without regex-guessing at the served HTML:
+
+```json
+{
+  "name": "dom-level7",
+  "url": "/dom/level7/",
+  "params": ["#hash"],
+  "vuln": {
+    "class": "dom",
+    "reach": "client",
+    "delivery": ["fragment"],
+    "sources": ["location.hash"],
+    "sinks": ["innerHTML"],
+    "exploitable": true,
+    "note": null
+  }
+}
+```
+
+| Field | Meaning |
+|-------|---------|
+| `class` | `reflected-html`, `reflected-attr`, `reflected-js`, `dom`, `stored`, `prototype-pollution`, `csti`, `non-xss-control`, or `unclassified` |
+| `sources` / `sinks` | DOM taint endpoints, e.g. `location.hash` → `innerHTML` |
+| `delivery` | where the payload enters: `query`, `path`, `body`, `header`, `cookie`, `referer`, `fragment`, `postmessage`, `window-name`, … |
+| `reach` | derived — `server` if any delivery channel fits an HTTP request, `client` if the payload only exists browser-side, `unknown` if untriaged |
+| `exploitable` | `false` marks a deliberate control / true negative |
+| `note` | caveats: required user interaction, why it is a control, non-obvious parameter names |
+
+Classification follows the **injection context** — where the bytes land — not
+what the receiving API does with a well-formed argument. A value reflected raw
+into a JS string literal is `reflected-js` however inert the function it is
+passed to.
+
+Two things this is designed to prevent a benchmark from getting wrong:
+
+- **`reach: "client"`** endpoints (fragment, postMessage, window.name,
+  clipboard, drag-and-drop) cannot be reached by a request-only scanner at
+  all. Counting them as misses measures the wrong thing.
+- **`exploitable: false`** endpoints are not bugs. The whole `xsleak` category
+  is cross-site *leaks*, not XSS — a scanner that reports nothing there is
+  correct.
+
+Endpoints that have not been triaged yet are `"unclassified"` with
+`reach: "unknown"`, which is deliberately distinct from "reviewed and found
+safe".
 
 ## XS-Leaks (Cross-Site Leaks)
 XS-Leaks are cross-origin side-channels that let an attacker infer state-dependent data without directly reading the response body. XSSMaze includes `xsleak-*` levels that intentionally vary response size, subresource composition, load/error behavior, timing, and redirect chains based on a "secret" state.

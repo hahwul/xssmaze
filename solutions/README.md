@@ -4,7 +4,7 @@ Per-category exploit notes for every endpoint in the lab. The lab itself runs
 `./bin/xssmaze` (default `http://127.0.0.1:3000`); each entry below shows a
 working payload for one or more maze levels.
 
-**Total**: 164 categories · 957 levels.
+**Total**: 167 categories · 980 levels.
 
 ## How to read an entry
 
@@ -30,9 +30,12 @@ working payload for one or more maze levels.
 - Four categories cover two URL paths each because their solutions share
   filter logic. See [Merged categories](#merged-categories) below.
 - A handful of levels are intentionally hardened (e.g. `sanitizer-level5`,
-  `shadow-dom-level5`, `slot-level4`, `stored-level2`, `waf-bypass-level5`,
-  `mutfilter-level1`). Those entries document the constraint instead of a
-  fabricated payload.
+  `stored-level2`, `waf-bypass-level5`, `mutfilter-level1`). Those entries
+  document the constraint instead of a fabricated payload.
+- Endpoints that are deliberately *not* XSS carry `vuln.class =
+  "non-xss-control"` and `vuln.exploitable = false` in `/map/json`. The whole
+  `xsleak` category is one of these: those are cross-site-leak oracles, so a
+  scanner that reports no XSS on them is correct, not missing a bug.
 
 ## Merged categories
 
@@ -83,6 +86,8 @@ working payload for one or more maze levels.
 | [dialog](dialog.md) | Reflections inside `<dialog>` element bodies, attributes, and JS sinks. |
 | [dom](dom.md) | Client-side DOM sinks driven by URL, hash, query, name, referrer, postMessage. |
 | [domctx](domctx.md) | Server reflections that land in JS strings, JSON, eval, or div bodies (DOM contexts). |
+| [domsink](domsink.md) | DOM sinks the rest of the lab skips: createHTMLDocument/importNode, DOMParser/adoptNode, indirect eval, `Reflect.apply(eval)`, `map(eval)`, `Object.assign(location)`, `setAttributeNS`, `form.action` + `submit()`. |
+| [domsource](domsource.md) | DOM sources the rest of the lab skips: IndexedDB, `URLSearchParams(location.hash)`, popstate/history round-trip, `document.currentScript.src`, a Permissions API callback, a CSS custom property, and a real same-origin WebSocket. |
 | [doublereflect](doublereflect.md) | Same input reflected in multiple places — exploit the weaker sink. |
 | [dragdrop](dragdrop.md) | Reflections passed through to_json into JS, used in drag-and-drop sinks. |
 | [ecommerce](ecommerce.md) | Raw reflections in storefront widgets (titles, prices, filters, cart, reviews, breadcrumbs). |
@@ -198,6 +203,7 @@ working payload for one or more maze levels.
 | [svgctx](svgctx.md) | Reflection inside SVG sub-elements (text/desc/title/xlink:href/foreignObject/animate). |
 | [tablecontext](tablecontext.md) | Plain reflections inside table-related and list-related text elements; no filtering. |
 | [tagattrmix](tagattrmix.md) | Mixed reflection in tag content and various attributes; pick the simplest breakout. |
+| [taintflow](taintflow.md) | Taint-propagation shapes rather than new sinks: the same `location.*` → `innerHTML` flow laundered through JSON round-trip, a Proxy get trap, a class getter, `await`, `Promise.all`, `structuredClone`, a tagged template, and a `String.replace` replacer function. |
 | [template](template.md) | Server-side and client-side template-style substitution sinks under `/template/`. |
 | [timing](timing.md) | Reflection in various JS literal contexts (string, object key, comment, regex, template). |
 | [tplel](tplel.md) | HTML `<template>` element reflections: inert content reactivated via innerHTML/appendChild. |

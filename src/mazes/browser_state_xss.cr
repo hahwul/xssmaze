@@ -1,4 +1,5 @@
-Xssmaze.push("browser-state-level1", "/browser-state/level1/?seed=a", "window.name bootstrap + innerHTML", "GET", ["seed"])
+Xssmaze.push("browser-state-level1", "/browser-state/level1/?seed=a", "window.name bootstrap + innerHTML", "GET", ["seed"],
+  vuln: "dom", sources: ["window.name"], sinks: ["innerHTML"], delivery: ["query"])
 maze_get "/browser-state/level1/" do |_|
   "<div id='output'></div>
   <script>
@@ -15,7 +16,8 @@ maze_get "/browser-state/level1/" do |_|
   </script>"
 end
 
-Xssmaze.push("browser-state-level2", "/browser-state/level2/?seed=a", "localStorage relay + insertAdjacentHTML", "GET", ["seed"])
+Xssmaze.push("browser-state-level2", "/browser-state/level2/?seed=a", "localStorage relay + insertAdjacentHTML", "GET", ["seed"],
+  vuln: "dom", sources: ["localStorage"], sinks: ["insertAdjacentHTML"], delivery: ["query"])
 maze_get "/browser-state/level2/" do |_|
   "<div id='output'></div>
   <script>
@@ -33,7 +35,8 @@ maze_get "/browser-state/level2/" do |_|
   </script>"
 end
 
-Xssmaze.push("browser-state-level3", "/browser-state/level3/?seed=a", "sessionStorage relay + createContextualFragment", "GET", ["seed"])
+Xssmaze.push("browser-state-level3", "/browser-state/level3/?seed=a", "sessionStorage relay + createContextualFragment", "GET", ["seed"],
+  vuln: "dom", sources: ["sessionStorage"], sinks: ["createContextualFragment"], delivery: ["query"])
 maze_get "/browser-state/level3/" do |_|
   "<div id='output'></div>
   <script>
@@ -53,7 +56,8 @@ maze_get "/browser-state/level3/" do |_|
   </script>"
 end
 
-Xssmaze.push("browser-state-level4", "/browser-state/level4/?seed=a", "postMessage relay + structured data + innerHTML", "GET", ["seed"])
+Xssmaze.push("browser-state-level4", "/browser-state/level4/?seed=a", "postMessage relay + structured data + innerHTML", "GET", ["seed"],
+  vuln: "dom", sources: ["postMessage"], sinks: ["innerHTML"], delivery: ["query"])
 maze_get "/browser-state/level4/" do |_|
   "<div id='output'></div>
   <iframe id='relay' sandbox='allow-scripts' style='display:none'></iframe>
@@ -71,7 +75,8 @@ maze_get "/browser-state/level4/" do |_|
   </script>"
 end
 
-Xssmaze.push("browser-state-level5", "/browser-state/level5/?seed=a", "document.referrer bootstrap + document.write", "GET", ["seed"])
+Xssmaze.push("browser-state-level5", "/browser-state/level5/?seed=a", "document.referrer bootstrap + document.write", "GET", ["seed"],
+  vuln: "dom", sources: ["document.referrer"], sinks: ["document.write"], delivery: ["query", "referer"])
 maze_get "/browser-state/level5/" do |_|
   "<div id='output'></div>
   <iframe id='relay' style='display:none'></iframe>

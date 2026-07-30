@@ -1,5 +1,6 @@
 # Level 1: Query in JS object property value — close the string, close the script, inject HTML
-Xssmaze.push("scriptgadget-level1", "/scriptgadget/level1/?query=a", "query in JS object property value (close script to inject)")
+Xssmaze.push("scriptgadget-level1", "/scriptgadget/level1/?query=a", "query in JS object property value (close script to inject)",
+  vuln: "reflected-js", delivery: ["query"])
 maze_get "/scriptgadget/level1/" do |env|
   query = env.params.query["query"]
 
@@ -10,7 +11,8 @@ maze_get "/scriptgadget/level1/" do |env|
 end
 
 # Level 2: Query in JS ternary expression — close the string, close the script, inject HTML
-Xssmaze.push("scriptgadget-level2", "/scriptgadget/level2/?query=a", "query in JS ternary expression (close script to inject)")
+Xssmaze.push("scriptgadget-level2", "/scriptgadget/level2/?query=a", "query in JS ternary expression (close script to inject)",
+  vuln: "reflected-js", delivery: ["query"])
 maze_get "/scriptgadget/level2/" do |env|
   query = env.params.query["query"]
 
@@ -21,7 +23,8 @@ maze_get "/scriptgadget/level2/" do |env|
 end
 
 # Level 3: Query in JS string concatenation — close the string, close the script, inject HTML
-Xssmaze.push("scriptgadget-level3", "/scriptgadget/level3/?query=a", "query in JS string concatenation (close script to inject)")
+Xssmaze.push("scriptgadget-level3", "/scriptgadget/level3/?query=a", "query in JS string concatenation (close script to inject)",
+  vuln: "reflected-js", delivery: ["query"])
 maze_get "/scriptgadget/level3/" do |env|
   query = env.params.query["query"]
 
@@ -32,7 +35,8 @@ maze_get "/scriptgadget/level3/" do |env|
 end
 
 # Level 4: Query in JS function call argument — close the string, close the script, inject HTML
-Xssmaze.push("scriptgadget-level4", "/scriptgadget/level4/?query=a", "query in JS function call arg (close script to inject)")
+Xssmaze.push("scriptgadget-level4", "/scriptgadget/level4/?query=a", "query in JS function call arg (close script to inject)",
+  vuln: "reflected-js", delivery: ["query"])
 maze_get "/scriptgadget/level4/" do |env|
   query = env.params.query["query"]
 
@@ -45,7 +49,8 @@ end
 # Level 5: Query in inline event handler — break out of the event attribute with ') then inject new attribute
 # Angle brackets are stripped so you cannot close the tag and inject new tags
 # Must use event attribute injection: ') followed by onmouseover=alert(1) or similar
-Xssmaze.push("scriptgadget-level5", "/scriptgadget/level5/?query=a", "query in onclick handler attr (break out, add event attr)")
+Xssmaze.push("scriptgadget-level5", "/scriptgadget/level5/?query=a", "query in onclick handler attr (break out, add event attr)",
+  vuln: "reflected-attr", delivery: ["query"], note: "angle brackets are stripped; break out of the onclick attribute instead of injecting a tag")
 maze_get "/scriptgadget/level5/" do |env|
   query = Filters.strip_angles(env.params.query["query"])
 
@@ -55,7 +60,8 @@ maze_get "/scriptgadget/level5/" do |env|
 end
 
 # Level 6: Query in script with JS template literal — close the script, inject HTML
-Xssmaze.push("scriptgadget-level6", "/scriptgadget/level6/?query=a", "query in JS template literal inside script (close script to inject)")
+Xssmaze.push("scriptgadget-level6", "/scriptgadget/level6/?query=a", "query in JS template literal inside script (close script to inject)",
+  vuln: "reflected-js", delivery: ["query"], note: "lands inside a template literal; ${...} also evaluates")
 maze_get "/scriptgadget/level6/" do |env|
   query = env.params.query["query"]
 

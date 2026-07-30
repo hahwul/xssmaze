@@ -1,7 +1,8 @@
 # Level 1: Reflection inside <select><option value="QUERY">
 # Bypass: close option and select tags, then inject HTML
 # e.g. "></option></select><script>alert(1)</script>
-Xssmaze.push("fragment-level1", "/fragment/level1/?query=a", "reflection in option value inside select (break out of option/select)")
+Xssmaze.push("fragment-level1", "/fragment/level1/?query=a", "reflection in option value inside select (break out of option/select)",
+  vuln: "reflected-attr", delivery: ["query"], note: "despite the category name this is a server-side HTML-context reflection, not a location.hash DOM flow; reflected into an <option value> attribute")
 maze_get "/fragment/level1/" do |env|
   query = env.params.query["query"]
 
@@ -12,7 +13,8 @@ end
 # Uses .sub (not .gsub), so only the first < and > are encoded.
 # Bypass: send dummy <> first to consume the .sub, then real payload
 # e.g. <> <script>alert(1)</script>
-Xssmaze.push("fragment-level2", "/fragment/level2/?query=a", "reflection in pre tag with .sub encoding (only first <> encoded)")
+Xssmaze.push("fragment-level2", "/fragment/level2/?query=a", "reflection in pre tag with .sub encoding (only first <> encoded)",
+  vuln: "reflected-html", delivery: ["query"], note: "despite the category name this is a server-side HTML-context reflection, not a location.hash DOM flow; only the first < and > are entity-encoded")
 maze_get "/fragment/level2/" do |env|
   query = env.params.query["query"]
   filtered = query.sub("<", "&lt;").sub(">", "&gt;")
@@ -23,7 +25,8 @@ end
 # Level 3: Reflection inside <svg> tag as text node
 # Bypass: inject SVG event handlers or close svg and inject HTML
 # e.g. </svg><script>alert(1)</script> or <svg onload=alert(1)>
-Xssmaze.push("fragment-level3", "/fragment/level3/?query=a", "reflection inside svg tag as text node")
+Xssmaze.push("fragment-level3", "/fragment/level3/?query=a", "reflection inside svg tag as text node",
+  vuln: "reflected-html", delivery: ["query"], note: "despite the category name this is a server-side HTML-context reflection, not a location.hash DOM flow; reflected as an <svg><text> node")
 maze_get "/fragment/level3/" do |env|
   query = env.params.query["query"]
 
@@ -33,7 +36,8 @@ end
 # Level 4: Reflection inside <math> tag
 # Bypass: close the math tag with </math> then inject HTML
 # e.g. </math><script>alert(1)</script>
-Xssmaze.push("fragment-level4", "/fragment/level4/?query=a", "reflection inside math tag (close tag escape)")
+Xssmaze.push("fragment-level4", "/fragment/level4/?query=a", "reflection inside math tag (close tag escape)",
+  vuln: "reflected-html", delivery: ["query"], note: "despite the category name this is a server-side HTML-context reflection, not a location.hash DOM flow; reflected inside <math><mi>")
 maze_get "/fragment/level4/" do |env|
   query = env.params.query["query"]
 
@@ -43,7 +47,8 @@ end
 # Level 5: Reflection inside <details><summary>QUERY</summary>
 # Bypass: close summary and details tags, then inject HTML
 # e.g. </summary></details><script>alert(1)</script>
-Xssmaze.push("fragment-level5", "/fragment/level5/?query=a", "reflection inside details/summary (break out and inject)")
+Xssmaze.push("fragment-level5", "/fragment/level5/?query=a", "reflection inside details/summary (break out and inject)",
+  vuln: "reflected-html", delivery: ["query"], note: "despite the category name this is a server-side HTML-context reflection, not a location.hash DOM flow; reflected inside <details><summary>")
 maze_get "/fragment/level5/" do |env|
   query = env.params.query["query"]
 
@@ -53,7 +58,8 @@ end
 # Level 6: Reflection inside <marquee> tag
 # Bypass: close the marquee tag with </marquee> then inject HTML
 # e.g. </marquee><script>alert(1)</script>
-Xssmaze.push("fragment-level6", "/fragment/level6/?query=a", "reflection inside marquee tag (close tag escape)")
+Xssmaze.push("fragment-level6", "/fragment/level6/?query=a", "reflection inside marquee tag (close tag escape)",
+  vuln: "reflected-html", delivery: ["query"], note: "despite the category name this is a server-side HTML-context reflection, not a location.hash DOM flow; reflected inside <marquee>")
 maze_get "/fragment/level6/" do |env|
   query = env.params.query["query"]
 

@@ -1,4 +1,5 @@
-Xssmaze.push("mobserver-level1", "/mobserver/level1/?query=a", "MutationObserver re-applies textContent as innerHTML")
+Xssmaze.push("mobserver-level1", "/mobserver/level1/?query=a", "MutationObserver re-applies textContent as innerHTML",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "a MutationObserver re-applies an added text node's textContent as innerHTML")
 maze_get "/mobserver/level1/" do |env|
   query = env.params.query["query"]
   "<div id='out'></div>
@@ -16,7 +17,8 @@ maze_get "/mobserver/level1/" do |env|
    </script>"
 end
 
-Xssmaze.push("mobserver-level2", "/mobserver/level2/?query=a", "observer copies attribute value into inline event handler-bearing element")
+Xssmaze.push("mobserver-level2", "/mobserver/level2/?query=a", "observer copies attribute value into inline event handler-bearing element",
+  vuln: "dom", sources: ["dataset"], sinks: ["innerHTML"], delivery: ["query"], note: "an attribute observer copies data-payload into a double-quoted title attribute; break out of the quote")
 maze_get "/mobserver/level2/" do |env|
   query = env.params.query["query"]
   "<div id='probe' data-payload='#{query}'></div>
@@ -31,7 +33,8 @@ maze_get "/mobserver/level2/" do |env|
    </script>"
 end
 
-Xssmaze.push("mobserver-level3", "/mobserver/level3/?query=a", "observer relays addedNodes innerHTML between containers")
+Xssmaze.push("mobserver-level3", "/mobserver/level3/?query=a", "observer relays addedNodes innerHTML between containers",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["insertAdjacentHTML", "innerHTML"], delivery: ["query"], note: "the observer relays addedNodes outerHTML into a second container")
 maze_get "/mobserver/level3/" do |env|
   query = env.params.query["query"]
   "<div id='src'></div><div id='out'></div>
@@ -47,7 +50,8 @@ maze_get "/mobserver/level3/" do |env|
    </script>"
 end
 
-Xssmaze.push("mobserver-level4", "/mobserver/level4/?query=a", "characterData observer re-emits data via document.write")
+Xssmaze.push("mobserver-level4", "/mobserver/level4/?query=a", "characterData observer re-emits data via document.write",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["document.write"], delivery: ["query"], note: "a characterData observer re-emits the node data through document.write")
 maze_get "/mobserver/level4/" do |env|
   query = env.params.query["query"]
   "<div id='src'>x</div>

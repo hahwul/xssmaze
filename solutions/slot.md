@@ -25,7 +25,10 @@ Web-component `<slot>` reflections — light DOM text/attribute interpolation th
 
 ### slot-level4
 
-`/slot/level4/?query=test`
+`/slot/level4/?query=%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `test`
-- context: `query.to_json` JSON-escapes; sink writes inside `<div>` — JSON-safe, no breakout (protected)
+- payload: `<img src=x onerror=alert(1)>`
+- context: `query.to_json` JSON-escapes the value, so there is no *JS-string*
+  breakout — but the string still reaches `shadowRoot.innerHTML` as raw HTML,
+  and event handlers fire inside a shadow root. Verified in Chrome 150.
+  (This entry previously claimed the level was protected; it is not.)

@@ -32,7 +32,12 @@ Open/closed shadow root sinks. Scripts inside shadow innerHTML do not execute, b
 
 ### shadow-dom-level5
 
-`/shadow-dom/level5/?query=test`
+`/shadow-dom/level5/?query=%27%29%3Balert%281%29%2F%2F`
 
-- payload: `test`
-- context: input goes only into CSSStyleSheet.replaceSync; CSS-only sink, no JS path (protected)
+- payload: `');alert(1)//`
+- context: the value is reflected raw into the single-quoted JS string argument
+  of `sheet.replaceSync('...')`, so it never has to be valid CSS — close the
+  string and the statement, then run code. `replaceSync`'s CSS-only semantics
+  never come into play because the breakout happens before the call.
+  Verified in Chrome 150. (This entry previously claimed the level was
+  protected; it is not.)

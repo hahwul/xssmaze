@@ -7,7 +7,8 @@
 # ability to treat storage/cookie/history reads as tainted.
 
 # Level 1: localStorage value reflected via innerHTML.
-Xssmaze.push("clientstate-level1", "/clientstate/level1/?pref=a", "localStorage value (seeded from URL) reflected via innerHTML", "GET", ["pref"])
+Xssmaze.push("clientstate-level1", "/clientstate/level1/?pref=a", "localStorage value (seeded from URL) reflected via innerHTML", "GET", ["pref"],
+  vuln: "dom", sources: ["localStorage"], sinks: ["innerHTML"], delivery: ["query"])
 maze_get "/clientstate/level1/" do |_env|
   "<html><body>
   <h1>User Preference</h1>
@@ -22,7 +23,8 @@ maze_get "/clientstate/level1/" do |_env|
 end
 
 # Level 2: sessionStorage value written via document.write.
-Xssmaze.push("clientstate-level2", "/clientstate/level2/?q=a", "sessionStorage value (seeded from URL) written via document.write", "GET", ["q"])
+Xssmaze.push("clientstate-level2", "/clientstate/level2/?q=a", "sessionStorage value (seeded from URL) written via document.write", "GET", ["q"],
+  vuln: "dom", sources: ["sessionStorage"], sinks: ["document.write"], delivery: ["query"])
 maze_get "/clientstate/level2/" do |_env|
   "<html><body>
   <h1>Recent Search</h1>
@@ -36,7 +38,8 @@ maze_get "/clientstate/level2/" do |_env|
 end
 
 # Level 3: localStorage draft injected via insertAdjacentHTML.
-Xssmaze.push("clientstate-level3", "/clientstate/level3/?draft=a", "localStorage draft (seeded from URL) injected via insertAdjacentHTML", "GET", ["draft"])
+Xssmaze.push("clientstate-level3", "/clientstate/level3/?draft=a", "localStorage draft (seeded from URL) injected via insertAdjacentHTML", "GET", ["draft"],
+  vuln: "dom", sources: ["localStorage"], sinks: ["insertAdjacentHTML"], delivery: ["query"])
 maze_get "/clientstate/level3/" do |_env|
   "<html><body>
   <h1>Autosaved Draft</h1>
@@ -51,7 +54,8 @@ maze_get "/clientstate/level3/" do |_env|
 end
 
 # Level 4: document.cookie value reflected via innerHTML.
-Xssmaze.push("clientstate-level4", "/clientstate/level4/?theme=a", "document.cookie value (seeded from URL) reflected via innerHTML", "GET", ["theme"])
+Xssmaze.push("clientstate-level4", "/clientstate/level4/?theme=a", "document.cookie value (seeded from URL) reflected via innerHTML", "GET", ["theme"],
+  vuln: "dom", sources: ["document.cookie"], sinks: ["innerHTML"], delivery: ["query"])
 maze_get "/clientstate/level4/" do |_env|
   "<html><body>
   <h1>Theme</h1>
@@ -67,7 +71,8 @@ maze_get "/clientstate/level4/" do |_env|
 end
 
 # Level 5: history.state value reflected via innerHTML.
-Xssmaze.push("clientstate-level5", "/clientstate/level5/?note=a", "history.state value (seeded from URL) reflected via innerHTML", "GET", ["note"])
+Xssmaze.push("clientstate-level5", "/clientstate/level5/?note=a", "history.state value (seeded from URL) reflected via innerHTML", "GET", ["note"],
+  vuln: "dom", sources: ["history.state"], sinks: ["innerHTML"], delivery: ["query"])
 maze_get "/clientstate/level5/" do |_env|
   "<html><body>
   <h1>Sticky Note</h1>
@@ -82,7 +87,8 @@ maze_get "/clientstate/level5/" do |_env|
 end
 
 # Level 6: localStorage JSON profile field reflected via innerHTML.
-Xssmaze.push("clientstate-level6", "/clientstate/level6/?bio=a", "localStorage JSON profile (seeded from URL) field reflected via innerHTML", "GET", ["bio"])
+Xssmaze.push("clientstate-level6", "/clientstate/level6/?bio=a", "localStorage JSON profile (seeded from URL) field reflected via innerHTML", "GET", ["bio"],
+  vuln: "dom", sources: ["localStorage"], sinks: ["innerHTML"], delivery: ["query"], note: "value is laundered through a JSON.stringify / JSON.parse round-trip")
 maze_get "/clientstate/level6/" do |_env|
   "<html><body>
   <h1>Profile</h1>

@@ -1,4 +1,5 @@
-Xssmaze.push("channel-level1", "/channel/level1/?seed=a", "BroadcastChannel relay + innerHTML", "GET", ["seed"])
+Xssmaze.push("channel-level1", "/channel/level1/?seed=a", "BroadcastChannel relay + innerHTML", "GET", ["seed"],
+  vuln: "dom", sources: ["broadcastchannel"], sinks: ["innerHTML"], delivery: ["query"])
 maze_get "/channel/level1/" do |_|
   "<div id='output'></div>
   <script>
@@ -16,7 +17,8 @@ maze_get "/channel/level1/" do |_|
   </script>"
 end
 
-Xssmaze.push("channel-level2", "/channel/level2/?seed=a", "MessageChannel port relay + insertAdjacentHTML", "GET", ["seed"])
+Xssmaze.push("channel-level2", "/channel/level2/?seed=a", "MessageChannel port relay + insertAdjacentHTML", "GET", ["seed"],
+  vuln: "dom", sources: ["messageport"], sinks: ["insertAdjacentHTML"], delivery: ["query"])
 maze_get "/channel/level2/" do |_|
   "<div id='output'></div>
   <script>
@@ -33,7 +35,8 @@ maze_get "/channel/level2/" do |_|
   </script>"
 end
 
-Xssmaze.push("channel-level3", "/channel/level3/?seed=a", "Worker message relay + createContextualFragment", "GET", ["seed"])
+Xssmaze.push("channel-level3", "/channel/level3/?seed=a", "Worker message relay + createContextualFragment", "GET", ["seed"],
+  vuln: "dom", sources: ["worker-message"], sinks: ["createContextualFragment"], delivery: ["query"])
 maze_get "/channel/level3/" do |_|
   "<div id='output'></div>
   <script>
@@ -58,7 +61,8 @@ maze_get "/channel/level3/" do |_|
   </script>"
 end
 
-Xssmaze.push("channel-level4", "/channel/level4/?seed=a", "BroadcastChannel JSON relay + srcdoc sink", "GET", ["seed"])
+Xssmaze.push("channel-level4", "/channel/level4/?seed=a", "BroadcastChannel JSON relay + srcdoc sink", "GET", ["seed"],
+  vuln: "dom", sources: ["broadcastchannel"], sinks: ["srcdoc"], delivery: ["query"], note: "relayed value is laundered through a JSON.stringify / JSON.parse round-trip")
 maze_get "/channel/level4/" do |_|
   "<iframe id='preview'></iframe>
   <script>

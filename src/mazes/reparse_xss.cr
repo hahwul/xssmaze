@@ -1,4 +1,5 @@
-Xssmaze.push("reparse-level1", "/reparse/level1/?query=a", "URLSearchParams clone + synthetic URL reparse + innerHTML")
+Xssmaze.push("reparse-level1", "/reparse/level1/?query=a", "URLSearchParams clone + synthetic URL reparse + innerHTML",
+  vuln: "dom", sources: ["location.search"], sinks: ["innerHTML"], delivery: ["query"], note: "the query is round-tripped through URLSearchParams and a synthetic URL before the sink")
 maze_get "/reparse/level1/" do |_|
   "<div id='output'></div>
   <script>
@@ -10,7 +11,8 @@ maze_get "/reparse/level1/" do |_|
   </script>"
 end
 
-Xssmaze.push("reparse-level2", "/reparse/level2/?blob=query=a", "nested querystring reparse + template.content clone", "GET", ["blob"])
+Xssmaze.push("reparse-level2", "/reparse/level2/?blob=query=a", "nested querystring reparse + template.content clone", "GET", ["blob"],
+  vuln: "dom", sources: ["location.search"], sinks: ["template.innerHTML"], delivery: ["query"], note: "payload is nested one querystring deep inside the blob parameter")
 maze_get "/reparse/level2/" do |_|
   "<div id='output'></div>
   <template id='wrapper'></template>
@@ -25,7 +27,8 @@ maze_get "/reparse/level2/" do |_|
   </script>"
 end
 
-Xssmaze.push("reparse-level3", "/reparse/level3/?query=a", "URLSearchParams HTML wrapper + srcdoc reparse")
+Xssmaze.push("reparse-level3", "/reparse/level3/?query=a", "URLSearchParams HTML wrapper + srcdoc reparse",
+  vuln: "dom", sources: ["location.search"], sinks: ["srcdoc"], delivery: ["query"], note: "the value is staged through a second URLSearchParams before reaching srcdoc")
 maze_get "/reparse/level3/" do |_|
   "<iframe id='preview'></iframe>
   <script>
@@ -40,7 +43,8 @@ maze_get "/reparse/level3/" do |_|
   </script>"
 end
 
-Xssmaze.push("reparse-level4", "/reparse/level4/?blob=html=a", "nested blob reparse + srcdoc wrapper", "GET", ["blob"])
+Xssmaze.push("reparse-level4", "/reparse/level4/?blob=html=a", "nested blob reparse + srcdoc wrapper", "GET", ["blob"],
+  vuln: "dom", sources: ["location.search"], sinks: ["srcdoc"], delivery: ["query"], note: "payload is nested one querystring deep inside the blob parameter")
 maze_get "/reparse/level4/" do |_|
   "<iframe id='preview'></iframe>
   <script>
@@ -55,7 +59,8 @@ maze_get "/reparse/level4/" do |_|
   </script>"
 end
 
-Xssmaze.push("reparse-level5", "/reparse/level5/?blob=outer=query=a", "double nested querystring reparse + innerHTML", "GET", ["blob"])
+Xssmaze.push("reparse-level5", "/reparse/level5/?blob=outer=query=a", "double nested querystring reparse + innerHTML", "GET", ["blob"],
+  vuln: "dom", sources: ["location.search"], sinks: ["innerHTML"], delivery: ["query"], note: "payload is nested two querystrings deep inside the blob parameter")
 maze_get "/reparse/level5/" do |_|
   "<div id='output'></div>
   <script>

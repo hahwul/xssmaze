@@ -23,15 +23,13 @@ end
 
 Xssmaze.push("polyglot-level3", "/polyglot/level3/?query=a", "triple URL decode")
 maze_get "/polyglot/level3/" do |env|
-  begin
-    data = URI.decode(env.params.query["query"])
-    data = URI.decode(data)
-    if data.includes?("<")
-      "Detect Special Character"
-    else
-      URI.decode(data)
-    end
-  rescue
-    "Decode Error"
+  data = URI.decode(env.params.query["query"])
+  data = URI.decode(data)
+  if data.includes?("<")
+    "Detect Special Character"
+  else
+    URI.decode(data)
   end
+rescue
+  "Decode Error"
 end

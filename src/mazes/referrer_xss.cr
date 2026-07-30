@@ -1,4 +1,5 @@
-Xssmaze.push("referrer-level1", "/referrer/level1/?seed=a", "document.referrer reparse + createContextualFragment", "GET", ["seed"])
+Xssmaze.push("referrer-level1", "/referrer/level1/?seed=a", "document.referrer reparse + createContextualFragment", "GET", ["seed"],
+  vuln: "dom", sources: ["document.referrer"], sinks: ["createContextualFragment"], delivery: ["referer"], note: "payload arrives as document.referrer: send a Referer header, or navigate here from a URL carrying seed=")
 maze_get "/referrer/level1/" do |_|
   "<div id='output'></div>
   <script>
@@ -11,7 +12,8 @@ maze_get "/referrer/level1/" do |_|
   </script>"
 end
 
-Xssmaze.push("referrer-level2", "/referrer/level2/?seed=a", "document.referrer reparse + template innerHTML clone", "GET", ["seed"])
+Xssmaze.push("referrer-level2", "/referrer/level2/?seed=a", "document.referrer reparse + template innerHTML clone", "GET", ["seed"],
+  vuln: "dom", sources: ["document.referrer"], sinks: ["template.innerHTML"], delivery: ["referer"], note: "payload arrives as document.referrer: send a Referer header, or navigate here from a URL carrying seed=")
 maze_get "/referrer/level2/" do |_|
   "<div id='output'></div>
   <script>

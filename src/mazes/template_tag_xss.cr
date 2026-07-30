@@ -1,4 +1,5 @@
-Xssmaze.push("tplel-level1", "/tplel/level1/?query=a", "<template> content cloned into innerHTML")
+Xssmaze.push("tplel-level1", "/tplel/level1/?query=a", "<template> content cloned into innerHTML",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "inert <template> content is read back out and re-injected with innerHTML, which activates it")
 maze_get "/tplel/level1/" do |env|
   query = env.params.query["query"]
   "<template id='t'>#{query}</template>
@@ -9,7 +10,8 @@ maze_get "/tplel/level1/" do |env|
    </script>"
 end
 
-Xssmaze.push("tplel-level2", "/tplel/level2/?query=a", "template.content.cloneNode then appendChild")
+Xssmaze.push("tplel-level2", "/tplel/level2/?query=a", "template.content.cloneNode then appendChild",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["template.content-clone"], delivery: ["query"], note: "template content is cloned and appended; cloned <script> stays inert, so use an event handler")
 maze_get "/tplel/level2/" do |env|
   query = env.params.query["query"]
   "<template id='t'><span>#{query}</span></template>
@@ -21,7 +23,8 @@ maze_get "/tplel/level2/" do |env|
    </script>"
 end
 
-Xssmaze.push("tplel-level3", "/tplel/level3/?query=a", "<template>'s inert script is reactivated by setHTML")
+Xssmaze.push("tplel-level3", "/tplel/level3/?query=a", "<template>'s inert script is reactivated by setHTML",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"])
 maze_get "/tplel/level3/" do |env|
   query = env.params.query["query"]
   "<template id='t'><img src=x><script>console.log('inert')</script></template>
@@ -33,7 +36,8 @@ maze_get "/tplel/level3/" do |env|
    </script>"
 end
 
-Xssmaze.push("tplel-level4", "/tplel/level4/?query=a", "<template> content concatenated into outer innerHTML")
+Xssmaze.push("tplel-level4", "/tplel/level4/?query=a", "<template> content concatenated into outer innerHTML",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["template.innerHTML", "innerHTML"], delivery: ["query"])
 maze_get "/tplel/level4/" do |env|
   query = env.params.query["query"]
   "<div id='out'></div>

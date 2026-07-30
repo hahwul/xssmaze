@@ -1,4 +1,5 @@
-Xssmaze.push("history-state-level1", "/history-state/level1/?seed=a", "history.replaceState bootstrap + innerHTML", "GET", ["seed"])
+Xssmaze.push("history-state-level1", "/history-state/level1/?seed=a", "history.replaceState bootstrap + innerHTML", "GET", ["seed"],
+  vuln: "dom", sources: ["history.state"], sinks: ["innerHTML"], delivery: ["query"])
 maze_get "/history-state/level1/" do |_|
   "<div id='output'></div>
   <script>
@@ -13,7 +14,8 @@ maze_get "/history-state/level1/" do |_|
   </script>"
 end
 
-Xssmaze.push("history-state-level2", "/history-state/level2/?seed=a", "history.replaceState object bootstrap + srcdoc sink", "GET", ["seed"])
+Xssmaze.push("history-state-level2", "/history-state/level2/?seed=a", "history.replaceState object bootstrap + srcdoc sink", "GET", ["seed"],
+  vuln: "dom", sources: ["history.state"], sinks: ["srcdoc"], delivery: ["query"])
 maze_get "/history-state/level2/" do |_|
   "<iframe id='preview'></iframe>
   <script>

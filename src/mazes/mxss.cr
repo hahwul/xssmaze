@@ -1,4 +1,5 @@
-Xssmaze.push("mxss-level1", "/mxss/level1/?query=a", "mutation XSS via innerHTML round-trip")
+Xssmaze.push("mxss-level1", "/mxss/level1/?query=a", "mutation XSS via innerHTML round-trip",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "innerHTML serialize/re-parse round-trip; needs a mutation vector rather than a plain tag")
 maze_get "/mxss/level1/" do |env|
   query = env.params.query["query"]
 
@@ -14,7 +15,8 @@ maze_get "/mxss/level1/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("mxss-level2", "/mxss/level2/?query=a", "mutation XSS via DOMParser + innerHTML re-serialize")
+Xssmaze.push("mxss-level2", "/mxss/level2/?query=a", "mutation XSS via DOMParser + innerHTML re-serialize",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["DOMParser", "innerHTML"], delivery: ["query"], note: "DOMParser parse then re-serialize into innerHTML")
 maze_get "/mxss/level2/" do |env|
   query = env.params.query["query"]
 
@@ -31,7 +33,8 @@ maze_get "/mxss/level2/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("mxss-level3", "/mxss/level3/?query=a", "mutation XSS via template + namespace confusion")
+Xssmaze.push("mxss-level3", "/mxss/level3/?query=a", "mutation XSS via template + namespace confusion",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["template.innerHTML", "innerHTML"], delivery: ["query"], note: "template context to document context namespace confusion")
 maze_get "/mxss/level3/" do |env|
   query = env.params.query["query"]
 
@@ -51,7 +54,8 @@ maze_get "/mxss/level3/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("mxss-level4", "/mxss/level4/?query=a", "mutation XSS via SVG foreignObject namespace switch")
+Xssmaze.push("mxss-level4", "/mxss/level4/?query=a", "mutation XSS via SVG foreignObject namespace switch",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["DOMParser", "innerHTML"], delivery: ["query"], note: "SVG foreignObject namespace switch on re-serialization")
 maze_get "/mxss/level4/" do |env|
   query = env.params.query["query"]
 
@@ -71,7 +75,8 @@ maze_get "/mxss/level4/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("mxss-level5", "/mxss/level5/?query=a", "mutation XSS via math/style element parsing differential")
+Xssmaze.push("mxss-level5", "/mxss/level5/?query=a", "mutation XSS via math/style element parsing differential",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "math/style parsing differential on re-serialization")
 maze_get "/mxss/level5/" do |env|
   query = env.params.query["query"]
 

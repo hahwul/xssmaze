@@ -11,7 +11,8 @@ require "json"
 # (not listed in the maze map) that reflects the forwarded `q` raw.
 
 # Level 1: fetch() text response -> innerHTML
-Xssmaze.push("apidom-level1", "/apidom/level1/?q=a", "fetch() text response reflected via innerHTML", "GET", ["q"])
+Xssmaze.push("apidom-level1", "/apidom/level1/?q=a", "fetch() text response reflected via innerHTML", "GET", ["q"],
+  vuln: "dom", sources: ["fetch-response"], sinks: ["innerHTML"], delivery: ["query"], note: "end-to-end only: the companion /apidom/levelN/api echo route is not XSS on its own")
 maze_get "/apidom/level1/" do |_env|
   "<html><body>
   <h1>Search</h1>
@@ -32,7 +33,8 @@ get "/apidom/level1/api" do |env|
 end
 
 # Level 2: fetch() JSON field -> innerHTML
-Xssmaze.push("apidom-level2", "/apidom/level2/?q=a", "fetch() JSON field reflected via innerHTML", "GET", ["q"])
+Xssmaze.push("apidom-level2", "/apidom/level2/?q=a", "fetch() JSON field reflected via innerHTML", "GET", ["q"],
+  vuln: "dom", sources: ["fetch-response"], sinks: ["innerHTML"], delivery: ["query"], note: "end-to-end only: the companion /apidom/levelN/api echo route is not XSS on its own")
 maze_get "/apidom/level2/" do |_env|
   "<html><body>
   <h1>Profile Card</h1>
@@ -53,7 +55,8 @@ get "/apidom/level2/api" do |env|
 end
 
 # Level 3: XMLHttpRequest responseText -> innerHTML
-Xssmaze.push("apidom-level3", "/apidom/level3/?q=a", "XMLHttpRequest responseText reflected via innerHTML", "GET", ["q"])
+Xssmaze.push("apidom-level3", "/apidom/level3/?q=a", "XMLHttpRequest responseText reflected via innerHTML", "GET", ["q"],
+  vuln: "dom", sources: ["xhr-response"], sinks: ["innerHTML"], delivery: ["query"], note: "end-to-end only: the companion /apidom/levelN/api echo route is not XSS on its own")
 maze_get "/apidom/level3/" do |_env|
   "<html><body>
   <h1>Status</h1>
@@ -75,7 +78,8 @@ get "/apidom/level3/api" do |env|
 end
 
 # Level 4: fetch() JSON field -> insertAdjacentHTML
-Xssmaze.push("apidom-level4", "/apidom/level4/?q=a", "fetch() JSON field injected via insertAdjacentHTML", "GET", ["q"])
+Xssmaze.push("apidom-level4", "/apidom/level4/?q=a", "fetch() JSON field injected via insertAdjacentHTML", "GET", ["q"],
+  vuln: "dom", sources: ["fetch-response"], sinks: ["insertAdjacentHTML"], delivery: ["query"], note: "end-to-end only: the companion /apidom/levelN/api echo route is not XSS on its own")
 maze_get "/apidom/level4/" do |_env|
   "<html><body>
   <h1>Notifications</h1>
@@ -98,7 +102,8 @@ get "/apidom/level4/api" do |env|
 end
 
 # Level 5: fetch() text response -> document.write
-Xssmaze.push("apidom-level5", "/apidom/level5/?q=a", "fetch() text response written via document.write", "GET", ["q"])
+Xssmaze.push("apidom-level5", "/apidom/level5/?q=a", "fetch() text response written via document.write", "GET", ["q"],
+  vuln: "dom", sources: ["fetch-response"], sinks: ["document.write"], delivery: ["query"], note: "end-to-end only: the companion /apidom/levelN/api echo route is not XSS on its own")
 maze_get "/apidom/level5/" do |_env|
   "<html><body>
   <h1>Widget</h1>
@@ -118,7 +123,8 @@ get "/apidom/level5/api" do |env|
 end
 
 # Level 6: fetch() text response -> Range.createContextualFragment + append
-Xssmaze.push("apidom-level6", "/apidom/level6/?q=a", "fetch() response parsed via createContextualFragment then appended", "GET", ["q"])
+Xssmaze.push("apidom-level6", "/apidom/level6/?q=a", "fetch() response parsed via createContextualFragment then appended", "GET", ["q"],
+  vuln: "dom", sources: ["fetch-response"], sinks: ["createContextualFragment"], delivery: ["query"], note: "end-to-end only: the companion /apidom/levelN/api echo route is not XSS on its own")
 maze_get "/apidom/level6/" do |_env|
   "<html><body>
   <h1>Fragment Loader</h1>

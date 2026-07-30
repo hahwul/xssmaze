@@ -1,4 +1,5 @@
-Xssmaze.push("opener-level1", "/opener/level1/?seed=a", "window.opener bootstrap + innerHTML", "GET", ["seed"])
+Xssmaze.push("opener-level1", "/opener/level1/?seed=a", "window.opener bootstrap + innerHTML", "GET", ["seed"],
+  vuln: "dom", sources: ["window.opener", "window.name"], sinks: ["innerHTML"], delivery: ["query"], note: "the page opens a second window and the payload crosses via window.opener.name; the popup blocker must allow it")
 maze_get "/opener/level1/" do |_|
   "<div id='output'></div>
   <script>
@@ -13,7 +14,8 @@ maze_get "/opener/level1/" do |_|
   </script>"
 end
 
-Xssmaze.push("opener-level2", "/opener/level2/?seed=a", "window.opener object relay + srcdoc", "GET", ["seed"])
+Xssmaze.push("opener-level2", "/opener/level2/?seed=a", "window.opener object relay + srcdoc", "GET", ["seed"],
+  vuln: "dom", sources: ["window.opener"], sinks: ["srcdoc"], delivery: ["query"], note: "the page opens a second window and reads a property off window.opener; the popup blocker must allow it")
 maze_get "/opener/level2/" do |_|
   "<iframe id='preview'></iframe>
   <script>
