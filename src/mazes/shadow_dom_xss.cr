@@ -64,7 +64,7 @@ maze_get "/shadow-dom/level4/" do |env|
 end
 
 Xssmaze.push("shadow-dom-level5", "/shadow-dom/level5/?query=a", "shadow DOM + adoptedStyleSheets CSS injection",
-  vuln: "non-xss-control", sources: ["server-reflected"], sinks: ["adoptedStyleSheets"], delivery: ["query"], exploitable: false, note: "CSSStyleSheet.replaceSync accepts CSS only and there is no script-executing CSS sink; this is a CSS-injection control, not XSS")
+  vuln: "reflected-js", sinks: ["adoptedStyleSheets"], delivery: ["query"], note: "the value is reflected raw into a single-quoted JS string argument, so it never has to be valid CSS: close the string and run code with ');alert(1)//")
 maze_get "/shadow-dom/level5/" do |env|
   query = env.params.query["query"]
 

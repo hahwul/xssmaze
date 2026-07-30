@@ -18,6 +18,15 @@ class Maze
   # carry `vuln == "non-xss-control"` and `exploitable == false`, so a
   # benchmark subtracts them instead of counting them as detection misses.
 
+  # Classification rule: classify by the *injection context* — where the
+  # bytes actually land — not by what the receiving API does with a
+  # well-formed argument. A value the server reflects raw into a JS string
+  # literal is `reflected-js` however inert the function it is passed to,
+  # because the breakout happens before that function is ever called.
+  # `dom` is for flows whose taint reaches a sink through client-side code
+  # (either from a client-side source, or from a server-reflected literal
+  # that a live DOM sink then executes without needing a breakout).
+  #
   # Closed set of `vuln` values. "unclassified" is the default for endpoints
   # that have not been triaged yet — deliberately distinct from
   # "non-xss-control" so unreviewed and reviewed-as-safe never get conflated.

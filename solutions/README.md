@@ -30,9 +30,8 @@ working payload for one or more maze levels.
 - Four categories cover two URL paths each because their solutions share
   filter logic. See [Merged categories](#merged-categories) below.
 - A handful of levels are intentionally hardened (e.g. `sanitizer-level5`,
-  `shadow-dom-level5`, `stored-level2`, `waf-bypass-level5`,
-  `mutfilter-level1`). Those entries document the constraint instead of a
-  fabricated payload.
+  `stored-level2`, `waf-bypass-level5`, `mutfilter-level1`). Those entries
+  document the constraint instead of a fabricated payload.
 - Endpoints that are deliberately *not* XSS carry `vuln.class =
   "non-xss-control"` and `vuln.exploitable = false` in `/map/json`. The whole
   `xsleak` category is one of these: those are cross-site-leak oracles, so a
