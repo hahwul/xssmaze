@@ -289,6 +289,129 @@ describe "Kemal routing integration" do
     response.body.should contain("var dest = '#{payload}';")
     response.body.should contain("location.assign(dest)")
   end
+
+  it "serves domsource level1 with an IndexedDB read into innerHTML" do
+    get "/domsource/level1/?query=a"
+    response.status_code.should eq 200
+    response.body.should contain("indexedDB.open('xssmaze-domsource'")
+    response.body.should contain("innerHTML = ev.target.result")
+  end
+
+  it "serves domsource level2 parsing the fragment as its own querystring" do
+    get "/domsource/level2/"
+    response.status_code.should eq 200
+    response.body.should contain("new URLSearchParams(location.hash.slice(1))")
+  end
+
+  it "serves domsource level3 with a popstate state round-trip" do
+    get "/domsource/level3/?query=a"
+    response.status_code.should eq 200
+    response.body.should contain("addEventListener('popstate'")
+    response.body.should contain("history.back()")
+  end
+
+  it "url-encodes the domsource level4 payload into the boot script src" do
+    payload = "<img src=x onerror=alert(1)>"
+    get "/domsource/level4/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should contain("/domsource/level4/boot.js?msg=#{URI.encode_www_form(payload)}")
+  end
+
+  it "serves the domsource level4 boot script reading document.currentScript.src" do
+    get "/domsource/level4/boot.js?msg=x"
+    response.status_code.should eq 200
+    (response.headers["Content-Type"]? || "").should contain("javascript")
+    response.body.should contain("document.currentScript.src")
+    response.body.should contain("document.write(msg)")
+  end
+
+  it "serves domsource level5 with the sink inside a permissions callback" do
+    get "/domsource/level5/?query=a"
+    response.status_code.should eq 200
+    response.body.should contain("navigator.permissions.query")
+  end
+
+  it "serves domsource level6 reading a CSS custom property back out" do
+    get "/domsource/level6/"
+    response.status_code.should eq 200
+    response.body.should contain("setProperty('--maze-label'")
+    response.body.should contain("getPropertyValue('--maze-label')")
+  end
+
+  it "serves domsource level7 connecting to a real same-origin WebSocket" do
+    get "/domsource/level7/?query=a"
+    response.status_code.should eq 200
+    response.body.should contain("/domsource/level7/echo")
+    response.body.should contain("socket.onmessage")
+  end
+
+  it "serves domsink level1 with a createHTMLDocument + importNode sink" do
+    get "/domsink/level1/?query=a"
+    response.status_code.should eq 200
+    response.body.should contain("document.implementation.createHTMLDocument")
+    response.body.should contain("document.importNode(inert.body, true)")
+  end
+
+  it "serves domsink level2 with a DOMParser + adoptNode sink" do
+    get "/domsink/level2/?query=a"
+    response.status_code.should eq 200
+    response.body.should contain("document.adoptNode(parsed.body.firstChild)")
+  end
+
+  it "serves domsink level3 with an indirect eval sink" do
+    get "/domsink/level3/?query=a"
+    response.status_code.should eq 200
+    response.body.should contain("(0, eval)(q)")
+  end
+
+  it "serves domsink level4 with a Reflect.apply(eval) sink" do
+    get "/domsink/level4/?query=a"
+    response.status_code.should eq 200
+    response.body.should contain("Reflect.apply(eval, globalThis, [q])")
+  end
+
+  it "serves domsink level5 with an Array.prototype.map(eval) sink" do
+    get "/domsink/level5/?query=a"
+    response.status_code.should eq 200
+    response.body.should contain(".map(eval)")
+  end
+
+  it "serves domsink level6 with an Object.assign(location) navigation sink" do
+    get "/domsink/level6/?query=a"
+    response.status_code.should eq 200
+    response.body.should contain("Object.assign(location, { href: q })")
+  end
+
+  it "serves domsink level7 with a setAttributeNS event-handler sink" do
+    get "/domsink/level7/?query=a"
+    response.status_code.should eq 200
+    response.body.should contain("setAttributeNS(null, 'onclick', q)")
+  end
+
+  it "serves domsink level8 with a form.action + submit() sink" do
+    get "/domsink/level8/?query=a"
+    response.status_code.should eq 200
+    response.body.should contain("form.action = q")
+    response.body.should contain("form.submit()")
+  end
+
+  it "serves every taintflow level with its laundering step intact" do
+    {
+      1 => "JSON.parse(JSON.stringify({ body: q }))",
+      2 => "new Proxy({ body: raw }",
+      3 => "get body() { return this._value; }",
+      4 => "await load(q)",
+      5 => "Promise.all([",
+      6 => "structuredClone({ payload: { body: q } })",
+      7 => "html`<article>${raw}</article>`",
+      8 => "template.replace('NAME_SLOT', function () { return q; })",
+    }.each do |level, marker|
+      get "/taintflow/level#{level}/?query=a"
+      response.status_code.should eq 200
+      response.body.should contain(marker)
+      response.body.should contain("innerHTML")
+    end
+  end
 end
 
 describe "WAF facade levels" do

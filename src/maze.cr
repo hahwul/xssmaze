@@ -52,7 +52,7 @@ class Maze
   # Where the payload enters, e.g. "query", "fragment", "postmessage".
   getter delivery : Array(String)
   # False when the endpoint is a control / true negative.
-  getter exploitable : Bool
+  getter? exploitable : Bool
   # Free-form caveat: why it is a control, what interaction it needs, etc.
   getter note : String?
 

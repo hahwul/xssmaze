@@ -38,7 +38,7 @@ describe Maze do
     maze.sources.should be_empty
     maze.sinks.should be_empty
     maze.delivery.should be_empty
-    maze.exploitable.should be_true
+    maze.exploitable?.should be_true
     maze.note.should be_nil
     maze.reach.should eq("unknown")
   end
@@ -58,7 +58,7 @@ describe Maze do
   it "marks controls as non-exploitable" do
     maze = Maze.new("xsleak-level1", "/xsleak/search?q=admin", "body size oracle", "GET", ["q"],
       "non-xss-control", [] of String, [] of String, ["query"], false, "cross-site leak, not XSS")
-    maze.exploitable.should be_false
+    maze.exploitable?.should be_false
     maze.vuln.should eq("non-xss-control")
     maze.note.should eq("cross-site leak, not XSS")
   end
@@ -92,14 +92,14 @@ describe "maze catalog vulnerability metadata" do
   it "keeps non-xss-control and exploitable=false in sync" do
     Xssmaze.get.each do |maze|
       if maze.vuln == "non-xss-control"
-        maze.exploitable.should be_false
+        maze.exploitable?.should be_false
       end
-      maze.exploitable.should be_true if maze.vuln == "unclassified"
+      maze.exploitable?.should be_true if maze.vuln == "unclassified"
     end
   end
 
   it "requires a note explaining every control" do
-    Xssmaze.get.reject(&.exploitable).each do |maze|
+    Xssmaze.get.reject(&.exploitable?).each do |maze|
       maze.note.should_not be_nil
     end
   end

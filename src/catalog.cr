@@ -142,8 +142,8 @@ module Xssmaze::Catalog
       {
         category:    cat,
         count:       cat_mazes.size,
-        exploitable: cat_mazes.count(&.exploitable),
-        controls:    cat_mazes.count { |maze| !maze.exploitable },
+        exploitable: cat_mazes.count(&.exploitable?),
+        controls:    cat_mazes.count { |maze| !maze.exploitable? },
         classes:     classes,
         reach:       reaches,
       }
@@ -226,8 +226,8 @@ module Xssmaze::Catalog
       params:      params_count.to_a.sort_by! { |(_, v)| -v }.to_h,
       classes:     classes_count.to_a.sort_by! { |(_, v)| -v }.to_h,
       reach:       reach_count,
-      exploitable: mazes.count(&.exploitable),
-      controls:    mazes.count { |maze| !maze.exploitable },
+      exploitable: mazes.count(&.exploitable?),
+      controls:    mazes.count { |maze| !maze.exploitable? },
       sources:     sources_count.to_a.sort_by! { |(_, v)| -v }.to_h,
       sinks:       sinks_count.to_a.sort_by! { |(_, v)| -v }.to_h,
     }.to_json
