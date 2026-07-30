@@ -45,14 +45,12 @@ end
 # Level 6: URL decode then strip < > (double URL encode bypass)
 Xssmaze.push("encoding-bypass-level6", "/encoding-bypass/level6/?query=a", "URL decode + angle strip (double encode bypass)")
 maze_get "/encoding-bypass/level6/" do |env|
-  begin
-    query = URI.decode(env.params.query["query"])
-    query = Filters.strip_angles(query)
+  query = URI.decode(env.params.query["query"])
+  query = Filters.strip_angles(query)
 
-    "<html><body>#{query}</body></html>"
-  rescue
-    "Decode Error"
-  end
+  "<html><body>#{query}</body></html>"
+rescue
+  "Decode Error"
 end
 
 # Level 7: Whitelist img/div/span tags, strip everything else

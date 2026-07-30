@@ -5,21 +5,19 @@ require "base64"
 # Requires triple URL-encoded payload (e.g., %25253Cscript%25253E...)
 Xssmaze.push("realworld-encoding-level1", "/realworld-encoding/level1/?query=a", "triple URL decode")
 maze_get "/realworld-encoding/level1/" do |env|
-  begin
-    data = URI.decode(env.params.query["query"])
+  data = URI.decode(env.params.query["query"])
+  if data.includes?("<") || data.includes?(">")
+    "Detect Special Character"
+  else
+    data = URI.decode(data)
     if data.includes?("<") || data.includes?(">")
       "Detect Special Character"
     else
-      data = URI.decode(data)
-      if data.includes?("<") || data.includes?(">")
-        "Detect Special Character"
-      else
-        URI.decode(data)
-      end
+      URI.decode(data)
     end
-  rescue
-    "Decode Error"
   end
+rescue
+  "Decode Error"
 end
 
 # Level 2: Unicode normalization (NFKC)
@@ -27,18 +25,16 @@ end
 # Server blocks literal < and > but normalizes Unicode before reflecting
 Xssmaze.push("realworld-encoding-level2", "/realworld-encoding/level2/?query=a", "Unicode NFKC normalization bypass")
 maze_get "/realworld-encoding/level2/" do |env|
-  begin
-    query = env.params.query["query"]
-    if query.includes?("<") || query.includes?(">")
-      "Detect Special Character"
-    else
-      # NFKC normalization: fullwidth chars become ASCII equivalents
-      normalized = query.unicode_normalize(:nfkc)
-      "<html><body><h1>Unicode Normalization Level</h1><div>#{normalized}</div></body></html>"
-    end
-  rescue
-    "Decode Error"
+  query = env.params.query["query"]
+  if query.includes?("<") || query.includes?(">")
+    "Detect Special Character"
+  else
+    # NFKC normalization: fullwidth chars become ASCII equivalents
+    normalized = query.unicode_normalize(:nfkc)
+    "<html><body><h1>Unicode Normalization Level</h1><div>#{normalized}</div></body></html>"
   end
+rescue
+  "Decode Error"
 end
 
 # Level 3: HTML entity double decode
@@ -47,30 +43,28 @@ end
 # e.g., &amp;lt; -> &lt; (server decode) -> < (browser decode)
 Xssmaze.push("realworld-encoding-level3", "/realworld-encoding/level3/?query=a", "HTML entity double decode")
 maze_get "/realworld-encoding/level3/" do |env|
-  begin
-    query = env.params.query["query"]
-    if query.includes?("<") || query.includes?(">")
-      "Detect Special Character"
-    else
-      # Decode common HTML entities one layer
-      decoded = query
-        .gsub("&amp;", "&")
-        .gsub("&lt;", "<")
-        .gsub("&gt;", ">")
-        .gsub("&quot;", "\"")
-        .gsub("&#39;", "'")
-        .gsub("&#x27;", "'")
-        .gsub("&#x3c;", "<")
-        .gsub("&#x3e;", ">")
-        .gsub("&#x3C;", "<")
-        .gsub("&#x3E;", ">")
-        .gsub("&#60;", "<")
-        .gsub("&#62;", ">")
-      "<html><body><h1>HTML Entity Double Decode Level</h1><div>#{decoded}</div></body></html>"
-    end
-  rescue
-    "Decode Error"
+  query = env.params.query["query"]
+  if query.includes?("<") || query.includes?(">")
+    "Detect Special Character"
+  else
+    # Decode common HTML entities one layer
+    decoded = query
+      .gsub("&amp;", "&")
+      .gsub("&lt;", "<")
+      .gsub("&gt;", ">")
+      .gsub("&quot;", "\"")
+      .gsub("&#39;", "'")
+      .gsub("&#x27;", "'")
+      .gsub("&#x3c;", "<")
+      .gsub("&#x3e;", ">")
+      .gsub("&#x3C;", "<")
+      .gsub("&#x3E;", ">")
+      .gsub("&#60;", "<")
+      .gsub("&#62;", ">")
+    "<html><body><h1>HTML Entity Double Decode Level</h1><div>#{decoded}</div></body></html>"
   end
+rescue
+  "Decode Error"
 end
 
 # Level 4: Mixed encoding chain (Base64 + URL)
@@ -78,13 +72,11 @@ end
 # To exploit: URL-encode your payload, then base64-encode that result
 Xssmaze.push("realworld-encoding-level4", "/realworld-encoding/level4/?query=a", "base64 then URL decode chain")
 maze_get "/realworld-encoding/level4/" do |env|
-  begin
-    data = Base64.decode_string(env.params.query["query"])
-    decoded = URI.decode(data)
-    "<html><body><h1>Mixed Encoding Chain Level</h1><div>#{decoded}</div></body></html>"
-  rescue
-    "Decode Error"
-  end
+  data = Base64.decode_string(env.params.query["query"])
+  decoded = URI.decode(data)
+  "<html><body><h1>Mixed Encoding Chain Level</h1><div>#{decoded}</div></body></html>"
+rescue
+  "Decode Error"
 end
 
 # Level 5: CSS style attribute injection
@@ -122,20 +114,18 @@ end
 # Requires URL-encoded SVG XSS payload (e.g., onload handler)
 Xssmaze.push("realworld-encoding-level7", "/realworld-encoding/level7/?query=a", "SVG with URL decode combo")
 maze_get "/realworld-encoding/level7/" do |env|
-  begin
-    query = env.params.query["query"]
-    if query.includes?("<") || query.includes?(">")
-      "Detect Special Character"
-    else
-      decoded = URI.decode(query)
-      "<html><body>
-      <h1>SVG + Encoding Combo Level</h1>
-      <svg><text>#{decoded}</text></svg>
-      </body></html>"
-    end
-  rescue
-    "Decode Error"
+  query = env.params.query["query"]
+  if query.includes?("<") || query.includes?(">")
+    "Detect Special Character"
+  else
+    decoded = URI.decode(query)
+    "<html><body>
+    <h1>SVG + Encoding Combo Level</h1>
+    <svg><text>#{decoded}</text></svg>
+    </body></html>"
   end
+rescue
+  "Decode Error"
 end
 
 # Level 8: JSON string escape bypass
