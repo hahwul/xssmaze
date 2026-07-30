@@ -106,7 +106,10 @@ module Xssmaze::Server
     get "/map/json" do |env|
       type = env.params.query["type"]?
       q = env.params.query["q"]?
-      if type.nil? && q.nil?
+      vuln = env.params.query["vuln"]?
+      reach = env.params.query["reach"]?
+      exploitable = env.params.query["exploitable"]?
+      if type.nil? && q.nil? && vuln.nil? && reach.nil? && exploitable.nil?
         next Xssmaze::Server.serve(env, map_json_entry, last_modified)
       end
 
@@ -125,6 +128,16 @@ module Xssmaze::Server
           maze = mazes[i]
           maze.name.downcase.includes?(n) || maze.desc.downcase.includes?(n)
         end
+      end
+      if v = vuln
+        filtered_idx = filtered_idx.select { |i| mazes[i].vuln == v }
+      end
+      if r = reach
+        filtered_idx = filtered_idx.select { |i| mazes[i].reach == r }
+      end
+      if e = exploitable
+        want = e != "false" && e != "0"
+        filtered_idx = filtered_idx.select { |i| mazes[i].exploitable == want }
       end
       filtered_objs = filtered_idx.map { |i| maze_json_objs[i] }
       {endpoints: filtered_objs, total: filtered_objs.size}.to_json

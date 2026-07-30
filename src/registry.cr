@@ -10,10 +10,22 @@ module Xssmaze
   @@mazes = [] of Maze
   @@frozen = false
 
+  # `name`/`url`/`desc`/`method`/`params` are the original positional
+  # contract and must stay put — every existing call site depends on it.
+  # Everything after `params` is structured vulnerability metadata, passed
+  # by keyword; see `Maze` for the schema. Omitting them leaves the endpoint
+  # "unclassified" rather than silently guessing.
   def self.push(name : String, url : String, desc : String,
-                method : String = "GET", params : Array(String) = ["query"])
+                method : String = "GET", params : Array(String) = ["query"],
+                vuln : String = "unclassified",
+                sources : Array(String) = [] of String,
+                sinks : Array(String) = [] of String,
+                delivery : Array(String) = [] of String,
+                exploitable : Bool = true,
+                note : String? = nil)
     raise "maze list is frozen" if @@frozen
-    @@mazes << Maze.new(name, url, desc, method, params)
+    @@mazes << Maze.new(name, url, desc, method, params,
+      vuln, sources, sinks, delivery, exploitable, note)
   end
 
   def self.get : Array(Maze)

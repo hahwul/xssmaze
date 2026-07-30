@@ -99,23 +99,54 @@ module Xssmaze::Catalog
     String.build do |io|
       io << "# XSSMaze Endpoints\n\n"
       io << "Total: " << mazes.size << "\n\n"
-      io << "| Name | Method | URL | Params | Description |\n"
-      io << "|------|--------|-----|--------|-------------|\n"
+      io << "`Class`/`Reach`/`Sources`/`Sinks` are the structured vulnerability\n"
+      io << "metadata also served by `/map/json`. `Class` = `non-xss-control` marks a\n"
+      io << "deliberate true negative; `Reach` = `client` means the payload only exists\n"
+      io << "browser-side (fragment, postMessage, clipboard, ...) and cannot be delivered\n"
+      io << "by a request-only scanner.\n\n"
+      io << "| Name | Method | URL | Params | Class | Reach | Sources | Sinks | Description |\n"
+      io << "|------|--------|-----|--------|-------|-------|---------|-------|-------------|\n"
       mazes.each do |maze|
         io << "| " << maze.name
         io << " | " << maze.method
         io << " | `" << maze.url << "`"
         io << " | `" << maze.params.join(",") << "`"
+        io << " | " << maze.vuln
+        io << " | " << maze.reach
+        io << " | " << md_cell(maze.sources)
+        io << " | " << md_cell(maze.sinks)
         io << " | " << maze.desc.gsub("|", "\\|")
         io << " |\n"
       end
     end
   end
 
+  private def self.md_cell(values : Array(String)) : String
+    return "-" if values.empty?
+    values.map { |v| "`#{v}`" }.join(" ")
+  end
+
+  # Per-category rollup. Beyond the raw count, this breaks each category down
+  # by vulnerability class and reachability so a benchmark can pick its target
+  # set (and exclude controls) without walking every endpoint in /map/json.
   def self.build_categories_json(groups : Hash(String, Array(Maze)),
                                  total : Int32) : String
     arr = groups.keys.sort!.map do |cat|
-      {category: cat, count: groups[cat].size}
+      cat_mazes = groups[cat]
+      classes = Hash(String, Int32).new(0)
+      reaches = Hash(String, Int32).new(0)
+      cat_mazes.each do |maze|
+        classes[maze.vuln] += 1
+        reaches[maze.reach] += 1
+      end
+      {
+        category:    cat,
+        count:       cat_mazes.size,
+        exploitable: cat_mazes.count(&.exploitable),
+        controls:    cat_mazes.count { |maze| !maze.exploitable },
+        classes:     classes,
+        reach:       reaches,
+      }
     end
     {total: total, categories: arr}.to_json
   end
@@ -176,15 +207,29 @@ module Xssmaze::Catalog
   def self.build_stats(mazes : Array(Maze), groups : Hash(String, Array(Maze))) : String
     methods_count = Hash(String, Int32).new(0)
     params_count = Hash(String, Int32).new(0)
+    classes_count = Hash(String, Int32).new(0)
+    reach_count = Hash(String, Int32).new(0)
+    sources_count = Hash(String, Int32).new(0)
+    sinks_count = Hash(String, Int32).new(0)
     mazes.each do |maze|
       methods_count[maze.method] += 1
       maze.params.each { |param| params_count[param] += 1 }
+      classes_count[maze.vuln] += 1
+      reach_count[maze.reach] += 1
+      maze.sources.each { |source| sources_count[source] += 1 }
+      maze.sinks.each { |sink| sinks_count[sink] += 1 }
     end
     {
-      total:      mazes.size,
-      categories: groups.size,
-      methods:    methods_count,
-      params:     params_count.to_a.sort_by! { |(_, v)| -v }.to_h,
+      total:       mazes.size,
+      categories:  groups.size,
+      methods:     methods_count,
+      params:      params_count.to_a.sort_by! { |(_, v)| -v }.to_h,
+      classes:     classes_count.to_a.sort_by! { |(_, v)| -v }.to_h,
+      reach:       reach_count,
+      exploitable: mazes.count(&.exploitable),
+      controls:    mazes.count { |maze| !maze.exploitable },
+      sources:     sources_count.to_a.sort_by! { |(_, v)| -v }.to_h,
+      sinks:       sinks_count.to_a.sort_by! { |(_, v)| -v }.to_h,
     }.to_json
   end
 
