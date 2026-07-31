@@ -2,7 +2,7 @@ version: 2.0
 shards:
   ameba:
     git: https://github.com/crystal-ameba/ameba.git
-    version: 1.7.0-dev+git.commit.f5d1ef6b995a6c103267dd779426f83e0b25aa8c
+    version: 1.7.0-dev+git.commit.cdd58b34b0d8a9c785d67183a7a8f07541549e55
 
   backtracer:
     git: https://github.com/sija/backtracer.cr.git
@@ -14,7 +14,7 @@ shards:
 
   kemal:
     git: https://github.com/kemalcr/kemal.git
-    version: 1.7.3
+    version: 1.12.0
 
   radix:
     git: https://github.com/luislavena/radix.git
