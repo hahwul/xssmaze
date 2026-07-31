@@ -4,75 +4,75 @@
 [![Crystal Lint](https://github.com/hahwul/xssmaze/actions/workflows/crystal_lint.yml/badge.svg)](https://github.com/hahwul/xssmaze/actions/workflows/crystal_lint.yml)
 [![Docker](https://github.com/hahwul/xssmaze/actions/workflows/ghcr.yml/badge.svg)](https://github.com/hahwul/xssmaze/actions/workflows/ghcr.yml)
 
-XSSMaze is an intentionally vulnerable web application for measuring and improving XSS detection in security testing tools. It covers a wide range of XSS contexts: basic reflection, DOM, header, path, POST, redirect, decode, hidden input, in-JS, in-attribute, in-frame, event handler, CSP bypass, SVG, CSS injection, template injection, WebSocket, JSON, advanced techniques, polyglot, browser-state, opener, storage-event, stream, channel, service-worker, history-state, reparse, referrer, jQuery DOM sinks, dynamic code/module execution sinks, client-state (web storage/cookie/history) sinks, async fetch/XHR API DOM sinks, the 2024 native unsafe HTML-parsing sinks (setHTMLUnsafe/parseHTMLUnsafe), iframe srcdoc property sinks, navigation sinks (window.open/location.assign/location.replace), under-covered DOM sources (IndexedDB, hash-as-querystring, popstate, document.currentScript.src, Permissions API callbacks, CSS custom properties, a real same-origin WebSocket), under-covered DOM sinks (createHTMLDocument/importNode, DOMParser/adoptNode, indirect eval, Reflect.apply(eval), map(eval), Object.assign(location), setAttributeNS, form.action+submit), and taint-propagation shapes that defeat naive analyzers (JSON round-trip, Proxy traps, class getters, await, Promise.all, structuredClone, tagged templates, replacer functions).
+XSSMaze is an intentionally vulnerable web application for measuring and improving XSS
+detection in security testing tools. It serves 1000+ endpoints across 170+ categories —
+reflected, DOM, stored, and header/path/body injection, plus filter and WAF bypasses,
+CSP gadgets, prototype pollution, template injection, and modern DOM sink/source shapes
+that defeat naive taint analysis.
+
+Every endpoint ships structured metadata, so a benchmark can score per vulnerability
+class instead of regex-guessing at the served HTML.
 
 ![](images/showcase.png)
 
-## Installation
+> [!WARNING]
+> This app is deliberately vulnerable. It binds to `127.0.0.1` by default — only pass
+> `-b 0.0.0.0` on a network you trust.
 
-### From Source
-```bash
-shards install
-shards build
-./bin/xssmaze
-```
+## Install
 
-### From Docker
 ```bash
-docker pull ghcr.io/hahwul/xssmaze:main
 docker run -p 3000:3000 ghcr.io/hahwul/xssmaze:main
 ```
 
-## Usage
-```
+Or from source:
+
+```bash
+shards install && shards build
 ./bin/xssmaze
-
-Options:
-  -b HOST, --bind HOST             Host to bind (defaults to 127.0.0.1; pass 0.0.0.0 to expose on the network)
-  -p PORT, --port PORT             Port to listen for connections (defaults to 3000)
-  -s, --ssl                        Enables SSL
-  --ssl-key-file FILE              SSL key file
-  --ssl-cert-file FILE             SSL certificate file
-  -h, --help                       Shows this help
 ```
 
-## Dynamic Security Headers (Query Params)
-For calibrating scanners against different defensive configurations, XSSMaze can override common security headers per-request via URL query parameters (works on any endpoint).
+## Usage
 
-- `set_csp`: sets `Content-Security-Policy` (URL-encode spaces/quotes)
-- `set_xcto`: sets `X-Content-Type-Options` (e.g. `nosniff`)
-- `set_xfo`: sets `X-Frame-Options` (e.g. `DENY`)
+```
+./bin/xssmaze [options]
 
-Examples:
-```bash
-curl -i "http://localhost:3000/basic/level1/?query=a&set_xcto=nosniff"
-curl -i "http://localhost:3000/basic/level1/?query=a&set_xfo=deny"
-curl -i "http://localhost:3000/basic/level1/?query=a&set_csp=default-src%20%27self%27"
+  -b HOST, --bind HOST     Host to bind (default 127.0.0.1)
+  -p PORT, --port PORT     Port to listen on (default 3000)
+  -s, --ssl                Enable SSL
+  --ssl-key-file FILE      SSL key file
+  --ssl-cert-file FILE     SSL certificate file
+  -h, --help               Show help
 ```
 
-## Endpoint Map
-```bash
-curl http://localhost:3000/map/text         # newline-separated URLs
-curl http://localhost:3000/map/json         # full metadata (also: ?type=dom or ?q=csp)
-curl http://localhost:3000/map/markdown     # markdown table
-curl http://localhost:3000/map/categories   # categories with counts + class/reach rollups
+## Endpoint map
 
-# Structured vulnerability metadata (see "Vulnerability metadata" below)
+| Endpoint | Returns |
+|----------|---------|
+| `/map/text` | newline-separated URLs |
+| `/map/json` | full metadata; filter with `?type=`, `?q=`, `?vuln=`, `?reach=`, `?exploitable=` |
+| `/map/markdown` | markdown table |
+| `/map/categories` | categories with counts + class/reach rollups |
+| `/map/openapi` | OpenAPI 3.0 catalog |
+| `/sitemap.xml` | sitemap of all maze paths |
+| `/stats` | aggregate counts by class, reach, source, and sink |
+| `/health` | liveness probe (`/healthz` alias) |
+| `/version` | version + counts |
+| `/random` | 302 to a random maze |
+
+```bash
 curl "http://localhost:3000/map/json?vuln=dom"           # only DOM flows
 curl "http://localhost:3000/map/json?reach=server"       # payload fits in an HTTP request
 curl "http://localhost:3000/map/json?exploitable=false"  # deliberate true negatives
-curl http://localhost:3000/map/openapi      # OpenAPI 3.0 catalog
-curl http://localhost:3000/sitemap.xml      # sitemap of all maze paths
-curl http://localhost:3000/health           # liveness probe
-curl http://localhost:3000/version          # version + counts
-curl -L http://localhost:3000/random        # 302 to a random maze
 ```
 
-The index page (`/`) provides a client-side filter, per-category counts, and links to all of the maps above. Map endpoints serve a payload that is built once at startup, cached, and gzip pre-compressed (`Accept-Encoding: gzip` cuts the index payload by ~85%), so they're safe to poll from tooling.
+The index page (`/`) has a client-side filter and links to every map above. Map responses
+are built once at startup, cached, and gzip pre-compressed (`Accept-Encoding: gzip` cuts
+the index by ~85%), so they are safe to poll from tooling.
 
 ## Vulnerability metadata
-Every endpoint in `/map/json` carries a `vuln` object so tooling can score per
-vulnerability class without regex-guessing at the served HTML:
+
+Every endpoint in `/map/json` carries a `vuln` object:
 
 ```json
 {
@@ -98,171 +98,78 @@ vulnerability class without regex-guessing at the served HTML:
 | `delivery` | where the payload enters: `query`, `path`, `body`, `header`, `cookie`, `referer`, `fragment`, `postmessage`, `window-name`, … |
 | `reach` | derived — `server` if any delivery channel fits an HTTP request, `client` if the payload only exists browser-side, `unknown` if untriaged |
 | `exploitable` | `false` marks a deliberate control / true negative |
-| `note` | caveats: required user interaction, why it is a control, non-obvious parameter names |
+| `note` | caveats: required interaction, why it is a control, non-obvious parameter names |
 
-Classification follows the **injection context** — where the bytes land — not
-what the receiving API does with a well-formed argument. A value reflected raw
-into a JS string literal is `reflected-js` however inert the function it is
-passed to.
+Classification follows the **injection context** — where the bytes land — not what the
+receiving API does with a well-formed argument. A value reflected raw into a JS string
+literal is `reflected-js` however inert the function it is passed to.
 
-Two things this is designed to prevent a benchmark from getting wrong:
+Two things this exists to stop a benchmark getting wrong:
 
-- **`reach: "client"`** endpoints (fragment, postMessage, window.name,
-  clipboard, drag-and-drop) cannot be reached by a request-only scanner at
-  all. Counting them as misses measures the wrong thing.
-- **`exploitable: false`** endpoints are not bugs. The whole `xsleak` category
-  is cross-site *leaks*, not XSS — a scanner that reports nothing there is
-  correct.
+- **`reach: "client"`** endpoints (fragment, postMessage, window.name, clipboard,
+  drag-and-drop) cannot be reached by a request-only scanner at all. Counting them as
+  misses measures the wrong thing.
+- **`exploitable: false`** endpoints are not bugs. The whole `xsleak` category is
+  cross-site *leaks*, not XSS — a scanner that reports nothing there is correct.
 
-Endpoints that have not been triaged yet are `"unclassified"` with
-`reach: "unknown"`, which is deliberately distinct from "reviewed and found
-safe".
+Untriaged endpoints are `"unclassified"` with `reach: "unknown"`, deliberately distinct
+from "reviewed and found safe".
 
-## XS-Leaks (Cross-Site Leaks)
-XS-Leaks are cross-origin side-channels that let an attacker infer state-dependent data without directly reading the response body. XSSMaze includes `xsleak-*` levels that intentionally vary response size, subresource composition, load/error behavior, timing, and redirect chains based on a "secret" state.
+## Security header overrides
 
-The state can be controlled either by:
-- `q=admin` (simple stateless demos for scanners), or
-- the `xsleak_role=admin` cookie (set via `GET /xsleak/login?as=admin`).
+To calibrate scanners against different defensive configurations, any endpoint accepts
+per-request header overrides via query params:
 
-### Levels
-- `GET /xsleak/search?q=admin` (`xsleak-level1`): body-size oracle (admin returns more HTML/results)
-- `GET /xsleak/frame?q=admin` (`xsleak-level2`): frame-count oracle (admin includes more iframes)
-- `GET /xsleak/avatar.gif?q=admin` (`xsleak-level3`): load/error oracle (admin returns an image, guest is 404)
-- `GET /xsleak/timing?q=admin` (`xsleak-level4`): timing oracle (guest path sleeps longer)
-- `GET /xsleak/redirect?q=admin` (`xsleak-level5`): redirect-chain oracle (admin has more hops)
+| Param | Sets |
+|-------|------|
+| `set_csp` | `Content-Security-Policy` (URL-encode spaces/quotes) |
+| `set_xcto` | `X-Content-Type-Options` (e.g. `nosniff`) |
+| `set_xfo` | `X-Frame-Options` (e.g. `DENY`) |
 
-### Measuring side-channels
-To validate dynamically, host an "attacker" page on a different origin and probe the victim endpoints using load/error handlers and timing:
-
-```html
-<script>
-  // Load/error oracle (200 vs 404)
-  const img = new Image();
-  img.onload = () => console.log("loaded");
-  img.onerror = () => console.log("error");
-  img.src = "http://127.0.0.1:3000/xsleak/avatar.gif?q=admin";
-
-  // Timing oracle (measure duration)
-  const t0 = performance.now();
-  fetch("http://127.0.0.1:3000/xsleak/timing?q=admin", { mode: "no-cors" })
-    .finally(() => console.log("ms:", performance.now() - t0));
-
-  // Frame-count oracle (browser-dependent)
-  const f = document.createElement("iframe");
-  f.src = "http://127.0.0.1:3000/xsleak/frame?q=admin";
-  f.onload = () => console.log("subframes:", f.contentWindow.length);
-  document.body.appendChild(f);
-</script>
+```bash
+curl -i "http://localhost:3000/basic/level1/?query=a&set_csp=default-src%20%27self%27"
 ```
 
-You can also spot differences via CLI:
+## XS-Leaks
+
+`xsleak-*` levels are cross-origin side-channels that vary response size, subresource
+count, load/error behavior, timing, and redirect depth by a "secret" state. State comes
+from either `q=admin` or the `xsleak_role=admin` cookie (set via `GET /xsleak/login?as=admin`).
+
+| Level | Endpoint | Oracle |
+|-------|----------|--------|
+| 1 | `/xsleak/search?q=admin` | body size (admin returns more results) |
+| 2 | `/xsleak/frame?q=admin` | frame count |
+| 3 | `/xsleak/avatar.gif?q=admin` | load/error (admin 200, guest 404) |
+| 4 | `/xsleak/timing?q=admin` | timing (guest path sleeps longer) |
+| 5 | `/xsleak/redirect?q=admin` | redirect-chain depth |
+
+These are *leaks*, not XSS — they are marked `exploitable: false` and a scanner reporting
+nothing here is behaving correctly. Spot the difference from the CLI:
+
 ```bash
-curl -i "http://localhost:3000/xsleak/avatar.gif?q=guest"   # 404
-curl -i "http://localhost:3000/xsleak/avatar.gif?q=admin"   # 200 image/gif
 curl -s "http://localhost:3000/xsleak/frame?q=guest" | wc -c
 curl -s "http://localhost:3000/xsleak/frame?q=admin" | wc -c
-curl -sL -o /dev/null -w "%{time_total}\n" "http://localhost:3000/xsleak/timing?q=guest"
 curl -sL -o /dev/null -w "%{time_total}\n" "http://localhost:3000/xsleak/timing?q=admin"
 ```
 
-## Benchmarking Scanner Tools
+To measure them properly, host a page on a different origin and probe with load/error
+handlers, timing, and `iframe.contentWindow.length`.
 
-XSSMaze includes an automated benchmark tool to measure how well XSS scanners perform against the lab's diverse vulnerability scenarios. The tool retrieves all endpoints from `/map/json`, runs scanner tools against them, and generates a detection scorecard.
+## Benchmarking scanners
 
-### Requirements
-
-- Python 3.x
-- `requests` library (`pip install requests`)
-- Scanner tools (e.g., [Nuclei](https://github.com/projectdiscovery/nuclei))
-
-### Quick Start
+`scripts/benchmark.py` pulls every endpoint from `/map/json`, runs a scanner against
+them, and prints a detection scorecard.
 
 ```bash
-# Start XSSMaze (in one terminal)
-./bin/xssmaze -b 0.0.0.0
-
-# Run benchmark (in another terminal)
-cd scripts
-./benchmark.sh http://localhost:3000
+./bin/xssmaze -b 0.0.0.0          # terminal 1
+cd scripts && ./benchmark.sh http://localhost:3000   # terminal 2
 ```
 
-### Usage Examples
+Nuclei is supported out of the box; any other tool can be wired in with
+`--custom-scanner "mytool {URL}"`. See [scripts/README.md](scripts/README.md) for
+options, report formats, and how to add a scanner permanently.
 
-```bash
-# Basic benchmark with console output
-python3 benchmark.py http://localhost:3000
+## License
 
-# Verbose mode (shows detailed progress)
-python3 benchmark.py http://localhost:3000 -v
-
-# Generate markdown report
-python3 benchmark.py http://localhost:3000 -o report.md
-
-# Run specific scanner only
-python3 benchmark.py http://localhost:3000 --scanner nuclei
-
-# Use a custom scanner command
-python3 benchmark.py http://localhost:3000 \
-  --custom-scanner "myxss {URL}" \
-  --custom-scanner-name "MyXSSScanner"
-```
-
-### Output Format
-
-The benchmark tool provides:
-
-- **Console Scorecard**: Summary table showing detection rates for each scanner
-- **Detailed Statistics**:
-  - Total registered endpoints
-  - Endpoints successfully detected (True Positives)
-  - Endpoints missed (False Negatives)
-  - Overall detection rate percentage
-  - Breakdown of missed detections by category
-- **Markdown Report** (optional): Exportable report with full benchmark results
-
-Example output:
-```
-======================================================================
-XSSMaze Scanner Benchmark Results
-======================================================================
-
-Target: http://localhost:3000
-Total Registered Endpoints: 450
-Categories: 45
-
-Scanner              Detected     Missed       Rate         Time (s)
-----------------------------------------------------------------------
-Nuclei               234          216          52.0%        125.3s
-
---- Nuclei Detailed Results ---
-✓ True Positives: 234/450
-✗ False Negatives (Missed): 216/450
-
-Missed by category:
-  advanced: 6/6 missed
-  csp-bypass: 5/5 missed
-  template-injection: 6/6 missed
-```
-
-### Supported Scanners
-
-The benchmark tool currently supports:
-
-- **Nuclei**: Uses XSS-related templates from the Nuclei template library
-- **Custom Scanners**: Any tool that can accept a URL and output results
-
-### Adding New Scanners
-
-To add support for a new scanner:
-
-1. Use the `--custom-scanner` option with command template
-2. Or extend `benchmark.py` with a new scanner method
-
-Example for adding a scanner permanently:
-```python
-def run_my_scanner(self) -> ScannerResult:
-    # Implementation here
-    pass
-```
-```
+MIT

@@ -1,8 +1,10 @@
 # Level 1: Reflection in HTTP header (X-Custom) + body
 Xssmaze.push("rsplit-level1", "/rsplit/level1/?query=a", "reflection in custom header + body")
 maze_get "/rsplit/level1/" do |env|
-  query = env.params.query["query"]
-  env.response.headers["X-Search-Term"] = query
+  query = env.params.query.fetch("query", "a")
+  # Reflected raw into the body below; the header copy drops CR/LF only
+  # because Crystal refuses to emit them (it raises instead of splitting).
+  env.response.headers["X-Search-Term"] = Xssmaze.header_value(query)
 
   "<html><body><h1>Search: #{query}</h1></body></html>"
 end

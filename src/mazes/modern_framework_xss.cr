@@ -55,9 +55,9 @@ end
 # Level 5: CORS response with reflected origin
 Xssmaze.push("modern-level5", "/modern/level5/?query=a", "reflected in CORS headers + body")
 maze_get "/modern/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "a")
   origin = env.request.headers.fetch("Origin", "*")
-  env.response.headers["Access-Control-Allow-Origin"] = origin
+  env.response.headers["Access-Control-Allow-Origin"] = Xssmaze.header_value(origin)
 
   "<html><body>#{query}</body></html>"
 end
