@@ -36,7 +36,7 @@ end
 Xssmaze.push("realworld_input-level4", "/realworld-input/level4/?url=https://example.com", "Location header redirect (javascript: sink)")
 maze_get "/realworld-input/level4/" do |env|
   url = env.params.query.fetch("url", "/")
-  env.response.headers["Location"] = url
+  env.response.headers["Location"] = Xssmaze.header_value(url)
   env.response.status_code = 302
 
   ""

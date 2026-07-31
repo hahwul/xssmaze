@@ -65,6 +65,11 @@ class Maze
   # Free-form caveat: why it is a control, what interaction it needs, etc.
   getter note : String?
 
+  # Category, derived from the name prefix ("basic-level1" -> "basic").
+  # Computed once: grouping, /map/json, /map/openapi and /stats each walk
+  # every maze, and the old `split("-").first?` allocated an array per call.
+  getter type : String
+
   def initialize(@name, @url, @desc, @method = "GET", @params = ["query"],
                  @vuln = "unclassified",
                  @sources = [] of String,
@@ -72,10 +77,8 @@ class Maze
                  @delivery = [] of String,
                  @exploitable = true,
                  @note = nil)
-  end
-
-  def type : String
-    @name.split("-").first? || "other"
+    dash = @name.index('-')
+    @type = dash ? @name[0, dash] : @name
   end
 
   # "server"  - the payload fits in the HTTP request (query/path/body/

@@ -117,17 +117,13 @@ module Xssmaze::Server
       end
     end
 
-    get "/health" do |env|
-      json_no_store(env)
-      uptime = (Time.utc - start_time).total_seconds.to_i
-      {status: "ok", uptime_seconds: uptime, endpoints: mazes.size}.to_json
-    end
-
-    # k8s-style alias.
-    get "/healthz" do |env|
-      json_no_store(env)
-      uptime = (Time.utc - start_time).total_seconds.to_i
-      {status: "ok", uptime_seconds: uptime, endpoints: mazes.size}.to_json
+    # /healthz is the k8s-style alias for the same probe.
+    %w[/health /healthz].each do |probe_path|
+      get probe_path do |env|
+        json_no_store(env)
+        uptime = (Time.utc - start_time).total_seconds.to_i
+        {status: "ok", uptime_seconds: uptime, endpoints: mazes.size}.to_json
+      end
     end
 
     # Filter the pre-materialized JSON objects rather than rebuilding tuples.
@@ -156,14 +152,7 @@ module Xssmaze::Server
 
     error 404 do |env|
       env.response.content_type = "text/html; charset=utf-8"
-      path = env.request.path
-      "<!DOCTYPE html><html><head><meta charset='UTF-8'><title>404 - XSSMaze</title>" \
-      "<style>body{font-family:-apple-system,sans-serif;max-width:720px;margin:60px auto;padding:0 20px;color:#333}" \
-      "h1{margin-bottom:6px}.path{background:#f4f4f4;padding:2px 6px;border-radius:3px;font-family:monospace;color:#c7254e}" \
-      "a{color:#0366d6;text-decoration:none}a:hover{text-decoration:underline}</style></head><body>" \
-      "<h1>404</h1><p>No maze at <span class='path'>#{Xssmaze.html_escape(path)}</span>.</p>" \
-      "<p>Try the <a href='/'>index</a>, the <a href='/map/text'>text map</a>, or the " \
-      "<a href='/map/categories'>category list</a>.</p></body></html>"
+      Catalog.render_404(env.request.path)
     end
 
     # spec-kemal expects Kemal's handler chain to be wired even when we

@@ -251,6 +251,21 @@ module Xssmaze::Catalog
 
   ROBOTS_BODY = "User-agent: *\nDisallow: /\n"
 
+  # The 404 body is the one page that varies per request (it echoes the
+  # missed path), so it is rendered rather than cached like the entries
+  # above. The path is escaped — this page is chrome, not a maze.
+  ERROR_404_STYLE = "body{font-family:-apple-system,sans-serif;max-width:720px;margin:60px auto;padding:0 20px;color:#333}" \
+                    "h1{margin-bottom:6px}.path{background:#f4f4f4;padding:2px 6px;border-radius:3px;font-family:monospace;color:#c7254e}" \
+                    "a{color:#0366d6;text-decoration:none}a:hover{text-decoration:underline}"
+
+  def self.render_404(path : String) : String
+    "<!DOCTYPE html><html><head><meta charset='UTF-8'><title>404 - XSSMaze</title>" \
+    "<style>#{ERROR_404_STYLE}</style></head><body>" \
+    "<h1>404</h1><p>No maze at <span class='path'>#{Xssmaze.html_escape(path)}</span>.</p>" \
+    "<p>Try the <a href='/'>index</a>, the <a href='/map/text'>text map</a>, or the " \
+    "<a href='/map/categories'>category list</a>.</p></body></html>"
+  end
+
   # Build every cached static asset in one shot. The key naming maps 1:1
   # to the route table in server.cr so adding a new catalog view is a
   # matter of: add a builder above, add an Entry here, add a route in

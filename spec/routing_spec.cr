@@ -496,3 +496,55 @@ describe "WAF facade levels" do
     response.body.should contain(%(<div id='preview'>#{payload}</div>))
   end
 end
+
+describe "endpoints reachable without their parameter" do
+  # Regression: these four advertised a bare path in /map/*, so crawling the
+  # catalog hit a KeyError and got a 500 instead of the level.
+  (1..4).each do |level|
+    it "redirect level#{level} redirects instead of raising when query is absent" do
+      get "/redirect/level#{level}/"
+      response.status_code.should eq 302
+    end
+  end
+
+  it "redirect level1 still honours a javascript: payload" do
+    get "/redirect/level1/?query=#{URI.encode_www_form("javascript:alert(1)")}"
+    response.status_code.should eq 302
+    response.headers["Location"].should eq("javascript:alert(1)")
+  end
+
+  it "redirect level2 still strips the javascript keyword" do
+    get "/redirect/level2/?query=#{URI.encode_www_form("javascript:alert(1)")}"
+    response.status_code.should eq 302
+    response.headers["Location"].should eq(":alert(1)")
+  end
+end
+
+describe "user input reflected into response headers" do
+  # Crystal raises on CR/LF in a header value, so these used to 500 rather
+  # than demonstrate anything. The reflection itself must survive.
+  it "reflects a search term into X-Search-Term" do
+    get "/rsplit/level1/?query=#{URI.encode_www_form("hello")}"
+    response.status_code.should eq 200
+    response.headers["X-Search-Term"].should eq("hello")
+  end
+
+  it "does not 500 on a CRLF payload in the header-reflection maze" do
+    get "/rsplit/level1/?query=#{URI.encode_www_form("a\r\nX-Evil: 1")}"
+    response.status_code.should eq 200
+    response.headers["X-Search-Term"].should eq("aX-Evil: 1")
+    response.headers.has_key?("X-Evil").should be_false
+  end
+
+  it "still reflects the raw payload into the body" do
+    payload = "<script>alert(1)</script>"
+    get "/rsplit/level1/?query=#{URI.encode_www_form(payload)}"
+    response.body.should contain(payload)
+  end
+
+  it "does not 500 when a CRLF override rides along on a maze request" do
+    get "/basic/level1/?query=a&set_csp=#{URI.encode_www_form("x\r\nX-Evil: 1")}"
+    response.status_code.should eq 200
+    response.headers.has_key?("X-Evil").should be_false
+  end
+end

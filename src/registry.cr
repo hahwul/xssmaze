@@ -1,4 +1,5 @@
 require "compress/gzip"
+require "html"
 
 # Catalog of every maze endpoint plus a few shared helpers used by maze
 # definitions and the catalog/server layers.
@@ -46,12 +47,22 @@ module Xssmaze
     groups
   end
 
+  # Escapes & < > " ' — byte-for-byte what the previous hand-rolled chain of
+  # five `gsub`s produced, in a single pass instead of five intermediates.
   def self.html_escape(s : String) : String
-    s.gsub('&', "&amp;")
-      .gsub('<', "&lt;")
-      .gsub('>', "&gt;")
-      .gsub('"', "&quot;")
-      .gsub('\'', "&#39;")
+    HTML.escape(s)
+  end
+
+  # Strip CR/LF/NUL from a value before it goes into a response header.
+  #
+  # This is NOT the lab going soft on itself. Crystal's `HTTP::Headers`
+  # raises `ArgumentError` on a control character, so a payload like
+  # `?query=a%0d%0aX-Evil:1` never produced a split response — it produced a
+  # 500 and a stack trace, killing the maze's real lesson (the value *is*
+  # still reflected into the header, which is what header-context tests
+  # need). Sanitizing here keeps the reflection and drops the crash.
+  def self.header_value(s : String) : String
+    s.delete("\r\n\u0000")
   end
 
   def self.gzip(body : String) : Bytes

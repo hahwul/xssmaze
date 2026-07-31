@@ -162,25 +162,44 @@ module Xssmaze::Assets
     (function () {
       var input = document.getElementById('search');
       if (!input) return;
-      var mazes = document.querySelectorAll('.maze');
-      var cats = document.querySelectorAll('.cat');
       var totalEl = document.getElementById('stat-visible');
-      input.addEventListener('input', function () {
+
+      // Walk the DOM once at startup and cache each category with its own
+      // rows plus their pre-lowercased haystack. The previous version called
+      // querySelectorAll once per category on every keystroke, which is ~175
+      // full subtree scans per character typed.
+      var groups = [].map.call(document.querySelectorAll('.cat'), function (cat) {
+        var rows = [].map.call(cat.querySelectorAll('.maze'), function (el) {
+          return {
+            el: el,
+            hay: (el.getAttribute('data-name') || '') + ' ' + (el.getAttribute('data-desc') || '')
+          };
+        });
+        return { el: cat, rows: rows };
+      });
+
+      function apply() {
         var q = input.value.toLowerCase().trim();
         var visible = 0;
-        mazes.forEach(function (el) {
-          var name = el.getAttribute('data-name') || '';
-          var desc = el.getAttribute('data-desc') || '';
-          var match = q === '' || name.indexOf(q) !== -1 || desc.indexOf(q) !== -1;
-          el.classList.toggle('hidden', !match);
-          if (match) visible++;
-        });
-        cats.forEach(function (cat) {
-          var any = cat.querySelectorAll('.maze:not(.hidden)').length > 0;
-          cat.classList.toggle('hidden', !any);
-        });
+        for (var i = 0; i < groups.length; i++) {
+          var group = groups[i];
+          var shown = 0;
+          for (var j = 0; j < group.rows.length; j++) {
+            var row = group.rows[j];
+            var match = q === '' || row.hay.indexOf(q) !== -1;
+            row.el.classList.toggle('hidden', !match);
+            if (match) shown++;
+          }
+          group.el.classList.toggle('hidden', shown === 0);
+          visible += shown;
+        }
         if (totalEl) totalEl.textContent = visible;
-      });
+      }
+
+      input.addEventListener('input', apply);
+      // Re-apply on load so a value restored by the browser (back/forward,
+      // autofill) is reflected instead of showing an unfiltered list.
+      if (input.value) apply();
     })();
   JS
 end
