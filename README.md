@@ -33,13 +33,22 @@ shards install && shards build
 ```
 ./bin/xssmaze [options]
 
-  -b HOST, --bind HOST     Host to bind (default 127.0.0.1)
-  -p PORT, --port PORT     Port to listen on (default 3000)
-  -s, --ssl                Enable SSL
-  --ssl-key-file FILE      SSL key file
-  --ssl-cert-file FILE     SSL certificate file
-  -h, --help               Show help
+  -b, --bind HOST          address to bind             127.0.0.1
+  -p, --port PORT          port to listen on           3000
+  -s, --ssl                serve over HTTPS
+      --ssl-key-file FILE  private key, PEM encoded
+      --ssl-cert-file FILE certificate, PEM encoded
+
+  -q, --quiet              do not log requests
+      --no-banner          start without the banner
+      --no-color           disable ANSI colour
+
+  -v, --version            print the version and exit
+  -h, --help               print this help and exit
 ```
+
+Colour is dropped automatically when the output is not a terminal, and
+`NO_COLOR` is honoured.
 
 ## Endpoint map
 
