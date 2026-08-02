@@ -1,9 +1,5 @@
 <img src="images/logo.png" alt="XSSMaze" width="260">
 
-[![Crystal CI](https://github.com/hahwul/xssmaze/actions/workflows/crystal_build.yml/badge.svg)](https://github.com/hahwul/xssmaze/actions/workflows/crystal_build.yml)
-[![Crystal Lint](https://github.com/hahwul/xssmaze/actions/workflows/crystal_lint.yml/badge.svg)](https://github.com/hahwul/xssmaze/actions/workflows/crystal_lint.yml)
-[![Docker](https://github.com/hahwul/xssmaze/actions/workflows/ghcr.yml/badge.svg)](https://github.com/hahwul/xssmaze/actions/workflows/ghcr.yml)
-
 XSSMaze is an intentionally vulnerable web application for measuring and improving XSS
 detection in security testing tools. It serves 1000+ endpoints across 170+ categories —
 reflected, DOM, stored, and header/path/body injection, plus filter and WAF bypasses,
