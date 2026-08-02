@@ -548,3 +548,35 @@ describe "user input reflected into response headers" do
     response.headers.has_key?("X-Evil").should be_false
   end
 end
+
+# The index page carries no assertions of its own historically, so a
+# redesign could silently drop the vulnerability metadata or break the
+# category deep links without a single test going red. These four pin the
+# contract that external tooling and bookmarks depend on.
+describe "index chrome" do
+  it "serves the favicon as SVG" do
+    get "/favicon.svg"
+    response.status_code.should eq 200
+    response.headers["Content-Type"].should contain("image/svg+xml")
+  end
+
+  it "renders per-endpoint vulnerability metadata into the row markup" do
+    get "/"
+    response.status_code.should eq 200
+    response.body.should contain("data-p='dom client'")
+    response.body.should contain("<span class='tag cls'>dom</span>")
+  end
+
+  it "keeps category anchors stable for deep links" do
+    get "/"
+    response.body.should contain("id='cat-basic'")
+    response.body.should contain("href='#cat-basic'")
+  end
+
+  it "renders the 404 page against the shared stylesheet" do
+    get "/no-such-maze"
+    response.status_code.should eq 404
+    response.body.should contain("/assets/index.css")
+    response.body.should contain("no-such-maze")
+  end
+end

@@ -17,6 +17,7 @@ module Xssmaze::Server
     {path: "/robots.txt", key: "robots"},
     {path: "/assets/index.css", key: "css"},
     {path: "/assets/index.js", key: "js"},
+    {path: "/favicon.svg", key: "favicon"},
   ]
 
   # Render a cached Catalog::Entry with ETag/304 + gzip support.

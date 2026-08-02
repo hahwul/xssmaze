@@ -22,68 +22,159 @@ module Xssmaze::Catalog
 
   # ----- Catalog views -----
 
+  # Shared <head> for the index and the 404 page so both pick up the same
+  # tokens, favicon and pre-paint theme restore.
+  private def self.build_head(io : IO, title : String, description : String) : Nil
+    io << "<!DOCTYPE html>\n<html lang='en'>\n<head>\n"
+    io << "<meta charset='UTF-8'>\n"
+    io << "<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n"
+    io << "<title>" << title << "</title>\n"
+    io << "<meta name='description' content='" << description << "'>\n"
+    io << "<meta name='theme-color' content='#ebe8e4' media='(prefers-color-scheme: light)'>\n"
+    io << "<meta name='theme-color' content='#100f0e' media='(prefers-color-scheme: dark)'>\n"
+    io << "<link rel='icon' href='/favicon.svg' type='image/svg+xml'>\n"
+    io << "<link rel='stylesheet' href='/assets/index.css'>\n"
+    io << "<script>" << Xssmaze::Assets::THEME_BOOT_JS << "</script>\n"
+    io << "</head>\n<body>\n"
+  end
+
+  # Endpoints the catalog publishes for tooling. Rendered in the page footer.
+  MAP_LINKS = %w[
+    /map/text /map/json /map/categories /map/markdown /map/openapi
+    /stats /payloads /random /health /version
+  ]
+
   def self.build_index_html(groups : Hash(String, Array(Maze)),
                             total : Int32) : String
     maze_list = build_maze_list(groups)
     cat_count = groups.size
+    sorted_types = groups.keys.sort!
+
+    # Metadata coverage, straight from the catalog. "unclassified" means not
+    # triaged yet, so it is counted as absent rather than as its own class.
+    # The per-class breakdown lives in /stats; the header carries the one
+    # number that tells a benchmark author how far triage has got.
+    classified = 0
+    groups.each_value do |type_mazes|
+      type_mazes.each { |maze| classified += 1 unless maze.vuln == "unclassified" }
+    end
 
     String.build do |io|
-      io << "<!DOCTYPE html>\n<html lang='en'>\n<head>\n"
-      io << "<meta charset='UTF-8'>\n"
-      io << "<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n"
-      io << "<title>XSSMaze</title>\n"
-      io << "<link rel='stylesheet' href='/assets/index.css'>\n"
-      io << "</head>\n<body>\n"
-      io << "<div class='header'>\n"
-      io << "<h1>XSSMaze</h1>\n"
-      io << "<p class='description'>XSSMaze is a web service configured to be vulnerable to XSS and is intended to measure and enhance the performance of security testing tools.</p>\n"
-      io << "<p class='description'>Most challenges use <code>query</code>, but some cases use parameters such as <code>callback</code>, <code>query2</code>, <code>seed</code>, <code>blob</code>, <code>url</code>, path segments, or request headers.</p>\n"
-      io << "<div class='stats'>\n"
-      io << "<span class='stat'><strong>" << total << "</strong> endpoints</span>\n"
-      io << "<span class='stat'><strong>" << cat_count << "</strong> categories</span>\n"
-      io << "<span class='stat'><strong id='stat-visible'>" << total << "</strong> visible</span>\n"
-      io << "<span class='stat'>v" << Xssmaze::VERSION << "</span>\n"
-      io << "</div>\n"
-      io << "<div class='controls'>\n"
-      io << "<input id='search' type='search' placeholder='Filter by name or description (e.g. dom, csp, level3)'>\n"
-      io << "</div>\n"
-      io << "<div class='map-links'>\n"
-      io << "<strong>Endpoints:</strong>\n"
-      io << "<a href='/map/text'>text</a>\n"
-      io << "<a href='/map/json'>json</a>\n"
-      io << "<a href='/map/categories'>categories</a>\n"
-      io << "<a href='/map/markdown'>markdown</a>\n"
-      io << "<a href='/health'>health</a>\n"
-      io << "<a href='/version'>version</a>\n"
+      build_head(io, "XSSMaze",
+        "A deliberately vulnerable web service for measuring how well a security " \
+        "scanner finds cross-site scripting. #{total} endpoints across #{cat_count} categories.")
+
+      # ----- header -----
+      io << "<header class='shell top'>\n<div class='brandline'>\n"
+      io << "<div class='brand'>" << Xssmaze::Assets::MARK_SVG << "<div>"
+      io << "<h1 class='wordmark'>XSSMaze</h1>"
+      io << "<p class='subline'>Cross-site scripting proving ground</p>"
+      io << "</div></div>\n"
+      io << "<div class='readout'>"
+      io << "<div><b>" << total << "</b><span>endpoints</span></div>"
+      io << "<div><b>" << cat_count << "</b><span>categories</span></div>"
+      io << "<div><b>" << classified << "</b><span>classified</span></div>"
+      io << "<div><b>" << Xssmaze::VERSION << "</b><span>version</span></div>"
       io << "</div>\n</div>\n"
+      io << "<p class='lede'>A deliberately vulnerable web service for measuring how well a "
+      io << "security scanner finds cross-site scripting. Every endpoint carries its own "
+      io << "vulnerability class, taint source, and sink.</p>\n"
+      io << "<p class='params'>Payloads arrive through "
+      io << "<code>query</code><code>callback</code><code>query2</code><code>seed</code>"
+      io << "<code>blob</code><code>url</code> plus path segments and request headers.</p>\n"
+      io << "</header>\n"
+
+      # ----- control bar -----
+      io << "<div class='bar'>\n<div class='bar-in'>\n"
+      io << "<input id='search' type='search' aria-label='Filter endpoints' "
+      io << "placeholder='filter by name, behaviour, source or sink...  (press /)'>\n"
+      io << "<div class='chips' role='group' aria-label='Filter by property'>"
+      io << "<button class='chip' data-filter='dom' aria-pressed='false'>dom</button>"
+      io << "<button class='chip' data-filter='client' aria-pressed='false'>client-only</button>"
+      io << "<button class='chip' data-filter='control' aria-pressed='false'>controls</button>"
+      io << "<button class='chip' data-filter='post' aria-pressed='false'>POST</button>"
+      io << "</div>\n"
+      io << "<p class='tally' aria-live='polite'><b id='stat-visible'>" << total
+      io << "</b> of " << total << " shown</p>\n"
+      io << "<button class='theme' id='theme' aria-label='Switch between light and dark'>&#9681;</button>\n"
+      io << "</div>\n</div>\n"
+
+      # ----- corridor list -----
+      io << "<div class='shell layout'>\n<nav class='rail-nav' aria-label='Categories'>\n"
+      io << "<h2>Categories</h2>\n"
+      sorted_types.each do |type|
+        io << "<a href='#cat-" << type << "'>" << type
+        io << " <i>" << groups[type].size << "</i></a>"
+      end
+      io << "\n</nav>\n"
       io << maze_list
-      io << "\n<script src='/assets/index.js' defer></script>\n"
+      io << "</div>\n"
+
+      # ----- footer -----
+      io << "<div class='shell'><footer class='foot'><span>Machine-readable</span>"
+      MAP_LINKS.each { |path| io << "<a href='" << path << "'>" << path << "</a>" }
+      io << "</footer></div>\n"
+
+      io << "<script src='/assets/index.js' defer></script>\n"
       io << "</body>\n</html>"
     end
   end
 
+  # One row per endpoint. `data-hay` is the search haystack (name, description
+  # and the DOM taint source/sink names, so typing `innerHTML` or
+  # `location.hash` finds the right levels). `data-p` is a space-joined token
+  # list the filter chips match against; the JS pads it so a chip matches a
+  # whole token rather than a substring.
   private def self.build_maze_list(groups : Hash(String, Array(Maze))) : String
     sorted_types = groups.keys.sort!
 
     String.build do |io|
-      io << "<div class='container'>\n  <ul class='list' id='maze-list'>"
+      io << "<main id='maze-list'>"
       sorted_types.each do |type|
         type_mazes = groups[type]
-        io << "<li class='cat' data-cat='" << type << "'>"
-        io << "<span class='cat-name' id='cat-" << type << "'>" << type << "</span>"
-        io << " <span class='count'>(" << type_mazes.size << ")</span>"
-        io << "<ul class='list'>"
-        type_mazes.each do |maze|
-          io << "<li class='maze' data-name='" << maze.name.downcase
-          io << "' data-desc='" << Xssmaze.html_escape(maze.desc.downcase) << "'>"
-          io << "<a href='" << maze.url << "'>" << maze.name << "</a>"
-          io << " <span class='method'>" << maze.method << "</span>"
-          io << " - " << Xssmaze.html_escape(maze.desc) << "</li>"
-        end
-        io << "</ul></li>"
+        io << "<section class='cat' data-cat='" << type << "' id='cat-" << type << "'>"
+        io << "<div class='cat-head'><h2>" << type << "</h2>"
+        io << "<span class='count'>" << type_mazes.size << "</span></div>"
+        io << "<ul class='rows'>"
+        type_mazes.each { |maze| build_maze_row(io, maze) }
+        io << "</ul></section>"
       end
-      io << "</ul></div>"
+      io << "<div class='empty hidden' id='empty'><b>No endpoint matches that.</b>"
+      io << "Clear the filter, or try a sink like <code>innerHTML</code>, a source like "
+      io << "<code>location.hash</code>, or a level such as <code>level3</code>.</div>"
+      io << "</main>"
     end
+  end
+
+  private def self.build_maze_row(io : IO, maze : Maze) : Nil
+    control = !maze.exploitable?
+    client = maze.reach == "client"
+
+    io << "<li class='maze"
+    io << " control" if control
+    io << "' data-hay='" << Xssmaze.html_escape(maze.name.downcase) << ' '
+    io << Xssmaze.html_escape(maze.desc.downcase)
+    maze.sources.each { |source| io << ' ' << Xssmaze.html_escape(source.downcase) }
+    maze.sinks.each { |sink| io << ' ' << Xssmaze.html_escape(sink.downcase) }
+    io << "' data-p='" << maze.vuln
+    io << " client" if client
+    io << " control" if control
+    io << " post" if maze.method != "GET"
+    io << "'>"
+
+    io << "<a href='" << maze.url << "'>" << maze.name << "</a>"
+    io << "<span class='desc'>" << Xssmaze.html_escape(maze.desc) << "</span>"
+
+    io << "<span class='meta'>"
+    io << "<span class='tag cls'>" << maze.vuln << "</span>" unless maze.vuln == "unclassified"
+    io << "<span class='tag client'>client</span>" if client
+    # The default input is `query`; naming it on every row would be noise, so
+    # only a non-default channel (a header, a fragment, a custom param) is shown.
+    if (param = maze.params.first?) && param != "query"
+      io << "<span class='tag'>" << Xssmaze.html_escape(param) << "</span>"
+    end
+    io << "<span class='tag method'>" << maze.method << "</span>" if maze.method != "GET"
+    io << "</span></li>"
   end
 
   def self.build_map_text(mazes : Array(Maze)) : String
@@ -253,17 +344,20 @@ module Xssmaze::Catalog
 
   # The 404 body is the one page that varies per request (it echoes the
   # missed path), so it is rendered rather than cached like the entries
-  # above. The path is escaped — this page is chrome, not a maze.
-  ERROR_404_STYLE = "body{font-family:-apple-system,sans-serif;max-width:720px;margin:60px auto;padding:0 20px;color:#333}" \
-                    "h1{margin-bottom:6px}.path{background:#f4f4f4;padding:2px 6px;border-radius:3px;font-family:monospace;color:#c7254e}" \
-                    "a{color:#0366d6;text-decoration:none}a:hover{text-decoration:underline}"
-
+  # above. The path is escaped — this page is chrome, not a maze. It shares
+  # the index stylesheet instead of carrying its own, so the two pages can
+  # never drift apart.
   def self.render_404(path : String) : String
-    "<!DOCTYPE html><html><head><meta charset='UTF-8'><title>404 - XSSMaze</title>" \
-    "<style>#{ERROR_404_STYLE}</style></head><body>" \
-    "<h1>404</h1><p>No maze at <span class='path'>#{Xssmaze.html_escape(path)}</span>.</p>" \
-    "<p>Try the <a href='/'>index</a>, the <a href='/map/text'>text map</a>, or the " \
-    "<a href='/map/categories'>category list</a>.</p></body></html>"
+    String.build do |io|
+      build_head(io, "404 - XSSMaze", "No maze at that path.")
+      io << "<div class='shell'><div class='notfound'>"
+      io << "<h1>404</h1>"
+      io << "<p>No maze at <span class='path'>" << Xssmaze.html_escape(path) << "</span>.</p>"
+      io << "<p>Try the <a href='/'>index</a>, the <a href='/map/text'>text map</a>, "
+      io << "the <a href='/map/categories'>category list</a>, or "
+      io << "<a href='/random'>a random maze</a>.</p>"
+      io << "</div></div></body></html>"
+    end
   end
 
   # Build every cached static asset in one shot. The key naming maps 1:1
@@ -293,6 +387,7 @@ module Xssmaze::Catalog
       "robots"     => Entry.new(ROBOTS_BODY, "text/plain; charset=utf-8", 3600),
       "css"        => Entry.new(Xssmaze::Assets::INDEX_CSS, "text/css; charset=utf-8", 86400),
       "js"         => Entry.new(Xssmaze::Assets::INDEX_JS, "application/javascript; charset=utf-8", 86400),
+      "favicon"    => Entry.new(Xssmaze::Assets::FAVICON_SVG, "image/svg+xml; charset=utf-8", 86400),
     }
   end
 end
