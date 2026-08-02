@@ -1,5 +1,9 @@
 require "kemal"
 require "http"
+require "log"
+require "./cli"
+require "./banner"
+require "./request_log"
 
 module Xssmaze::Server
   # Mapping of route path -> catalog key. Keep this table small and
@@ -91,6 +95,33 @@ module Xssmaze::Server
     #    pages with stack traces and source snippets.
     Kemal.config.host_binding = "127.0.0.1"
     Kemal.config.env = "production" unless ENV["KEMAL_ENV"]?
+    Kemal.config.app_name = "XSSMaze"
+
+    # 2. Own the command line and the console output.
+    #
+    #    Kemal would otherwise parse ARGV itself and print its generic help,
+    #    startup notice and request log. We parse first, then hand Kemal a
+    #    ready-made config (`Kemal.run(args: nil)`). In test mode ARGV belongs
+    #    to the spec runner, so it is left alone.
+    options = run_server ? CLI.parse!(ARGV) : CLI::Options.new
+
+    if run_server
+      Kemal.config.logging = false
+      Kemal.config.shutdown_message = false
+      # Position 1 keeps the logger just inside the init handler, so it times
+      # and reports every response including the ones handlers below produce.
+      Kemal.config.add_handler(RequestLog.new(STDOUT), 1) unless options.quiet?
+      # Kemal's own `Log` output is the startup notice plus unhandled
+      # exceptions. The banner replaces the notice, so lift Kemal to `warn`
+      # and keep the exceptions, restyled. `setup` (not `bind`) because the
+      # default binding would otherwise keep broadcasting the notice.
+      level = ::Log::Severity.parse?(ENV["LOG_LEVEL"]? || "info") || ::Log::Severity::Info
+      ::Log.setup do |c|
+        backend = ::Log::IOBackend.new(STDERR, formatter: UI::LOG_FORMATTER)
+        c.bind "*", level, backend
+        c.bind "kemal.*", ::Log::Severity::Warn, backend
+      end
+    end
 
     Xssmaze.freeze!
     catalog = Catalog.build_all
@@ -160,6 +191,67 @@ module Xssmaze::Server
     # don't call Kemal.run (test mode).
     Kemal.config.setup
 
-    Kemal.run if run_server
+    return unless run_server
+
+    # Bind first, announce second: a banner that says "serving <url>" should
+    # only appear once that URL is real.
+    bind!
+    announce(mazes) if options.banner?
+    listen
+  end
+
+  # Claim the socket ourselves so a failure is reported in our own voice.
+  # Kemal skips its own bind when the server it is handed is already bound.
+  private def self.bind! : Nil
+    config = Kemal.config
+    server = HTTP::Server.new(config.handlers)
+
+    {% if flag?(:without_openssl) %}
+      server.bind_tcp(config.host_binding, config.port)
+    {% else %}
+      if ssl = config.ssl
+        server.bind_tls(config.host_binding, config.port, ssl)
+      else
+        server.bind_tcp(config.host_binding, config.port)
+      end
+    {% end %}
+
+    config.server = server
+  rescue ex : Socket::BindError
+    Banner.fail(
+      "cannot bind #{Kemal.config.host_binding}:#{Kemal.config.port} — #{ex.os_error.try(&.message) || ex.message}",
+      hint: "pick another port with `-p PORT`",
+    )
+  end
+
+  # The startup banner, with the numbers and the URL this process actually
+  # serves rather than the defaults.
+  private def self.announce(mazes : Array(Maze)) : Nil
+    config = Kemal.config
+    host = config.host_binding
+    # 0.0.0.0 / :: are reachable from the network but useless to click, so
+    # the banner shows loopback and warns separately.
+    display_host = host.in?("0.0.0.0", "::", "[::]") ? "127.0.0.1" : host
+
+    Banner.startup(
+      STDOUT,
+      url: "#{config.scheme}://#{display_host}:#{config.port}",
+      endpoints: mazes.size,
+      categories: mazes.map(&.type).uniq!.size,
+      classified: mazes.count { |maze| maze.vuln != "unclassified" },
+      exposed: !host.in?("127.0.0.1", "localhost", "::1", "[::1]"),
+    )
+  end
+
+  private def self.listen : Nil
+    Kemal.run(args: nil) do
+      # Registered after Kemal's own handler so the goodbye matches the
+      # rest of the console instead of Kemal's log line.
+      Process.on_terminate do
+        STDOUT.puts UI.dim("\n  stopped\n")
+        Kemal.stop
+        exit
+      end
+    end
   end
 end
