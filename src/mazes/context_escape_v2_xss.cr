@@ -4,7 +4,7 @@
 Xssmaze.push("ctxv2-level1", "/ctxv2/level1/?query=a", "reflection inside HTML comment (close with -->)",
   vuln: "reflected-html", delivery: ["query"], note: "reflected inside an HTML comment; close it with -->")
 maze_get "/ctxv2/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><!-- Search query: #{query} --><div>Welcome</div></body></html>"
 end
@@ -16,7 +16,7 @@ end
 Xssmaze.push("ctxv2-level2", "/ctxv2/level2/?query=a", "reflection inside textarea tag (close tag escape)",
   vuln: "reflected-html", delivery: ["query"], note: "reflected inside <textarea> raw-text; close it with </textarea>")
 maze_get "/ctxv2/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><h2>Edit your message:</h2><textarea name=\"message\" rows=\"5\" cols=\"40\">#{query}</textarea></body></html>"
 end
@@ -28,7 +28,7 @@ end
 Xssmaze.push("ctxv2-level3", "/ctxv2/level3/?query=a", "reflection inside title tag (close tag escape)",
   vuln: "reflected-html", delivery: ["query"], note: "reflected inside <title> raw-text; close it with </title>")
 maze_get "/ctxv2/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head><title>Search: #{query}</title></head><body><h2>Results</h2><p>Searching...</p></body></html>"
 end
@@ -40,7 +40,7 @@ end
 Xssmaze.push("ctxv2-level4", "/ctxv2/level4/?query=a", "reflection inside style tag (close tag escape)",
   vuln: "reflected-html", delivery: ["query"], note: "reflected inside <style>; close it with </style> to inject markup")
 maze_get "/ctxv2/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head><style>.user-theme { color: #{query}; }</style></head><body><div class=\"user-theme\">Styled content</div></body></html>"
 end
@@ -52,7 +52,7 @@ end
 Xssmaze.push("ctxv2-level5", "/ctxv2/level5/?query=a", "reflection inside noscript tag (close tag escape)",
   vuln: "reflected-html", delivery: ["query"], note: "reflected inside <noscript>; close it with </noscript>")
 maze_get "/ctxv2/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><noscript>JavaScript required. Your search: #{query}</noscript><div>Main content</div></body></html>"
 end
@@ -67,7 +67,7 @@ end
 Xssmaze.push("ctxv2-level6", "/ctxv2/level6/?query=a", "reflection in iframe srcdoc (HTML entity injection via unescaped &)",
   vuln: "reflected-attr", delivery: ["query"], note: "reflected into an iframe srcdoc; < and > are entity-encoded but the quote and & are not, so break the attribute or send pre-encoded entities that decode inside the srcdoc")
 maze_get "/ctxv2/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Encode < and > to prevent direct attribute breakout, but leave & intact
   # This means pre-encoded HTML entities in the input survive and get rendered in srcdoc
   filtered = query.gsub("<", "&lt;").gsub(">", "&gt;")

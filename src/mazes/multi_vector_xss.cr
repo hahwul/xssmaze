@@ -3,7 +3,7 @@
 Xssmaze.push("multivector-level1", "/multivector/level1/?query=a", "3 forms, reflection in 2nd form input value only",
   vuln: "reflected-attr", delivery: ["query"], note: "only the second of three forms carries the reflection, in its input value")
 maze_get "/multivector/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<!DOCTYPE html>
 <html><body>
@@ -28,7 +28,7 @@ end
 Xssmaze.push("multivector-level2", "/multivector/level2/?query=a", "dual reflection: script var + HTML body paragraph",
   vuln: "reflected-html", delivery: ["query"], note: "also lands in a double-quoted JS string in an inline <script>")
 maze_get "/multivector/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<!DOCTYPE html>
 <html><body>
@@ -43,7 +43,7 @@ end
 Xssmaze.push("multivector-level3", "/multivector/level3/?query=a", "reflection in option value inside select with 10 options",
   vuln: "reflected-attr", delivery: ["query"], note: "reflected into the fourth <option value> of a ten-option <select>")
 maze_get "/multivector/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<!DOCTYPE html>
 <html><body>
@@ -68,7 +68,7 @@ end
 Xssmaze.push("multivector-level4", "/multivector/level4/?query=a", "5 input fields, reflection only in 3rd field value",
   vuln: "reflected-attr", delivery: ["query"], note: "only the third of five input values carries the reflection")
 maze_get "/multivector/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<!DOCTYPE html>
 <html><body>
@@ -89,7 +89,7 @@ end
 Xssmaze.push("multivector-level5", "/multivector/level5/?query=a", "triple reflection: title + meta content + div body",
   vuln: "reflected-html", delivery: ["query"], note: "three contexts — <title>, meta content and a div body")
 maze_get "/multivector/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<!DOCTYPE html>
 <html>
@@ -109,7 +109,7 @@ end
 Xssmaze.push("multivector-level6", "/multivector/level6/?query=a", "deep nested reflection: article > section > div > p",
   vuln: "reflected-html", delivery: ["query"], note: "the reflection is nested four levels deep, in article > section > div > p")
 maze_get "/multivector/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<!DOCTYPE html>
 <html lang=\"en\">

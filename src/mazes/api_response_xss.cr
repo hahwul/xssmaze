@@ -5,7 +5,7 @@
 Xssmaze.push("api-response-level1", "/api-response/level1/?query=a", "JSON-like response with text/html content type",
   vuln: "reflected-html", delivery: ["query"], note: "JSON-shaped body served as text/html, so markup inside the string value is parsed as HTML")
 maze_get "/api-response/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   env.response.content_type = "text/html"
 
   "{\"message\":\"#{query}\",\"status\":\"ok\"}"
@@ -18,7 +18,7 @@ end
 Xssmaze.push("api-response-level2", "/api-response/level2/?query=a", "XML response with text/html content type",
   vuln: "reflected-html", delivery: ["query"], note: "XML-shaped body served as text/html, so the element text is parsed as HTML")
 maze_get "/api-response/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   env.response.content_type = "text/html"
 
   "<response><message>#{query}</message></response>"
@@ -31,7 +31,7 @@ end
 Xssmaze.push("api-response-level3", "/api-response/level3/?query=a", "CSV-like response with text/html content type",
   vuln: "reflected-html", delivery: ["query"], note: "CSV-shaped body served as text/html")
 maze_get "/api-response/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   env.response.content_type = "text/html"
 
   "name,value\nresult,#{query}"
@@ -44,7 +44,7 @@ end
 Xssmaze.push("api-response-level4", "/api-response/level4/?query=a", "JSONP callback response with text/html content type",
   vuln: "reflected-html", delivery: ["query"], note: "JSONP-shaped body served as text/html; it is never executed as script, so inject markup instead of breaking out of the JS string")
 maze_get "/api-response/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   env.response.content_type = "text/html"
 
   "jsonpCallback({\"data\":\"#{query}\"})"
@@ -56,7 +56,7 @@ end
 Xssmaze.push("api-response-level5", "/api-response/level5/?query=a", "HTML fragment response without full document structure",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/api-response/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   env.response.content_type = "text/html"
 
   "<div class=\"result\">#{query}</div>"
@@ -69,7 +69,7 @@ end
 Xssmaze.push("api-response-level6", "/api-response/level6/?query=a", "Plain text error response with text/html content type",
   vuln: "reflected-html", delivery: ["query"], note: "plain-text-looking body, but the response is served as text/html")
 maze_get "/api-response/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   env.response.content_type = "text/html"
 
   "Error: #{query}"

@@ -5,7 +5,7 @@
 Xssmaze.push("manifest-level1", "/manifest/level1/?query=a", "page fetches manifest.json and innerHTMLs description field",
   vuln: "dom", sources: ["fetch-response"], sinks: ["innerHTML"], delivery: ["query"], note: "the value is JSON-escaped into the page, echoed by /manifest/level1/manifest.json and innerHTMLed; a double quote breaks the JSON, and innerHTML does not run a bare <script>, so use <img src=x onerror=...>")
 maze_get "/manifest/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   "<div id='out'></div>
    <script>
      fetch('/manifest/level1/manifest.json?query=' + encodeURIComponent(#{query.to_json}))
@@ -16,6 +16,6 @@ end
 
 maze_get "/manifest/level1/manifest.json" do |env|
   env.response.content_type = "application/json"
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   %({"description": "#{query}"})
 end

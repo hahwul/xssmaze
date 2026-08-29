@@ -1,7 +1,7 @@
 Xssmaze.push("websocket-xss-level1", "/websocket/level1/?query=a", "WebSocket message XSS (basic)",
   vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "simulated socket message: the value is server-inlined into a JS string, not received over a real WebSocket")
 maze_get "/websocket/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>WebSocket XSS Level 1</h1>
@@ -22,7 +22,7 @@ end
 Xssmaze.push("websocket-xss-level2", "/websocket/level2/?query=a", "WebSocket JSON message XSS",
   vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "simulated socket message laundered through a JSON.parse round-trip")
 maze_get "/websocket/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>WebSocket XSS Level 2</h1>
@@ -44,7 +44,7 @@ end
 Xssmaze.push("websocket-xss-level3", "/websocket/level3/?query=a", "WebSocket with HTML message rendering",
   vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "simulated socket message concatenated into innerHTML")
 maze_get "/websocket/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>WebSocket XSS Level 3</h1>
@@ -72,7 +72,7 @@ end
 Xssmaze.push("websocket-xss-level4", "/websocket/level4/?query=a", "WebSocket with eval-based message processing",
   vuln: "dom", sources: ["server-reflected"], sinks: ["eval", "innerHTML"], delivery: ["query"], note: "simulated socket command passed to eval")
 maze_get "/websocket/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>WebSocket XSS Level 4</h1>
@@ -97,7 +97,7 @@ end
 Xssmaze.push("websocket-xss-level5", "/websocket/level5/?query=a", "WebSocket with DOM manipulation",
   vuln: "dom", sources: ["server-reflected"], sinks: ["setAttribute", "event-handler-attribute"], delivery: ["query"], note: "sets an onclick attribute from a JSON-parsed message; requires a user click")
 maze_get "/websocket/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>WebSocket XSS Level 5</h1>

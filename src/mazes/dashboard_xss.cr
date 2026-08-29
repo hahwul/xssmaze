@@ -3,7 +3,7 @@
 Xssmaze.push("dashboard-level1", "/dashboard/level1/?query=a", "dashboard card header raw reflection",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/dashboard/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><div class=\"card\"><div class=\"card-header\">#{query}</div></div></body></html>"
 end
@@ -14,7 +14,7 @@ end
 Xssmaze.push("dashboard-level2", "/dashboard/level2/?query=a", "admin table cell dual reflection (attr + body)",
   vuln: "reflected-html", delivery: ["query"], note: "reflected into both a title attribute and the cell body; the body is a direct HTML injection")
 maze_get "/dashboard/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><table><tr><td class=\"text-truncate\" title=\"#{query}\">#{query}</td></tr></table></body></html>"
 end
@@ -24,7 +24,7 @@ end
 Xssmaze.push("dashboard-level3", "/dashboard/level3/?query=a", "notification alert raw reflection",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/dashboard/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><div class=\"alert alert-info\" role=\"alert\">#{query}</div></body></html>"
 end
@@ -34,7 +34,7 @@ end
 Xssmaze.push("dashboard-level4", "/dashboard/level4/?query=a", "sidebar nav-link raw reflection",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/dashboard/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><ul class=\"nav\"><li class=\"nav-item\"><a class=\"nav-link\" href=\"#\">#{query}</a></li></ul></body></html>"
 end
@@ -44,7 +44,7 @@ end
 Xssmaze.push("dashboard-level5", "/dashboard/level5/?query=a", "modal body raw reflection",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/dashboard/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><div class=\"modal\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-body\"><p>#{query}</p></div></div></div></div></body></html>"
 end
@@ -54,7 +54,7 @@ end
 Xssmaze.push("dashboard-level6", "/dashboard/level6/?query=a", "status badge raw reflection",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/dashboard/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><span class=\"badge badge-primary\">#{query}</span></body></html>"
 end

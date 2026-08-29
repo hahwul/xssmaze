@@ -3,7 +3,7 @@
 Xssmaze.push("cmspattern-level1", "/cmspattern/level1/?query=a", "WordPress post title raw reflection",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/cmspattern/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><h1 class=\"entry-title\">#{query}</h1></body></html>"
 end
@@ -13,7 +13,7 @@ end
 Xssmaze.push("cmspattern-level2", "/cmspattern/level2/?query=a", "WordPress widget title raw reflection",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/cmspattern/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><div class=\"widget\"><h3 class=\"widget-title\">#{query}</h3></div></body></html>"
 end
@@ -23,7 +23,7 @@ end
 Xssmaze.push("cmspattern-level3", "/cmspattern/level3/?query=a", "Drupal field body raw reflection",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/cmspattern/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><div class=\"field field--name-body\"><p>#{query}</p></div></body></html>"
 end
@@ -33,7 +33,7 @@ end
 Xssmaze.push("cmspattern-level4", "/cmspattern/level4/?query=a", "Joomla module heading raw reflection",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/cmspattern/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><div class=\"moduletable\"><h3>#{query}</h3><div class=\"module-body\">content</div></div></body></html>"
 end
@@ -43,7 +43,7 @@ end
 Xssmaze.push("cmspattern-level5", "/cmspattern/level5/?query=a", "Ghost blog excerpt raw reflection",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/cmspattern/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><p class=\"post-card-excerpt\">#{query}</p></body></html>"
 end
@@ -53,7 +53,7 @@ end
 Xssmaze.push("cmspattern-level6", "/cmspattern/level6/?query=a", "Medium-style article content raw reflection",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/cmspattern/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><article><section><div class=\"section-content\"><p>#{query}</p></div></section></article></body></html>"
 end

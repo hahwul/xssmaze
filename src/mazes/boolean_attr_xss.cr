@@ -2,7 +2,7 @@
 Xssmaze.push("booleanattr-level1", "/booleanattr/level1/?query=true", "boolean attr context in checkbox checked",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/booleanattr/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Boolean Attr XSS Level 1</h1>
@@ -14,7 +14,7 @@ end
 Xssmaze.push("booleanattr-level2", "/booleanattr/level2/?query=true", "boolean attr context in select multiple",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/booleanattr/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Boolean Attr XSS Level 2</h1>
@@ -26,7 +26,7 @@ end
 Xssmaze.push("booleanattr-level3", "/booleanattr/level3/?query=true", "boolean attr context in input readonly",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/booleanattr/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Boolean Attr XSS Level 3</h1>
@@ -38,7 +38,7 @@ end
 Xssmaze.push("booleanattr-level4", "/booleanattr/level4/?query=true", "boolean attr context in button disabled",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/booleanattr/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Boolean Attr XSS Level 4</h1>
@@ -50,7 +50,7 @@ end
 Xssmaze.push("booleanattr-level5", "/booleanattr/level5/?query=true", "boolean attr context in details open",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/booleanattr/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Boolean Attr XSS Level 5</h1>
@@ -62,7 +62,7 @@ end
 Xssmaze.push("booleanattr-level6", "/booleanattr/level6/?query=true", "boolean attr context in input autofocus",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/booleanattr/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Boolean Attr XSS Level 6</h1>

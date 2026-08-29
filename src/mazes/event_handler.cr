@@ -24,34 +24,34 @@ end
 Xssmaze.push("eventhandler-xss-level1", "/eventhandler/level1/?query=a", "eventhandler-xss (basic)",
   vuln: "reflected-attr", delivery: ["query"], note: "angle brackets are stripped, so no tag can be opened; the payload has to be a bare attribute injected into the wrapper <div ...>, e.g. onmouseover=alert(1), and needs its event to fire")
 maze_get "/eventhandler/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   EventHandlerHelper.build_html(query)
 end
 
 Xssmaze.push("eventhandler-xss-level2", "/eventhandler/level2/?query=a", "eventhandler-xss (level 2)",
   vuln: "reflected-attr", delivery: ["query"], note: "as level 1, and onerror/onload/onclick are removed by name; other handlers survive")
 maze_get "/eventhandler/level2/" do |env|
-  query = EventHandlerHelper.sanitize(env.params.query["query"], 2)
+  query = EventHandlerHelper.sanitize(env.params.query.fetch("query", ""), 2)
   EventHandlerHelper.build_html(query)
 end
 
 Xssmaze.push("eventhandler-xss-level3", "/eventhandler/level3/?query=a", "eventhandler-xss (level 3)",
   vuln: "reflected-attr", delivery: ["query"], note: "as level 1, and seven handler names are removed; unlisted ones such as ondblclick survive")
 maze_get "/eventhandler/level3/" do |env|
-  query = EventHandlerHelper.sanitize(env.params.query["query"], 3)
+  query = EventHandlerHelper.sanitize(env.params.query.fetch("query", ""), 3)
   EventHandlerHelper.build_html(query)
 end
 
 Xssmaze.push("eventhandler-xss-level4", "/eventhandler/level4/?query=a", "eventhandler-xss (level 4)",
   vuln: "reflected-attr", delivery: ["query"], note: "as level 1, and animation/drag handlers plus javascript: are removed; ontoggle and onpointerover survive")
 maze_get "/eventhandler/level4/" do |env|
-  query = EventHandlerHelper.sanitize(env.params.query["query"], 4)
+  query = EventHandlerHelper.sanitize(env.params.query.fetch("query", ""), 4)
   EventHandlerHelper.build_html(query)
 end
 
 Xssmaze.push("eventhandler-xss-level5", "/eventhandler/level5/?query=a", "eventhandler-xss (level 5)",
   vuln: "reflected-attr", delivery: ["query"], note: "as level 1, with a long handler denylist stripped in a single pass, so ononclickclick= rejoins into onclick=")
 maze_get "/eventhandler/level5/" do |env|
-  query = EventHandlerHelper.sanitize(env.params.query["query"], 5)
+  query = EventHandlerHelper.sanitize(env.params.query.fetch("query", ""), 5)
   EventHandlerHelper.build_html(query)
 end

@@ -4,7 +4,7 @@
 Xssmaze.push("inlinestyle-level1", "/inlinestyle/level1/?query=a", "reflection in inline style color value (double-quoted)",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/inlinestyle/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <div style=\"color: #{query}\">text</div>
@@ -17,7 +17,7 @@ end
 Xssmaze.push("inlinestyle-level2", "/inlinestyle/level2/?query=a", "reflection inside url() in inline style (single-quoted url, double-quoted attr)",
   vuln: "reflected-attr", delivery: ["query"], note: "inside a single-quoted url() in a style attribute; close the single quote then break the attribute with the double quote")
 maze_get "/inlinestyle/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <p style=\"background-image: url('#{query}')\">text</p>
@@ -30,7 +30,7 @@ end
 Xssmaze.push("inlinestyle-level3", "/inlinestyle/level3/?query=a", "reflection inside font-family in inline style (single-quoted value, double-quoted attr)",
   vuln: "reflected-attr", delivery: ["query"], note: "inside a single-quoted font-family; close the single quote then break the attribute with the double quote")
 maze_get "/inlinestyle/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <span style=\"font-family: '#{query}'\">text</span>
@@ -43,7 +43,7 @@ end
 Xssmaze.push("inlinestyle-level4", "/inlinestyle/level4/?query=a", "reflection inside content in inline style (single-quoted value, double-quoted attr)",
   vuln: "reflected-attr", delivery: ["query"], note: "inside a single-quoted content value; close the single quote then break the attribute with the double quote")
 maze_get "/inlinestyle/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <div style=\"content: '#{query}'\">text</div>
@@ -56,7 +56,7 @@ end
 Xssmaze.push("inlinestyle-level5", "/inlinestyle/level5/?query=a", "reflection in inline style width value (no inner quotes, double-quoted attr)",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/inlinestyle/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <table><tr><td style=\"width: #{query}\">data</td></tr></table>
@@ -69,7 +69,7 @@ end
 Xssmaze.push("inlinestyle-level6", "/inlinestyle/level6/?query=a", "reflection as entire inline style value (double-quoted attr)",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/inlinestyle/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <div style=\"#{query}\">text</div>
