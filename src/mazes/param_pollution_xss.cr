@@ -1,6 +1,7 @@
 # Level 1: First param value used for display, second for filter check
 # HPP: duplicate param names cause different server behavior
-Xssmaze.push("hpp-level1", "/hpp/level1/?query=safe&query=a", "HTTP parameter pollution (first wins display)")
+Xssmaze.push("hpp-level1", "/hpp/level1/?query=safe&query=a", "HTTP parameter pollution (first wins display)",
+  vuln: "reflected-html", delivery: ["query"], note: "the first query value is what gets displayed but the last one is what the angle-bracket check inspects; send the payload first and a clean value second")
 maze_get "/hpp/level1/" do |env|
   values = env.params.query.fetch_all("query")
   # Server uses first value for display but checks last for filtering
@@ -15,7 +16,8 @@ maze_get "/hpp/level1/" do |env|
 end
 
 # Level 2: Param splitting - query and q both reflected, but only query is filtered
-Xssmaze.push("hpp-level2", "/hpp/level2/?query=a&q=b", "param split: query filtered, q unfiltered")
+Xssmaze.push("hpp-level2", "/hpp/level2/?query=a&q=b", "param split: query filtered, q unfiltered", "GET", ["query", "q"],
+  vuln: "reflected-html", delivery: ["query"], note: "the injectable parameter is q; query has its angle brackets stripped")
 maze_get "/hpp/level2/" do |env|
   query = Filters.strip_angles(env.params.query.fetch("query", "a"))
   q = env.params.query.fetch("q", "b")
@@ -24,7 +26,8 @@ maze_get "/hpp/level2/" do |env|
 end
 
 # Level 3: Array parameter injection
-Xssmaze.push("hpp-level3", "/hpp/level3/?items[]=a&items[]=b", "array parameter injection")
+Xssmaze.push("hpp-level3", "/hpp/level3/?items[]=a&items[]=b", "array parameter injection", "GET", ["items[]"],
+  vuln: "reflected-html", delivery: ["query"], note: "the parameter name is the literal items[], and every repeat of it is reflected into its own list item")
 maze_get "/hpp/level3/" do |env|
   items = env.params.query.fetch_all("items[]")
 
@@ -32,7 +35,8 @@ maze_get "/hpp/level3/" do |env|
 end
 
 # Level 4: Param with dot notation (config.theme)
-Xssmaze.push("hpp-level4", "/hpp/level4/?config.theme=blue", "dot-notation parameter reflection")
+Xssmaze.push("hpp-level4", "/hpp/level4/?config.theme=blue", "dot-notation parameter reflection", "GET", ["config.theme"],
+  vuln: "reflected-attr", delivery: ["query"], note: "the parameter name is the literal config.theme; the value lands in the double-quoted style attribute of <body>")
 maze_get "/hpp/level4/" do |env|
   theme = env.params.query.fetch("config.theme", "default")
 

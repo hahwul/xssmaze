@@ -7,7 +7,8 @@
 # Mirrors CVE-2020-12625 / countless reports against IdP login pages
 # that echo the raw `redirect_uri` into a "Continue to ..." link or
 # a hidden form. The attribute is single-quoted and unencoded.
-Xssmaze.push("bugbounty-level1", "/bugbounty/level1/?redirect_uri=https://app.example.com/cb", "OAuth redirect_uri reflected in login form action", "GET", ["redirect_uri"])
+Xssmaze.push("bugbounty-level1", "/bugbounty/level1/?redirect_uri=https://app.example.com/cb", "OAuth redirect_uri reflected in login form action", "GET", ["redirect_uri"],
+  vuln: "reflected-attr", delivery: ["query"], note: "reflected into two single-quoted attributes: an anchor href and a hidden input value")
 maze_get "/bugbounty/level1/" do |env|
   redirect_uri = env.params.query.fetch("redirect_uri", "/")
 
@@ -27,7 +28,8 @@ end
 # raw `error_description` query param into the error page. Bug bounty
 # reports against these flows are still common — see HackerOne reports
 # under the OAuth/SSO tag.
-Xssmaze.push("bugbounty-level2", "/bugbounty/level2/?error=invalid_request&error_description=bad+input", "OAuth error_description reflected on callback", "GET", ["error_description"])
+Xssmaze.push("bugbounty-level2", "/bugbounty/level2/?error=invalid_request&error_description=bad+input", "OAuth error_description reflected on callback", "GET", ["error", "error_description"],
+  vuln: "reflected-html", delivery: ["query"], note: "both error and error_description are reflected raw into the body")
 maze_get "/bugbounty/level2/" do |env|
   err = env.params.query.fetch("error", "unknown_error")
   desc = env.params.query.fetch("error_description", "")
@@ -46,7 +48,8 @@ end
 # the user's query into the page title without escaping. Quick wins
 # for any scanner: `</title><script>alert(1)</script>` breaks out and
 # executes. Direct reflection, no chain required.
-Xssmaze.push("bugbounty-level3", "/bugbounty/level3/?q=widget", "search query reflected into <title>", "GET", ["q"])
+Xssmaze.push("bugbounty-level3", "/bugbounty/level3/?q=widget", "search query reflected into <title>", "GET", ["q"],
+  vuln: "reflected-html", delivery: ["query"], note: "lands inside <title>, an RCDATA context; close the title tag before injecting markup")
 maze_get "/bugbounty/level3/" do |env|
   q = env.params.query.fetch("q", "")
 
@@ -63,7 +66,8 @@ end
 # build the form server-side with naive string concat allow attribute
 # breakout — historically observed in WordPress plugins, Laravel
 # apps, and several Drupal modules.
-Xssmaze.push("bugbounty-level4", "/bugbounty/level4/?token=abc123", "password reset token in hidden input (attribute breakout)", "GET", ["token"])
+Xssmaze.push("bugbounty-level4", "/bugbounty/level4/?token=abc123", "password reset token in hidden input (attribute breakout)", "GET", ["token"],
+  vuln: "reflected-attr", delivery: ["query"], note: "the input is type=hidden, so an event handler added to it never fires; break out into a new tag")
 maze_get "/bugbounty/level4/" do |env|
   token = env.params.query.fetch("token", "")
 
@@ -82,7 +86,8 @@ end
 # name back to the user. The filename arrives from the multipart
 # `filename` parameter (Content-Disposition) — attacker-controlled.
 # Both attribute and body contexts are exploitable.
-Xssmaze.push("bugbounty-level5", "/bugbounty/level5/?filename=cat.png", "upload filename reflected in img alt + caption", "GET", ["filename"])
+Xssmaze.push("bugbounty-level5", "/bugbounty/level5/?filename=cat.png", "upload filename reflected in img alt + caption", "GET", ["filename"],
+  vuln: "reflected-html", delivery: ["query"], note: "reflected twice: a single-quoted img alt attribute and the figcaption body text")
 maze_get "/bugbounty/level5/" do |env|
   filename = env.params.query.fetch("filename", "image.png")
 
@@ -101,7 +106,8 @@ end
 # let a user pick this value via querystring (admin preview, multi-
 # tenant dashboards) leak the attribute context into an inline script
 # block.
-Xssmaze.push("bugbounty-level6", "/bugbounty/level6/?shortname=test", "third-party embed snippet with reflected data attr", "GET", ["shortname"])
+Xssmaze.push("bugbounty-level6", "/bugbounty/level6/?shortname=test", "third-party embed snippet with reflected data attr", "GET", ["shortname"],
+  vuln: "reflected-js", delivery: ["query"], note: "lands in two single-quoted JS strings inside an inline script, one of them a script src being built")
 maze_get "/bugbounty/level6/" do |env|
   shortname = env.params.query.fetch("shortname", "demo")
 
@@ -126,7 +132,8 @@ end
 # an attacker injects via X-Forwarded-Host and the resulting <base>
 # rewrites every subsequent relative resource. Documented by James
 # Kettle's PortSwigger research and replicated in many bounty reports.
-Xssmaze.push("bugbounty-level7", "/bugbounty/level7/", "X-Forwarded-Host reflected in <base href> (cache poison chain)", "GET", ["X-Forwarded-Host"])
+Xssmaze.push("bugbounty-level7", "/bugbounty/level7/", "X-Forwarded-Host reflected in <base href> (cache poison chain)", "GET", ["X-Forwarded-Host"],
+  vuln: "reflected-attr", delivery: ["header"], note: "the payload arrives in the X-Forwarded-Host request header, not the query string; it lands in a double-quoted <base href> and a <link> href")
 maze_get "/bugbounty/level7/" do |env|
   host = env.request.headers.fetch("X-Forwarded-Host", env.request.headers.fetch("Host", "localhost"))
 
@@ -143,7 +150,8 @@ end
 # GitLab, Gitea, and self-hosted Git UIs have repeatedly shipped XSS
 # via branch / tag / ref parameters (CVE-2021-22214 lineage). The ref
 # lands in a breadcrumb link plus a header.
-Xssmaze.push("bugbounty-level8", "/bugbounty/level8/?ref=main", "git ref/branch name reflected in breadcrumb + header", "GET", ["ref"])
+Xssmaze.push("bugbounty-level8", "/bugbounty/level8/?ref=main", "git ref/branch name reflected in breadcrumb + header", "GET", ["ref"],
+  vuln: "reflected-html", delivery: ["query"], note: "reflected into a single-quoted href and again as body text")
 maze_get "/bugbounty/level8/" do |env|
   ref = env.params.query.fetch("ref", "main")
 
@@ -160,7 +168,8 @@ end
 # bad value back in the form. Quote-only escaping is applied, but
 # angle brackets pass through — exactly the regression seen in many
 # SaaS signup pages.
-Xssmaze.push("bugbounty-level9", "/bugbounty/level9/?email=bad", "validation error reflecting bad input (angle brackets unfiltered)", "GET", ["email"])
+Xssmaze.push("bugbounty-level9", "/bugbounty/level9/?email=bad", "validation error reflecting bad input (angle brackets unfiltered)", "GET", ["email"],
+  vuln: "reflected-html", delivery: ["query"], note: "both quote characters are entity-encoded, so the input value attribute cannot be broken out of; the alert body reflection still takes raw angle brackets")
 maze_get "/bugbounty/level9/" do |env|
   email = Filters.escape_quotes(env.params.query.fetch("email", ""))
 
@@ -180,7 +189,8 @@ end
 # endpoint sets content-type to application/json but the response is
 # HTML-flavoured and browsers sniff it when navigated to directly.
 # Several CVEs against image/file servers match this shape.
-Xssmaze.push("bugbounty-level10", "/bugbounty/level10/?msg=hi", "JSON endpoint sniffable as HTML (no nosniff)", "GET", ["msg"])
+Xssmaze.push("bugbounty-level10", "/bugbounty/level10/?msg=hi", "JSON endpoint sniffable as HTML (no nosniff)", "GET", ["msg"],
+  vuln: "non-xss-control", delivery: ["query"], exploitable: false, note: "the body is HTML but the response is served as application/json; no modern browser sniffs that into a document, so the markup never executes")
 maze_get "/bugbounty/level10/" do |env|
   msg = env.params.query.fetch("msg", "")
   env.response.content_type = "application/json"

@@ -1,5 +1,6 @@
 # Level 1: Reflection inside <option> tag value
-Xssmaze.push("specialtag-level1", "/specialtag/level1/?query=a", "reflection in option value attribute")
+Xssmaze.push("specialtag-level1", "/specialtag/level1/?query=a", "reflection in option value attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/specialtag/level1/" do |env|
   query = env.params.query["query"]
 
@@ -7,7 +8,8 @@ maze_get "/specialtag/level1/" do |env|
 end
 
 # Level 2: Reflection inside <meta> tag content
-Xssmaze.push("specialtag-level2", "/specialtag/level2/?query=a", "reflection in meta tag content")
+Xssmaze.push("specialtag-level2", "/specialtag/level2/?query=a", "reflection in meta tag content",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/specialtag/level2/" do |env|
   query = env.params.query["query"]
 
@@ -15,7 +17,8 @@ maze_get "/specialtag/level2/" do |env|
 end
 
 # Level 3: Reflection inside <button> with value attribute
-Xssmaze.push("specialtag-level3", "/specialtag/level3/?query=a", "button value attribute (formaction possible)")
+Xssmaze.push("specialtag-level3", "/specialtag/level3/?query=a", "button value attribute (formaction possible)",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/specialtag/level3/" do |env|
   query = env.params.query["query"]
 
@@ -23,7 +26,8 @@ maze_get "/specialtag/level3/" do |env|
 end
 
 # Level 4: Reflection in <base> tag href
-Xssmaze.push("specialtag-level4", "/specialtag/level4/?query=a", "base tag href injection")
+Xssmaze.push("specialtag-level4", "/specialtag/level4/?query=a", "base tag href injection",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/specialtag/level4/" do |env|
   query = env.params.query["query"]
 
@@ -31,7 +35,8 @@ maze_get "/specialtag/level4/" do |env|
 end
 
 # Level 5: Input in <img> alt attribute (< > stripped, attribute breakout possible)
-Xssmaze.push("specialtag-level5", "/specialtag/level5/?query=a", "img alt attribute (angle stripped)")
+Xssmaze.push("specialtag-level5", "/specialtag/level5/?query=a", "img alt attribute (angle stripped)",
+  vuln: "reflected-attr", delivery: ["query"], note: "angle brackets are stripped, so break out of the quote and add a handler to the image itself; /logo.png does not exist, so an injected onerror fires on its own")
 maze_get "/specialtag/level5/" do |env|
   query = Filters.strip_angles(env.params.query["query"])
 
@@ -39,7 +44,8 @@ maze_get "/specialtag/level5/" do |env|
 end
 
 # Level 6: Reflection in srcdoc attribute of iframe
-Xssmaze.push("specialtag-level6", "/specialtag/level6/?query=a", "iframe srcdoc attribute injection")
+Xssmaze.push("specialtag-level6", "/specialtag/level6/?query=a", "iframe srcdoc attribute injection",
+  vuln: "reflected-attr", sinks: ["srcdoc"], delivery: ["query"], note: "the srcdoc attribute is double-quoted, so quote the injected markup with single quotes or entities")
 maze_get "/specialtag/level6/" do |env|
   query = env.params.query["query"]
 
@@ -47,7 +53,8 @@ maze_get "/specialtag/level6/" do |env|
 end
 
 # Level 7: Reflection in <object> data attribute
-Xssmaze.push("specialtag-level7", "/specialtag/level7/?query=a", "object data attribute injection")
+Xssmaze.push("specialtag-level7", "/specialtag/level7/?query=a", "object data attribute injection",
+  vuln: "reflected-attr", delivery: ["query"], note: "an object data URL is not a script sink on its own; break out of the double-quoted attribute")
 maze_get "/specialtag/level7/" do |env|
   query = env.params.query["query"]
 
@@ -55,7 +62,8 @@ maze_get "/specialtag/level7/" do |env|
 end
 
 # Level 8: Reflection in unquoted img src (space-terminated)
-Xssmaze.push("specialtag-level8", "/specialtag/level8/?query=a", "unquoted src attribute injection")
+Xssmaze.push("specialtag-level8", "/specialtag/level8/?query=a", "unquoted src attribute injection",
+  vuln: "reflected-attr", delivery: ["query"], note: "the src attribute is unquoted, so a space is enough to start a new attribute")
 maze_get "/specialtag/level8/" do |env|
   query = env.params.query["query"]
 

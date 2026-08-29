@@ -1,7 +1,8 @@
 # Level 1: Reflection in og:title meta tag content attribute
 # Bypass: break out of content attribute with " then inject new tag
 # e.g. "><script>alert(1)</script>
-Xssmaze.push("seoctx-level1", "/seoctx/level1/?query=a", "reflection in og:title meta content attribute")
+Xssmaze.push("seoctx-level1", "/seoctx/level1/?query=a", "reflection in og:title meta content attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/seoctx/level1/" do |env|
   query = env.params.query["query"]
 
@@ -11,7 +12,8 @@ end
 # Level 2: Reflection in keywords meta tag content attribute
 # Bypass: break out of content attribute with " then inject new tag
 # e.g. "><script>alert(1)</script>
-Xssmaze.push("seoctx-level2", "/seoctx/level2/?query=a", "reflection in keywords meta content attribute")
+Xssmaze.push("seoctx-level2", "/seoctx/level2/?query=a", "reflection in keywords meta content attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/seoctx/level2/" do |env|
   query = env.params.query["query"]
 
@@ -21,7 +23,8 @@ end
 # Level 3: Reflection in og:description meta tag content attribute
 # Bypass: break out of content attribute with " then inject new tag
 # e.g. "><script>alert(1)</script>
-Xssmaze.push("seoctx-level3", "/seoctx/level3/?query=a", "reflection in og:description meta content attribute")
+Xssmaze.push("seoctx-level3", "/seoctx/level3/?query=a", "reflection in og:description meta content attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/seoctx/level3/" do |env|
   query = env.params.query["query"]
 
@@ -31,7 +34,8 @@ end
 # Level 4: Reflection in og:url meta tag content attribute
 # Bypass: break out of content attribute with " then inject new tag
 # e.g. "><script>alert(1)</script>
-Xssmaze.push("seoctx-level4", "/seoctx/level4/?query=a", "reflection in og:url meta content attribute")
+Xssmaze.push("seoctx-level4", "/seoctx/level4/?query=a", "reflection in og:url meta content attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/seoctx/level4/" do |env|
   query = env.params.query["query"]
 
@@ -41,7 +45,8 @@ end
 # Level 5: Reflection in canonical link href attribute
 # Bypass: break out of href attribute with " then inject new tag
 # e.g. "><script>alert(1)</script>
-Xssmaze.push("seoctx-level5", "/seoctx/level5/?query=a", "reflection in canonical link href attribute")
+Xssmaze.push("seoctx-level5", "/seoctx/level5/?query=a", "reflection in canonical link href attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/seoctx/level5/" do |env|
   query = env.params.query["query"]
 
@@ -51,7 +56,8 @@ end
 # Level 6: Dual reflection - in meta author content AND in body span
 # Bypass: either context is exploitable; body span is easiest with raw HTML injection
 # e.g. <script>alert(1)</script>
-Xssmaze.push("seoctx-level6", "/seoctx/level6/?query=a", "dual reflection in meta author and body span")
+Xssmaze.push("seoctx-level6", "/seoctx/level6/?query=a", "dual reflection in meta author and body span",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected into the meta content attribute and again as span text; the span copy takes markup directly")
 maze_get "/seoctx/level6/" do |env|
   query = env.params.query["query"]
 

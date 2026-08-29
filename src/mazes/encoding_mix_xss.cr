@@ -1,7 +1,8 @@
 # Level 1: UTF-7 Content-Type allowing +ADw-script+AD4- injection
 # Exploit: +ADw-script+AD4-alert(1)+ADw-/script+AD4- which is UTF-7 for <script>alert(1)</script>
 # Or just use raw <script>alert(1)</script> since the body is not encoded
-Xssmaze.push("encmix-level1", "/encmix/level1/?query=a", "UTF-7 charset in Content-Type with raw reflection")
+Xssmaze.push("encmix-level1", "/encmix/level1/?query=a", "UTF-7 charset in Content-Type with raw reflection",
+  vuln: "reflected-html", delivery: ["query"], note: "no modern browser decodes UTF-7, but the reflection is raw, so a plain payload works regardless of the declared charset")
 maze_get "/encmix/level1/" do |env|
   query = env.params.query["query"]
   env.response.content_type = "text/html; charset=utf-7"
@@ -16,7 +17,8 @@ end
 # The server encodes < to &lt; and > to &gt;, but & is left raw
 # Exploit: &#x3c;script&#x3e;alert(1)&#x3c;/script&#x3e; — server does not re-encode the &
 # so the HTML entities are preserved and the browser decodes them to <script>alert(1)</script>
-Xssmaze.push("encmix-level2", "/encmix/level2/?query=a", "HTML entity encode < > but not & (double-entity bypass)")
+Xssmaze.push("encmix-level2", "/encmix/level2/?query=a", "HTML entity encode < > but not & (double-entity bypass)",
+  vuln: "non-xss-control", delivery: ["query"], exploitable: false, note: "both angle brackets are entity-encoded before reflection, and an entity in a text node decodes to a character rather than markup, so the numeric-entity payload only renders as visible text")
 maze_get "/encmix/level2/" do |env|
   query = env.params.query["query"]
   # Only encode literal < and > but leave & untouched
@@ -32,7 +34,8 @@ end
 # The server escapes ' with \' but does not filter \uXXXX sequences
 # Exploit: \u003cimg src=x onerror=alert(1)\u003e — JS interprets unicode escapes in strings
 # Or break out with: </script><img src=x onerror=alert(1)>
-Xssmaze.push("encmix-level3", "/encmix/level3/?query=a", "JS string with backslash escape but no unicode filtering")
+Xssmaze.push("encmix-level3", "/encmix/level3/?query=a", "JS string with backslash escape but no unicode filtering",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "backslashes and single quotes are escaped, so neither a string breakout nor a unicode escape survives; the value still reaches innerHTML as raw HTML")
 maze_get "/encmix/level3/" do |env|
   query = env.params.query["query"]
   # Escape single quotes and backslashes for the JS string
@@ -52,7 +55,8 @@ end
 # The server builds a JSON response but serves it as text/html
 # Exploit: Break out of JSON string value and inject HTML tags
 # e.g. </script><img src=x onerror=alert(1)> or just raw HTML in the JSON context
-Xssmaze.push("encmix-level4", "/encmix/level4/?query=a", "JSON context served as text/html")
+Xssmaze.push("encmix-level4", "/encmix/level4/?query=a", "JSON context served as text/html",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "the value is server-inlined raw into a double-quoted JS string and then written to innerHTML; closing the <script> block works too")
 maze_get "/encmix/level4/" do |env|
   query = env.params.query["query"]
   env.response.content_type = "text/html"
@@ -74,7 +78,8 @@ end
 # Second occurrence of < > remains raw
 # Exploit: Use two sets of angle brackets — first pair gets encoded, second pair is raw
 # e.g. <x><img src=x onerror=alert(1)>
-Xssmaze.push("encmix-level5", "/encmix/level5/?query=a", "HTML encode only first < and > (second reflection raw)")
+Xssmaze.push("encmix-level5", "/encmix/level5/?query=a", "HTML encode only first < and > (second reflection raw)",
+  vuln: "reflected-html", delivery: ["query"], note: "the server URL-decodes once, then entity-encodes only the first < and the first >")
 maze_get "/encmix/level5/" do |env|
   query = env.params.query["query"]
 
@@ -97,7 +102,8 @@ end
 # Serves content with charset=iso-8859-1 and reflects input without encoding
 # This can cause character interpretation differences with high-byte characters
 # Exploit: Standard XSS payloads work since there is no filtering: <script>alert(1)</script>
-Xssmaze.push("encmix-level6", "/encmix/level6/?query=a", "ISO-8859-1 charset with raw reflection")
+Xssmaze.push("encmix-level6", "/encmix/level6/?query=a", "ISO-8859-1 charset with raw reflection",
+  vuln: "reflected-html", delivery: ["query"], note: "the iso-8859-1 charset is incidental; the reflection itself is raw")
 maze_get "/encmix/level6/" do |env|
   query = env.params.query["query"]
   env.response.content_type = "text/html; charset=iso-8859-1"

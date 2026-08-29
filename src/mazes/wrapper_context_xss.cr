@@ -1,5 +1,6 @@
 # Level 1: Query wrapped in <b> and <i> tags - standard injection
-Xssmaze.push("wrappercontext-level1", "/wrappercontext/level1/?query=a", "reflection wrapped in bold+italic tags")
+Xssmaze.push("wrappercontext-level1", "/wrappercontext/level1/?query=a", "reflection wrapped in bold+italic tags",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/wrappercontext/level1/" do |env|
   query = env.params.query["query"]
 
@@ -7,7 +8,8 @@ maze_get "/wrappercontext/level1/" do |env|
 end
 
 # Level 2: Query wrapped in <span style="color:red"> - standard injection
-Xssmaze.push("wrappercontext-level2", "/wrappercontext/level2/?query=a", "reflection wrapped in styled span")
+Xssmaze.push("wrappercontext-level2", "/wrappercontext/level2/?query=a", "reflection wrapped in styled span",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/wrappercontext/level2/" do |env|
   query = env.params.query["query"]
 
@@ -15,7 +17,8 @@ maze_get "/wrappercontext/level2/" do |env|
 end
 
 # Level 3: Query wrapped in <a href="#"> - inject tags within link text
-Xssmaze.push("wrappercontext-level3", "/wrappercontext/level3/?query=a", "reflection wrapped in anchor tag text")
+Xssmaze.push("wrappercontext-level3", "/wrappercontext/level3/?query=a", "reflection wrapped in anchor tag text",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/wrappercontext/level3/" do |env|
   query = env.params.query["query"]
 
@@ -23,7 +26,8 @@ maze_get "/wrappercontext/level3/" do |env|
 end
 
 # Level 4: Query wrapped in <small><em> - standard injection
-Xssmaze.push("wrappercontext-level4", "/wrappercontext/level4/?query=a", "reflection wrapped in small+em tags")
+Xssmaze.push("wrappercontext-level4", "/wrappercontext/level4/?query=a", "reflection wrapped in small+em tags",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/wrappercontext/level4/" do |env|
   query = env.params.query["query"]
 
@@ -31,7 +35,8 @@ maze_get "/wrappercontext/level4/" do |env|
 end
 
 # Level 5: Query wrapped in <mark> - standard injection
-Xssmaze.push("wrappercontext-level5", "/wrappercontext/level5/?query=a", "reflection wrapped in mark tag")
+Xssmaze.push("wrappercontext-level5", "/wrappercontext/level5/?query=a", "reflection wrapped in mark tag",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/wrappercontext/level5/" do |env|
   query = env.params.query["query"]
 
@@ -39,7 +44,8 @@ maze_get "/wrappercontext/level5/" do |env|
 end
 
 # Level 6: Query wrapped in <abbr title="abbreviation"> - standard injection
-Xssmaze.push("wrappercontext-level6", "/wrappercontext/level6/?query=a", "reflection wrapped in abbr tag")
+Xssmaze.push("wrappercontext-level6", "/wrappercontext/level6/?query=a", "reflection wrapped in abbr tag",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/wrappercontext/level6/" do |env|
   query = env.params.query["query"]
 
