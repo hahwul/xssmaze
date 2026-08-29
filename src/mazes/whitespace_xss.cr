@@ -1,6 +1,7 @@
 # Level 1: All spaces replaced by &nbsp; but in HTML body — tags still work
 # Use / as attribute delimiter instead of space: <img/src=x/onerror=alert(1)>
-Xssmaze.push("whitespace-level1", "/whitespace/level1/?query=a", "spaces replaced with &amp;nbsp; in body")
+Xssmaze.push("whitespace-level1", "/whitespace/level1/?query=a", "spaces replaced with &amp;nbsp; in body",
+  vuln: "reflected-html", delivery: ["query"], note: "spaces become &nbsp; entities, which do not separate attributes; use a slash instead: <img/src=x/onerror=alert(1)>")
 maze_get "/whitespace/level1/" do |env|
   query = env.params.query["query"]
   filtered = query.gsub(" ", "&nbsp;")
@@ -12,7 +13,8 @@ maze_get "/whitespace/level1/" do |env|
 end
 
 # Level 2: Tabs stripped, reflected in HTML body — spaces still work for tags
-Xssmaze.push("whitespace-level2", "/whitespace/level2/?query=a", "tabs stripped, body reflection")
+Xssmaze.push("whitespace-level2", "/whitespace/level2/?query=a", "tabs stripped, body reflection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/whitespace/level2/" do |env|
   query = env.params.query["query"]
   filtered = query.gsub("\t", "")
@@ -24,7 +26,8 @@ maze_get "/whitespace/level2/" do |env|
 end
 
 # Level 3: Newlines stripped, reflected in HTML body — single-line payloads work normally
-Xssmaze.push("whitespace-level3", "/whitespace/level3/?query=a", "newlines stripped, body reflection")
+Xssmaze.push("whitespace-level3", "/whitespace/level3/?query=a", "newlines stripped, body reflection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/whitespace/level3/" do |env|
   query = env.params.query["query"]
   filtered = query.gsub("\n", "").gsub("\r", "")
@@ -36,7 +39,8 @@ maze_get "/whitespace/level3/" do |env|
 end
 
 # Level 4: Multiple spaces collapsed to one, reflected in <div> — standard injection works
-Xssmaze.push("whitespace-level4", "/whitespace/level4/?query=a", "multiple spaces collapsed to one in div")
+Xssmaze.push("whitespace-level4", "/whitespace/level4/?query=a", "multiple spaces collapsed to one in div",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/whitespace/level4/" do |env|
   query = env.params.query["query"]
   filtered = query.gsub(/  +/, " ")
@@ -48,7 +52,8 @@ maze_get "/whitespace/level4/" do |env|
 end
 
 # Level 5: Reflected inside <pre> tag raw (preserves whitespace) — break out with </pre>
-Xssmaze.push("whitespace-level5", "/whitespace/level5/?query=a", "raw reflection inside pre tag")
+Xssmaze.push("whitespace-level5", "/whitespace/level5/?query=a", "raw reflection inside pre tag",
+  vuln: "reflected-html", delivery: ["query"], note: "<pre> is an ordinary element, not raw text, so no </pre> is needed before injecting")
 maze_get "/whitespace/level5/" do |env|
   query = env.params.query["query"]
 
@@ -60,7 +65,8 @@ end
 
 # Level 6: All whitespace (space, tab, newline) stripped, reflected in HTML body
 # Use / as delimiter: <svg/onload=alert(1)>
-Xssmaze.push("whitespace-level6", "/whitespace/level6/?query=a", "all whitespace stripped, body reflection")
+Xssmaze.push("whitespace-level6", "/whitespace/level6/?query=a", "all whitespace stripped, body reflection",
+  vuln: "reflected-html", delivery: ["query"], note: "every whitespace character is stripped; use a slash separator: <svg/onload=alert(1)>")
 maze_get "/whitespace/level6/" do |env|
   query = env.params.query["query"]
   filtered = query.gsub(/[\s]/, "")

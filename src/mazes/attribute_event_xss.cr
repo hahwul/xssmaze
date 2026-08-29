@@ -1,7 +1,8 @@
 # Level 1: Reflection inside onmouseover JS string
 # Query is placed inside a single-quoted JS string in an onmouseover event handler.
 # Bypass: break out with ') then inject new attribute/tag, e.g. ')//
-Xssmaze.push("attr-event-level1", "/attr-event/level1/?query=a", "reflection in onmouseover JS string context")
+Xssmaze.push("attr-event-level1", "/attr-event/level1/?query=a", "reflection in onmouseover JS string context",
+  vuln: "reflected-attr", delivery: ["query"], note: "the handler only runs on hover; the enclosing attribute is double-quoted, so break out of it to inject a self-firing tag")
 maze_get "/attr-event/level1/" do |env|
   query = env.params.query["query"]
 
@@ -11,7 +12,8 @@ end
 # Level 2: Reflection inside onsubmit JS string
 # Query is placed inside a single-quoted JS string in an onsubmit handler.
 # Bypass: break out with ') then inject handler, e.g. ');alert(1)//
-Xssmaze.push("attr-event-level2", "/attr-event/level2/?query=a", "reflection in onsubmit JS string context")
+Xssmaze.push("attr-event-level2", "/attr-event/level2/?query=a", "reflection in onsubmit JS string context",
+  vuln: "reflected-attr", delivery: ["query"], note: "the handler only runs on form submit; the enclosing attribute is double-quoted, so break out of it to inject a self-firing tag")
 maze_get "/attr-event/level2/" do |env|
   query = env.params.query["query"]
 
@@ -21,7 +23,8 @@ end
 # Level 3: Reflection inside onload JS string
 # Query is placed inside a single-quoted JS string in a body onload handler.
 # Bypass: break out with ') then inject, e.g. ');alert(1)//
-Xssmaze.push("attr-event-level3", "/attr-event/level3/?query=a", "reflection in body onload JS string context")
+Xssmaze.push("attr-event-level3", "/attr-event/level3/?query=a", "reflection in body onload JS string context",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/attr-event/level3/" do |env|
   query = env.params.query["query"]
 
@@ -32,7 +35,8 @@ end
 # Query is placed inside a single-quoted JS string in an img onerror handler.
 # The img src is intentionally invalid to trigger onerror.
 # Bypass: break out with ') then inject, e.g. ');alert(1)//
-Xssmaze.push("attr-event-level4", "/attr-event/level4/?query=a", "reflection in img onerror JS string context")
+Xssmaze.push("attr-event-level4", "/attr-event/level4/?query=a", "reflection in img onerror JS string context",
+  vuln: "reflected-attr", delivery: ["query"], note: "the img src is deliberately broken, so the onerror handler fires without interaction")
 maze_get "/attr-event/level4/" do |env|
   query = env.params.query["query"]
 
@@ -42,7 +46,8 @@ end
 # Level 5: Reflection inside onblur JS string
 # Query is placed inside a single-quoted JS string in an input onblur handler.
 # Bypass: break out with ') then inject, e.g. ');alert(1)//
-Xssmaze.push("attr-event-level5", "/attr-event/level5/?query=a", "reflection in input onblur JS string context")
+Xssmaze.push("attr-event-level5", "/attr-event/level5/?query=a", "reflection in input onblur JS string context",
+  vuln: "reflected-attr", delivery: ["query"], note: "the handler only runs when the input loses focus; the enclosing attribute is double-quoted, so break out of it to inject a self-firing tag")
 maze_get "/attr-event/level5/" do |env|
   query = env.params.query["query"]
 
@@ -52,7 +57,8 @@ end
 # Level 6: Reflection inside onclick JS string
 # Query is placed inside a single-quoted JS string in a button onclick handler.
 # Bypass: break out with ') then inject, e.g. ');alert(1)//
-Xssmaze.push("attr-event-level6", "/attr-event/level6/?query=a", "reflection in button onclick JS string context")
+Xssmaze.push("attr-event-level6", "/attr-event/level6/?query=a", "reflection in button onclick JS string context",
+  vuln: "reflected-attr", delivery: ["query"], note: "the handler only runs on click; the enclosing attribute is double-quoted, so break out of it to inject a self-firing tag")
 maze_get "/attr-event/level6/" do |env|
   query = env.params.query["query"]
 

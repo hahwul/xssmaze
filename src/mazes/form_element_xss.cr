@@ -1,5 +1,6 @@
 # Level 1: Reflected in <input placeholder="QUERY">
-Xssmaze.push("formelement-level1", "/formelement/level1/?query=a", "reflection in input placeholder attribute")
+Xssmaze.push("formelement-level1", "/formelement/level1/?query=a", "reflection in input placeholder attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/formelement/level1/" do |env|
   query = env.params.query["query"]
 
@@ -10,7 +11,8 @@ maze_get "/formelement/level1/" do |env|
 end
 
 # Level 2: Reflected in <textarea placeholder="QUERY">
-Xssmaze.push("formelement-level2", "/formelement/level2/?query=a", "reflection in textarea placeholder attribute")
+Xssmaze.push("formelement-level2", "/formelement/level2/?query=a", "reflection in textarea placeholder attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/formelement/level2/" do |env|
   query = env.params.query["query"]
 
@@ -21,7 +23,8 @@ maze_get "/formelement/level2/" do |env|
 end
 
 # Level 3: Reflected in <button title="QUERY">
-Xssmaze.push("formelement-level3", "/formelement/level3/?query=a", "reflection in button title attribute")
+Xssmaze.push("formelement-level3", "/formelement/level3/?query=a", "reflection in button title attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/formelement/level3/" do |env|
   query = env.params.query["query"]
 
@@ -32,7 +35,8 @@ maze_get "/formelement/level3/" do |env|
 end
 
 # Level 4: Reflected in <select name="QUERY">
-Xssmaze.push("formelement-level4", "/formelement/level4/?query=a", "reflection in select name attribute")
+Xssmaze.push("formelement-level4", "/formelement/level4/?query=a", "reflection in select name attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/formelement/level4/" do |env|
   query = env.params.query["query"]
 
@@ -43,7 +47,8 @@ maze_get "/formelement/level4/" do |env|
 end
 
 # Level 5: Reflected in <option value="QUERY">
-Xssmaze.push("formelement-level5", "/formelement/level5/?query=a", "reflection in option value attribute")
+Xssmaze.push("formelement-level5", "/formelement/level5/?query=a", "reflection in option value attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/formelement/level5/" do |env|
   query = env.params.query["query"]
 
@@ -54,7 +59,8 @@ maze_get "/formelement/level5/" do |env|
 end
 
 # Level 6: Reflected in <label for="QUERY">
-Xssmaze.push("formelement-level6", "/formelement/level6/?query=a", "reflection in label for attribute")
+Xssmaze.push("formelement-level6", "/formelement/level6/?query=a", "reflection in label for attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/formelement/level6/" do |env|
   query = env.params.query["query"]
 

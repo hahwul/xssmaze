@@ -23,7 +23,8 @@ single = {
 # Level 1: comment system storing into attribute context
 # Real shape: comment body escaped for body display but reused
 # *raw* inside an attribute (`title=`, `data-*`). Reviews-style.
-Xssmaze.push("storedpat-level1", "/storedpat/level1/", "comment stored in body (escaped) + title attr (raw)", "POST")
+Xssmaze.push("storedpat-level1", "/storedpat/level1/", "comment stored in body (escaped) + title attr (raw)", "POST", ["body"],
+  vuln: "stored", delivery: ["body"], note: "the field is body, not query; the list text is HTML-escaped, so the injectable context is the raw double-quoted title attribute")
 maze_get "/storedpat/level1/" do |_|
   items = store["lvl1"].entries.map do |c|
     "<li title=\"#{c}\">#{Xssmaze.html_escape(c)}</li>"
@@ -51,7 +52,8 @@ end
 # `**bold**` and `*italic*` are converted; raw HTML passes through.
 # Real shape: GitHub README / Discourse cooked content, where the
 # renderer trusts the saved markdown.
-Xssmaze.push("storedpat-level2", "/storedpat/level2/", "profile bio markdown render (HTML pass-through)", "POST")
+Xssmaze.push("storedpat-level2", "/storedpat/level2/", "profile bio markdown render (HTML pass-through)", "POST", ["bio"],
+  vuln: "stored", delivery: ["body"], note: "the field is bio, not query; raw HTML passes straight through the markdown rewrite")
 maze_get "/storedpat/level2/" do |_|
   bio = single["lvl2"].value
   rendered = bio.gsub(/\*\*([^*]+)\*\*/) { "<strong>#{$1}</strong>" }
@@ -78,7 +80,8 @@ end
 # Real shape: e-commerce review form. Review body lands raw in
 # `<meta property="og:description">` content, which is attribute
 # context — escapes quotes only.
-Xssmaze.push("storedpat-level3", "/storedpat/level3/", "product review stored into <meta og:description>", "POST")
+Xssmaze.push("storedpat-level3", "/storedpat/level3/", "product review stored into <meta og:description>", "POST", ["review"],
+  vuln: "stored", delivery: ["body"], note: "the field is review, not query; the visible copy is HTML-escaped, so break out of the double-quoted <meta og:description> content in the head")
 maze_get "/storedpat/level3/" do |_|
   last = single["lvl3"].value
   "<!doctype html><html><head>
@@ -104,7 +107,8 @@ end
 # Level 4: chat message recent list (same-request preview + GET list)
 # Real shape: support chat / live discussion thread. New message is
 # appended and the entire thread re-rendered, raw.
-Xssmaze.push("storedpat-level4", "/storedpat/level4/", "chat message thread (raw render)", "POST")
+Xssmaze.push("storedpat-level4", "/storedpat/level4/", "chat message thread (raw render)", "POST", ["msg"],
+  vuln: "stored", delivery: ["body"], note: "the field is msg, not query")
 maze_get "/storedpat/level4/" do |_|
   msgs = store["lvl4"].entries.map { |m| "<div class='msg'>#{m}</div>" }.join
   "<!doctype html><html><body>
@@ -128,7 +132,8 @@ end
 # Real shape: Zendesk-style ticket. Subject lands in `<title>` and
 # in `<h1>` on the ticket-view page (a separate GET). Same-request
 # response also shows the stored subject for scanner detection.
-Xssmaze.push("storedpat-level5", "/storedpat/level5/", "ticket subject stored into <title> and <h1>", "POST")
+Xssmaze.push("storedpat-level5", "/storedpat/level5/", "ticket subject stored into <title> and <h1>", "POST", ["subject"],
+  vuln: "stored", delivery: ["body"], note: "the field is subject, not query; it is reflected into both <title>, a raw-text element, and an <h1> that needs no breakout")
 maze_get "/storedpat/level5/" do |_|
   subj = single["lvl5"].value
   "<!doctype html><html><head>
@@ -153,7 +158,8 @@ end
 # Real shape: admin dashboard fetches notes API and pastes the
 # `text` field into the DOM. POST stores; GET serves the API; the
 # HTML page wires it up.
-Xssmaze.push("storedpat-level6", "/storedpat/level6/", "admin note: POST stored, fetched JSON → innerHTML", "POST")
+Xssmaze.push("storedpat-level6", "/storedpat/level6/", "admin note: POST stored, fetched JSON → innerHTML", "POST", ["note"],
+  vuln: "stored", sources: ["fetch-response"], sinks: ["innerHTML"], delivery: ["body"], note: "the field is note, not query; the stored value is served by /storedpat/level6/api and pasted into innerHTML, so use <img src=x onerror=...>")
 maze_get "/storedpat/level6/" do |_|
   "<!doctype html><html><body>
   <h1>Admin notes</h1>

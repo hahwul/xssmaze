@@ -1,6 +1,7 @@
 # Level 1: Reflection inside <style> tag (CSS context injection)
 # Exploit: query="></style><script>alert(1)</script>
-Xssmaze.push("racecon-level1", "/racecon/level1/?query=a", "reflection inside style tag (CSS context)")
+Xssmaze.push("racecon-level1", "/racecon/level1/?query=a", "reflection inside style tag (CSS context)",
+  vuln: "reflected-html", delivery: ["query"], note: "despite the category name there is no race; the value lands in a <style> block, so open with </style> before injecting")
 maze_get "/racecon/level1/" do |env|
   query = env.params.query["query"]
 
@@ -14,7 +15,8 @@ end
 
 # Level 2: Reflection in <textarea> without encoding (must close textarea first)
 # Exploit: query=</textarea><script>alert(1)</script>
-Xssmaze.push("racecon-level2", "/racecon/level2/?query=a", "reflection inside textarea (raw, no encoding)")
+Xssmaze.push("racecon-level2", "/racecon/level2/?query=a", "reflection inside textarea (raw, no encoding)",
+  vuln: "reflected-html", delivery: ["query"], note: "despite the category name there is no race; <textarea> is a raw-text element, so open with </textarea>")
 maze_get "/racecon/level2/" do |env|
   query = env.params.query["query"]
 
@@ -29,7 +31,8 @@ end
 
 # Level 3: Reflection in SVG <text> element (SVG context)
 # Exploit: query=</text><svg onload=alert(1)> or query=</text><script>alert(1)</script>
-Xssmaze.push("racecon-level3", "/racecon/level3/?query=a", "reflection inside SVG text element")
+Xssmaze.push("racecon-level3", "/racecon/level3/?query=a", "reflection inside SVG text element",
+  vuln: "reflected-html", delivery: ["query"], note: "despite the category name there is no race; the value lands in an <svg><text> node, so open with </text></svg>")
 maze_get "/racecon/level3/" do |env|
   query = env.params.query["query"]
 
@@ -43,7 +46,8 @@ end
 
 # Level 4: Reflection inside <title> tag (must close title to inject)
 # Exploit: query=</title><script>alert(1)</script>
-Xssmaze.push("racecon-level4", "/racecon/level4/?query=a", "reflection inside title tag")
+Xssmaze.push("racecon-level4", "/racecon/level4/?query=a", "reflection inside title tag",
+  vuln: "reflected-html", delivery: ["query"], note: "despite the category name there is no race; <title> is a raw-text element, so open with </title>")
 maze_get "/racecon/level4/" do |env|
   query = env.params.query["query"]
 

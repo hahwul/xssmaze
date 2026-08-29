@@ -1,5 +1,6 @@
 # Level 1: Query reflected raw in <p> tag - standard injection
-Xssmaze.push("multiline-level1", "/multiline/level1/?query=a", "raw reflection in p tag")
+Xssmaze.push("multiline-level1", "/multiline/level1/?query=a", "raw reflection in p tag",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/multiline/level1/" do |env|
   query = env.params.query["query"]
 
@@ -11,7 +12,8 @@ end
 
 # Level 2: Query reflected in JS string with newlines NOT escaped
 # Bypass: inject newline then </script><img src=x onerror=alert(1)>
-Xssmaze.push("multiline-level2", "/multiline/level2/?query=a", "reflected in JS string, newlines not escaped")
+Xssmaze.push("multiline-level2", "/multiline/level2/?query=a", "reflected in JS string, newlines not escaped",
+  vuln: "reflected-js", delivery: ["query"], note: "double quotes are backslash-escaped but newlines are not, so close the </script> block rather than the string")
 maze_get "/multiline/level2/" do |env|
   query = env.params.query["query"]
   # Escape quotes but NOT newlines
@@ -27,7 +29,8 @@ end
 
 # Level 3: Query reflected in HTML attribute value with newlines allowed
 # Bypass: " onfocus=alert(1) autofocus "
-Xssmaze.push("multiline-level3", "/multiline/level3/?query=a", "reflected in attribute value, newlines allowed")
+Xssmaze.push("multiline-level3", "/multiline/level3/?query=a", "reflected in attribute value, newlines allowed",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/multiline/level3/" do |env|
   query = env.params.query["query"]
 
@@ -39,7 +42,8 @@ end
 
 # Level 4: Query reflected inside <textarea> tags
 # Bypass: close textarea with </textarea> then inject
-Xssmaze.push("multiline-level4", "/multiline/level4/?query=a", "reflected inside textarea tags")
+Xssmaze.push("multiline-level4", "/multiline/level4/?query=a", "reflected inside textarea tags",
+  vuln: "reflected-html", delivery: ["query"], note: "<textarea> is a raw-text element, so the payload has to open with </textarea>")
 maze_get "/multiline/level4/" do |env|
   query = env.params.query["query"]
 
@@ -51,7 +55,8 @@ end
 
 # Level 5: Query split on newlines, each line wrapped in <li>
 # Bypass: inject HTML in any line
-Xssmaze.push("multiline-level5", "/multiline/level5/?query=a", "split on newlines into li tags")
+Xssmaze.push("multiline-level5", "/multiline/level5/?query=a", "split on newlines into li tags",
+  vuln: "reflected-html", delivery: ["query"], note: "the value is split on newlines and each line is wrapped raw in its own <li>")
 maze_get "/multiline/level5/" do |env|
   query = env.params.query["query"]
   lines = query.split("\n")
@@ -67,7 +72,8 @@ end
 
 # Level 6: Query reflected inside <pre> tags
 # Bypass: close pre with </pre> then inject
-Xssmaze.push("multiline-level6", "/multiline/level6/?query=a", "reflected inside pre tags")
+Xssmaze.push("multiline-level6", "/multiline/level6/?query=a", "reflected inside pre tags",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/multiline/level6/" do |env|
   query = env.params.query["query"]
 

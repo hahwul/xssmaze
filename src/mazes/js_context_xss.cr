@@ -1,7 +1,8 @@
 # Level 1: Reflection in JS variable assignment var x = "QUERY";
 # Bypass: close script tag and inject HTML
 # e.g. </script><script>alert(1)</script>
-Xssmaze.push("jsctx-level1", "/jsctx/level1/?query=a", "reflection in JS variable assignment (double-quoted string)")
+Xssmaze.push("jsctx-level1", "/jsctx/level1/?query=a", "reflection in JS variable assignment (double-quoted string)",
+  vuln: "reflected-js", delivery: ["query"])
 maze_get "/jsctx/level1/" do |env|
   query = env.params.query["query"]
 
@@ -11,7 +12,8 @@ end
 # Level 2: Reflection in JS object key {QUERY: "value"}
 # Bypass: close script tag and inject HTML
 # e.g. </script><script>alert(1)</script>
-Xssmaze.push("jsctx-level2", "/jsctx/level2/?query=a", "reflection in JS object key")
+Xssmaze.push("jsctx-level2", "/jsctx/level2/?query=a", "reflection in JS object key",
+  vuln: "reflected-js", delivery: ["query"], note: "the value lands in object-key position, so an in-JS break has to close the object literal; closing </script> is simpler")
 maze_get "/jsctx/level2/" do |env|
   query = env.params.query["query"]
 
@@ -21,7 +23,8 @@ end
 # Level 3: Reflection in JS array element ["a", "QUERY", "b"]
 # Bypass: close script tag and inject HTML
 # e.g. </script><script>alert(1)</script>
-Xssmaze.push("jsctx-level3", "/jsctx/level3/?query=a", "reflection in JS array element (double-quoted)")
+Xssmaze.push("jsctx-level3", "/jsctx/level3/?query=a", "reflection in JS array element (double-quoted)",
+  vuln: "reflected-js", delivery: ["query"])
 maze_get "/jsctx/level3/" do |env|
   query = env.params.query["query"]
 
@@ -31,7 +34,8 @@ end
 # Level 4: Reflection in JS function argument func("QUERY")
 # Bypass: close script tag and inject HTML
 # e.g. </script><script>alert(1)</script>
-Xssmaze.push("jsctx-level4", "/jsctx/level4/?query=a", "reflection in JS function argument (double-quoted)")
+Xssmaze.push("jsctx-level4", "/jsctx/level4/?query=a", "reflection in JS function argument (double-quoted)",
+  vuln: "reflected-js", delivery: ["query"])
 maze_get "/jsctx/level4/" do |env|
   query = env.params.query["query"]
 
@@ -41,7 +45,8 @@ end
 # Level 5: Reflection in JS regex /QUERY/g
 # Bypass: close script tag and inject HTML
 # e.g. </script><script>alert(1)</script>
-Xssmaze.push("jsctx-level5", "/jsctx/level5/?query=a", "reflection in JS regex literal")
+Xssmaze.push("jsctx-level5", "/jsctx/level5/?query=a", "reflection in JS regex literal",
+  vuln: "reflected-js", delivery: ["query"], note: "the value lands inside a regex literal, so terminate it with / before injecting, or close the </script> block")
 maze_get "/jsctx/level5/" do |env|
   query = env.params.query["query"]
 
@@ -51,7 +56,8 @@ end
 # Level 6: Reflection in JS multiline comment /* QUERY */
 # Bypass: close comment with */ then close script and inject HTML
 # e.g. */</script><script>alert(1)</script>
-Xssmaze.push("jsctx-level6", "/jsctx/level6/?query=a", "reflection in JS multiline comment (close comment and script)")
+Xssmaze.push("jsctx-level6", "/jsctx/level6/?query=a", "reflection in JS multiline comment (close comment and script)",
+  vuln: "reflected-js", delivery: ["query"], note: "the value lands inside a /* */ comment, so it must start with */ (or close the </script> block)")
 maze_get "/jsctx/level6/" do |env|
   query = env.params.query["query"]
 

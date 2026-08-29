@@ -1,5 +1,6 @@
 # Level 1: Reflected in <video src="QUERY">
-Xssmaze.push("mediacontext-level1", "/mediacontext/level1/?query=a", "reflection in video src attribute")
+Xssmaze.push("mediacontext-level1", "/mediacontext/level1/?query=a", "reflection in video src attribute",
+  vuln: "reflected-attr", delivery: ["query"], note: "a javascript: URL does not execute in a video src; break out of the double-quoted attribute instead")
 maze_get "/mediacontext/level1/" do |env|
   query = env.params.query["query"]
 
@@ -10,7 +11,8 @@ maze_get "/mediacontext/level1/" do |env|
 end
 
 # Level 2: Reflected in <audio src="QUERY">
-Xssmaze.push("mediacontext-level2", "/mediacontext/level2/?query=a", "reflection in audio src attribute")
+Xssmaze.push("mediacontext-level2", "/mediacontext/level2/?query=a", "reflection in audio src attribute",
+  vuln: "reflected-attr", delivery: ["query"], note: "a javascript: URL does not execute in an audio src; break out of the double-quoted attribute instead")
 maze_get "/mediacontext/level2/" do |env|
   query = env.params.query["query"]
 
@@ -21,7 +23,8 @@ maze_get "/mediacontext/level2/" do |env|
 end
 
 # Level 3: Reflected in <source src="QUERY"> inside a <video>
-Xssmaze.push("mediacontext-level3", "/mediacontext/level3/?query=a", "reflection in source src attribute inside video")
+Xssmaze.push("mediacontext-level3", "/mediacontext/level3/?query=a", "reflection in source src attribute inside video",
+  vuln: "reflected-attr", delivery: ["query"], note: "a javascript: URL does not execute in a <source> src; break out of the double-quoted attribute instead")
 maze_get "/mediacontext/level3/" do |env|
   query = env.params.query["query"]
 
@@ -32,7 +35,8 @@ maze_get "/mediacontext/level3/" do |env|
 end
 
 # Level 4: Reflected in <embed src="QUERY">
-Xssmaze.push("mediacontext-level4", "/mediacontext/level4/?query=a", "reflection in embed src attribute")
+Xssmaze.push("mediacontext-level4", "/mediacontext/level4/?query=a", "reflection in embed src attribute",
+  vuln: "reflected-attr", delivery: ["query"], note: "no browser still runs Flash, so the embed src is inert; break out of the double-quoted attribute instead")
 maze_get "/mediacontext/level4/" do |env|
   query = env.params.query["query"]
 
@@ -43,7 +47,8 @@ maze_get "/mediacontext/level4/" do |env|
 end
 
 # Level 5: Reflected in <track src="QUERY"> inside a <video>
-Xssmaze.push("mediacontext-level5", "/mediacontext/level5/?query=a", "reflection in track src attribute inside video")
+Xssmaze.push("mediacontext-level5", "/mediacontext/level5/?query=a", "reflection in track src attribute inside video",
+  vuln: "reflected-attr", delivery: ["query"], note: "a track src only ever loads a WebVTT file; break out of the double-quoted attribute instead")
 maze_get "/mediacontext/level5/" do |env|
   query = env.params.query["query"]
 
@@ -54,7 +59,8 @@ maze_get "/mediacontext/level5/" do |env|
 end
 
 # Level 6: Reflected in <img alt="QUERY">
-Xssmaze.push("mediacontext-level6", "/mediacontext/level6/?query=a", "reflection in img alt attribute")
+Xssmaze.push("mediacontext-level6", "/mediacontext/level6/?query=a", "reflection in img alt attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/mediacontext/level6/" do |env|
   query = env.params.query["query"]
 

@@ -2,7 +2,8 @@
 # shortcuts[].url) are not script-execution sinks - browsers parse them
 # as data only. We keep just the realistic case where the page fetches
 # its own manifest at runtime and feeds a field back into innerHTML.
-Xssmaze.push("manifest-level1", "/manifest/level1/?query=a", "page fetches manifest.json and innerHTMLs description field")
+Xssmaze.push("manifest-level1", "/manifest/level1/?query=a", "page fetches manifest.json and innerHTMLs description field",
+  vuln: "dom", sources: ["fetch-response"], sinks: ["innerHTML"], delivery: ["query"], note: "the value is JSON-escaped into the page, echoed by /manifest/level1/manifest.json and innerHTMLed; a double quote breaks the JSON, and innerHTML does not run a bare <script>, so use <img src=x onerror=...>")
 maze_get "/manifest/level1/" do |env|
   query = env.params.query["query"]
   "<div id='out'></div>
