@@ -3,7 +3,7 @@
 Xssmaze.push("multipleoutput-level1", "/multipleoutput/level1/?query=a", "raw div + encoded span",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/multipleoutput/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   encoded = HTML.escape(query)
 
   "<html><body><div>#{query}</div><span>#{encoded}</span></body></html>"
@@ -14,7 +14,7 @@ end
 Xssmaze.push("multipleoutput-level2", "/multipleoutput/level2/?query=a", "JS-escaped script var + raw p tag",
   vuln: "reflected-html", delivery: ["query"], note: "the script-string copy escapes quotes, backslashes and angle brackets; the <p> copy is untouched")
 maze_get "/multipleoutput/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   js_escaped = query.gsub("\\", "\\\\").gsub("'", "\\'").gsub("\"", "\\\"").gsub("<", "\\x3c").gsub(">", "\\x3e")
 
   "<html><body><script>var a=\"#{js_escaped}\";</script><p>#{query}</p></body></html>"
@@ -25,7 +25,7 @@ end
 Xssmaze.push("multipleoutput-level3", "/multipleoutput/level3/?query=a", "encoded attribute + raw HTML comment",
   vuln: "reflected-html", delivery: ["query"], note: "the raw copy sits in an HTML comment, so close it with --> before injecting")
 maze_get "/multipleoutput/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   encoded = HTML.escape(query)
 
   "<html><body><input value=\"#{encoded}\"><!-- #{query} --></body></html>"
@@ -36,7 +36,7 @@ end
 Xssmaze.push("multipleoutput-level4", "/multipleoutput/level4/?query=a", "triple output: encoded attr + encoded title + raw div",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/multipleoutput/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   encoded = HTML.escape(query)
 
   "<html><head><title>#{encoded}</title></head><body><input value=\"#{encoded}\"><div>#{query}</div></body></html>"
@@ -47,7 +47,7 @@ end
 Xssmaze.push("multipleoutput-level5", "/multipleoutput/level5/?query=a", "encoded style comment + raw p tag",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/multipleoutput/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   style_safe = query.gsub("<", "&lt;").gsub(">", "&gt;")
 
   "<html><head><style>/* #{style_safe} */</style></head><body><p>#{query}</p></body></html>"
@@ -58,7 +58,7 @@ end
 Xssmaze.push("multipleoutput-level6", "/multipleoutput/level6/?query=a", "four outputs: 3 encoded + 1 raw footer",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/multipleoutput/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   encoded = HTML.escape(query)
 
   "<html><head><title>#{encoded}</title></head><body><input value=\"#{encoded}\"><div>#{encoded}</div><footer>#{query}</footer></body></html>"

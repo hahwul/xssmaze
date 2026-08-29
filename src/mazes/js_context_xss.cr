@@ -4,7 +4,7 @@
 Xssmaze.push("jsctx-level1", "/jsctx/level1/?query=a", "reflection in JS variable assignment (double-quoted string)",
   vuln: "reflected-js", delivery: ["query"])
 maze_get "/jsctx/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><script>var x = \"#{query}\";</script></body></html>"
 end
@@ -15,7 +15,7 @@ end
 Xssmaze.push("jsctx-level2", "/jsctx/level2/?query=a", "reflection in JS object key",
   vuln: "reflected-js", delivery: ["query"], note: "the value lands in object-key position, so an in-JS break has to close the object literal; closing </script> is simpler")
 maze_get "/jsctx/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><script>var obj = {#{query}: \"value\"};</script></body></html>"
 end
@@ -26,7 +26,7 @@ end
 Xssmaze.push("jsctx-level3", "/jsctx/level3/?query=a", "reflection in JS array element (double-quoted)",
   vuln: "reflected-js", delivery: ["query"])
 maze_get "/jsctx/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><script>var arr = [\"a\", \"#{query}\", \"b\"];</script></body></html>"
 end
@@ -37,7 +37,7 @@ end
 Xssmaze.push("jsctx-level4", "/jsctx/level4/?query=a", "reflection in JS function argument (double-quoted)",
   vuln: "reflected-js", delivery: ["query"])
 maze_get "/jsctx/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><script>function process(d){return d;} process(\"#{query}\");</script></body></html>"
 end
@@ -48,7 +48,7 @@ end
 Xssmaze.push("jsctx-level5", "/jsctx/level5/?query=a", "reflection in JS regex literal",
   vuln: "reflected-js", delivery: ["query"], note: "the value lands inside a regex literal, so terminate it with / before injecting, or close the </script> block")
 maze_get "/jsctx/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><script>var pattern = /#{query}/g;</script></body></html>"
 end
@@ -59,7 +59,7 @@ end
 Xssmaze.push("jsctx-level6", "/jsctx/level6/?query=a", "reflection in JS multiline comment (close comment and script)",
   vuln: "reflected-js", delivery: ["query"], note: "the value lands inside a /* */ comment, so it must start with */ (or close the </script> block)")
 maze_get "/jsctx/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><script>/* User query: #{query} */ var x = 1;</script></body></html>"
 end

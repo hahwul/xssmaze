@@ -2,7 +2,7 @@
 Xssmaze.push("errhandling-level1", "/errhandling/level1/?query=a", "error boundary with raw reflection in error message",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/errhandling/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Error Handling XSS Level 1</h1>
@@ -17,7 +17,7 @@ end
 Xssmaze.push("errhandling-level2", "/errhandling/level2/?query=a", "stack trace with raw reflection in third frame",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/errhandling/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Error Handling XSS Level 2</h1>
@@ -36,7 +36,7 @@ end
 Xssmaze.push("errhandling-level3", "/errhandling/level3/?query=a", "form validation error with raw reflection in alert span",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/errhandling/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Error Handling XSS Level 3</h1>
@@ -53,7 +53,7 @@ end
 Xssmaze.push("errhandling-level4", "/errhandling/level4/?query=a", "API error response in pre tag with raw JSON-like reflection",
   vuln: "reflected-html", delivery: ["query"], note: "served as text/html, so tags in the value render despite the JSON wrapper")
 maze_get "/errhandling/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Error Handling XSS Level 4</h1>
@@ -66,7 +66,7 @@ end
 Xssmaze.push("errhandling-level5", "/errhandling/level5/?query=a", "permission denied page with raw reflection in resource path",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/errhandling/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Error Handling XSS Level 5</h1>
@@ -82,7 +82,7 @@ end
 Xssmaze.push("errhandling-level6", "/errhandling/level6/?query=a", "rate limit page with raw reflection in IP/source field",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/errhandling/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Error Handling XSS Level 6</h1>

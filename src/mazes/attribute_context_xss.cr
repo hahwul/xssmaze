@@ -3,7 +3,7 @@
 Xssmaze.push("attrctx-level1", "/attrctx/level1/?query=a", "reflection in input value attribute (double-quoted)",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/attrctx/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><input type=\"text\" value=\"#{query}\"></body></html>"
 end
@@ -13,7 +13,7 @@ end
 Xssmaze.push("attrctx-level2", "/attrctx/level2/?query=a", "reflection in href attribute (javascript: protocol)",
   vuln: "reflected-attr", delivery: ["query"], note: "reflected into an <a href>; the attribute is unescaped, so a \" breakout fires without the click a javascript: URL would need")
 maze_get "/attrctx/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><a href=\"#{query}\">Click here</a></body></html>"
 end
@@ -23,7 +23,7 @@ end
 Xssmaze.push("attrctx-level3", "/attrctx/level3/?query=a", "reflection in img src (double-quote encoded, single-quote allowed)",
   vuln: "reflected-attr", delivery: ["query"], note: "double quotes are entity-encoded, but the attribute is single-quoted, so break out with '")
 maze_get "/attrctx/level3/" do |env|
-  query = Filters.escape_double_quote(env.params.query["query"])
+  query = Filters.escape_double_quote(env.params.query.fetch("query", ""))
 
   "<html><body><img src='#{query}'></body></html>"
 end
@@ -33,7 +33,7 @@ end
 Xssmaze.push("attrctx-level4", "/attrctx/level4/?query=a", "reflection in style attribute (double-quoted)",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/attrctx/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><div style=\"color: #{query}\">Hello</div></body></html>"
 end
@@ -43,7 +43,7 @@ end
 Xssmaze.push("attrctx-level5", "/attrctx/level5/?query=a", "reflection in iframe src attribute (javascript: protocol)",
   vuln: "reflected-attr", delivery: ["query"], note: "reflected into an <iframe src>; the double-quoted attribute is unescaped, so the breakout is the reliable route rather than the scheme")
 maze_get "/attrctx/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><iframe src=\"#{query}\"></iframe></body></html>"
 end
@@ -53,7 +53,7 @@ end
 Xssmaze.push("attrctx-level6", "/attrctx/level6/?query=a", "reflection in hidden input value (type override to trigger focus)",
   vuln: "reflected-attr", delivery: ["query"], note: "a hidden input never renders, so the payload has to bring its own trigger, e.g. \" type=text autofocus onfocus=alert(1) x=\"")
 maze_get "/attrctx/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><input type=\"hidden\" value=\"#{query}\"></body></html>"
 end

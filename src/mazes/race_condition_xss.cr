@@ -3,7 +3,7 @@
 Xssmaze.push("racecon-level1", "/racecon/level1/?query=a", "reflection inside style tag (CSS context)",
   vuln: "reflected-html", delivery: ["query"], note: "despite the category name there is no race; the value lands in a <style> block, so open with </style> before injecting")
 maze_get "/racecon/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head>
   <style>body { font-family: \"#{query}\"; }</style>
@@ -18,7 +18,7 @@ end
 Xssmaze.push("racecon-level2", "/racecon/level2/?query=a", "reflection inside textarea (raw, no encoding)",
   vuln: "reflected-html", delivery: ["query"], note: "despite the category name there is no race; <textarea> is a raw-text element, so open with </textarea>")
 maze_get "/racecon/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Race Condition XSS Level 2</h1>
@@ -34,7 +34,7 @@ end
 Xssmaze.push("racecon-level3", "/racecon/level3/?query=a", "reflection inside SVG text element",
   vuln: "reflected-html", delivery: ["query"], note: "despite the category name there is no race; the value lands in an <svg><text> node, so open with </text></svg>")
 maze_get "/racecon/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Race Condition XSS Level 3</h1>
@@ -49,7 +49,7 @@ end
 Xssmaze.push("racecon-level4", "/racecon/level4/?query=a", "reflection inside title tag",
   vuln: "reflected-html", delivery: ["query"], note: "despite the category name there is no race; <title> is a raw-text element, so open with </title>")
 maze_get "/racecon/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head>
   <title>#{query}</title>

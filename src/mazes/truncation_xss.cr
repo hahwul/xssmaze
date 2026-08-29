@@ -2,7 +2,7 @@
 Xssmaze.push("truncation-level1", "/truncation/level1/?query=a", "reflects first 100 chars raw",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/truncation/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   truncated = query[0, {query.size, 100}.min]
   "<html><body>#{truncated}</body></html>"
 end
@@ -11,7 +11,7 @@ end
 Xssmaze.push("truncation-level2", "/truncation/level2/?query=a", "reflects first 50 chars raw",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/truncation/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   truncated = query[0, {query.size, 50}.min]
   "<html><body>#{truncated}</body></html>"
 end
@@ -20,7 +20,7 @@ end
 Xssmaze.push("truncation-level3", "/truncation/level3/?query=a", "reflects first 200 chars in input value attribute",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/truncation/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   truncated = query[0, {query.size, 200}.min]
   "<html><body><input type=\"text\" value=\"#{truncated}\"></body></html>"
 end
@@ -29,7 +29,7 @@ end
 Xssmaze.push("truncation-level4", "/truncation/level4/?query=a", "reflects first 30 chars raw",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/truncation/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   truncated = query[0, {query.size, 30}.min]
   "<html><body>#{truncated}</body></html>"
 end
@@ -38,7 +38,7 @@ end
 Xssmaze.push("truncation-level5", "/truncation/level5/?query=a", "reflects first 80 chars in script string context",
   vuln: "reflected-js", delivery: ["query"])
 maze_get "/truncation/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   truncated = query[0, {query.size, 80}.min]
   "<html><body><script>var x=\"#{truncated}\";</script></body></html>"
 end
@@ -47,7 +47,7 @@ end
 Xssmaze.push("truncation-level6", "/truncation/level6/?query=a", "reflects first 40 chars raw",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/truncation/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   truncated = query[0, {query.size, 40}.min]
   "<html><body>#{truncated}</body></html>"
 end
