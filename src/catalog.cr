@@ -92,7 +92,7 @@ module Xssmaze::Catalog
       io << "<button class='chip' data-filter='dom' aria-pressed='false'>dom</button>"
       io << "<button class='chip' data-filter='client' aria-pressed='false'>client-only</button>"
       io << "<button class='chip' data-filter='control' aria-pressed='false'>controls</button>"
-      io << "<button class='chip' data-filter='post' aria-pressed='false'>POST</button>"
+      io << "<button class='chip' data-filter='post' aria-pressed='false'>POST/QUERY</button>"
       io << "</div>\n"
       io << "<p class='tally' aria-live='polite'><b id='stat-visible'>" << total
       io << "</b> of " << total << " shown</p>\n"
@@ -159,6 +159,9 @@ module Xssmaze::Catalog
     io << "' data-p='" << maze.vuln
     io << " client" if client
     io << " control" if control
+    # The `post` token predates HTTP QUERY and really means "not a plain GET",
+    # which is what the POST/QUERY chip filters on. Kept as-is so bookmarked
+    # filter state keeps working.
     io << " post" if maze.method != "GET"
     io << "'>"
 
@@ -242,6 +245,12 @@ module Xssmaze::Catalog
     {total: total, categories: arr}.to_json
   end
 
+  # Path Item operations OpenAPI 3.0 actually defines. Anything outside this
+  # set — HTTP QUERY, for one — is not a valid Path Item field, so it goes
+  # into the `x-additional-operations` extension instead of quietly making the
+  # whole document invalid for every consumer.
+  OPENAPI_METHODS = %w[get put post delete options head patch trace]
+
   # Minimal OpenAPI 3.0 document so external tooling (Swagger UI, code
   # generators, scanner runners) can ingest the catalog directly.
   def self.build_openapi(mazes : Array(Maze)) : String
@@ -269,7 +278,13 @@ module Xssmaze::Catalog
         "responses"   => JSON.parse({"200" => {description: "ok"}}.to_json),
       }
       paths[path] ||= Hash(String, Hash(String, JSON::Any)).new
-      paths[path][method] = op
+      if OPENAPI_METHODS.includes?(method)
+        paths[path][method] = op
+      else
+        extra = paths[path]["x-additional-operations"]? || {} of String => JSON::Any
+        extra[maze.method] = JSON.parse(op.to_json)
+        paths[path]["x-additional-operations"] = extra
+      end
     end
 
     {
