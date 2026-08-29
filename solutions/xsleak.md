@@ -11,33 +11,33 @@ Sign in first via `/xsleak/login?as=admin` to observe the admin branch.
 
 `/xsleak/search?q=admin`
 
-- payload: `q=admin` (no XSS — control)
-- context: body-size oracle; admin returns ~60 results plus hidden filler, guest ~6 — the response length leaks the role. No sink to inject.
+- payload: `no payload — control`
+- context: body-size oracle (probe with `q=admin`); admin returns ~60 results plus hidden filler, guest ~6 — the response length leaks the role. No sink to inject. XS-Leak, not XSS.
 
 ### xsleak-level2
 
 `/xsleak/frame?q=admin`
 
-- payload: `q=admin` (no XSS — control)
-- context: frame-count oracle; admin embeds 12 subframes, guest 1 — `window.frames.length` leaks the role cross-origin. No sink to inject.
+- payload: `no payload — control`
+- context: frame-count oracle (probe with `q=admin`); admin embeds 12 subframes, guest 1 — `window.frames.length` leaks the role cross-origin. No sink to inject. XS-Leak, not XSS.
 
 ### xsleak-level3
 
 `/xsleak/avatar.gif?q=admin`
 
-- payload: `q=admin` (no XSS — control)
-- context: image load/error oracle; admin gets a valid GIF (onload), guest a 404 (onerror). No sink to inject.
+- payload: `no payload — control`
+- context: image load/error oracle (probe with `q=admin`); admin gets a valid GIF (onload), guest a 404 (onerror). No sink to inject. XS-Leak, not XSS.
 
 ### xsleak-level4
 
 `/xsleak/timing?q=admin`
 
-- payload: `q=admin` (no XSS — control)
-- context: response-timing oracle; the guest branch sleeps ~250ms, admin ~10ms — measurable cross-origin. No sink to inject.
+- payload: `no payload — control`
+- context: response-timing oracle (probe with `q=admin`); the guest branch sleeps ~250ms, admin ~10ms — measurable cross-origin. No sink to inject. XS-Leak, not XSS.
 
 ### xsleak-level5
 
 `/xsleak/redirect?q=admin`
 
-- payload: `q=admin` (no XSS — control)
-- context: redirect-chain-length oracle; admin follows 5 hops, guest 1 — observable via fetch/redirect counting. No sink to inject.
+- payload: `no payload — control`
+- context: redirect-chain-length oracle (probe with `q=admin`); admin follows 5 hops, guest 1 — observable via fetch/redirect counting. No sink to inject. XS-Leak, not XSS.

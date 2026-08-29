@@ -6,8 +6,11 @@ Reflections with mutation/regex filters that can be bypassed.
 
 `/mutfilter/level1/?query=%25%33%43img%20src=x%20onerror=alert(1)%25%33%45`
 
-- payload: `%3Cimg src=x onerror=alert(1)%3E` (double-encoded `<`/`>`)
-- context: `<`/`>` replaced with literal `%3C`/`%3E`; double-URL-encode so framework decodes once leaving `%3C` literal which the filter ignores (note: browser still sees `%3C` literally — practical bypass requires double-decoding sink, level is mostly unexploitable)
+- payload: `no payload — control`
+- context: `<`/`>` are replaced with the literal text `%3C`/`%3E` and nothing
+  decodes them client-side — served output is the visible string
+  `%3Cimg src=x onerror=alert(1)%3E`, so no tag can form. There is no
+  double-decoding sink to walk the encoding back through. A true negative.
 
 ### mutfilter-level2
 

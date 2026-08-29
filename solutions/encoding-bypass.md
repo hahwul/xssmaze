@@ -41,8 +41,11 @@ Server filter strategies bypassable via case mix, double-encoding, alternative t
 
 `/encoding-bypass/level6/?query=%253Cscript%253Ealert(1)%253C/script%253E`
 
-- payload: `%3Cscript%3Ealert(1)%3C/script%3E`
-- context: server URL-decodes once then strips raw `<>`; double-encode to deliver after strip
+- payload: `no payload — control`
+- context: the description promises a double-encoding bypass, but the raw `<`/`>`
+  strip runs *after* the single URL-decode, so both angle brackets are removed
+  before reaching the body — served output is `scriptalert(1)/script`, inert.
+  No `<` or `>` can reach the sink.
 
 ### encoding-bypass-level7
 

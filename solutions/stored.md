@@ -14,9 +14,11 @@ Classic stored XSS endpoints: input persisted server-side, then reflected on sub
 
 `[POST] /stored/level2/`
 
-- payload: `<script>alert(1)</script>`
-- body: `query=<script>alert(1)</script>`
-- context: strip_angles removes `<` `>` from li body — defensive stub, no working bypass
+- payload: `no payload — control`
+- context: submitted via POST (`query=<script>alert(1)</script>`) and rendered as
+  `<li>` text content, but `strip_angles` removes `<`/`>` before storage, so no
+  markup can be introduced — a `<script>` body stores and renders as inert text.
+  A defensive stub with no working bypass.
 
 ### stored-level3
 

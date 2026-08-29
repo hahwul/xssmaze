@@ -13,8 +13,11 @@ Charset and encoding tricks (UTF-7, partial entity encode, JS string escape, JSO
 
 `/encmix/level2/?query=%26%23x3c%3Bscript%26%23x3e%3Balert(1)%26%23x3c%3B/script%26%23x3e%3B`
 
-- payload: `&#x3c;script&#x3e;alert(1)&#x3c;/script&#x3e;`
-- context: server encodes `<`/`>` but not `&`; numeric entities pass through then browser decodes
+- payload: `no payload — control`
+- context: the server entity-encodes `<`/`>` before reflecting into a text node,
+  and a character reference in text decodes to a literal character, not markup —
+  served output is `<div>&#x3c;script&#x3e;alert(1)&#x3c;/script&#x3e;</div>`,
+  which renders as the visible text `<script>alert(1)</script>`. No tag forms.
 
 ### encmix-level3
 

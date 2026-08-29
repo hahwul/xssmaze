@@ -41,8 +41,13 @@ Real-world reflection patterns: double sinks, debug flags, truncation, headers, 
 
 `/realworld/level6/?query=%3Cscript%3Ealert(1)%3C%2Fscript%3E`
 
-- payload: `<script>alert(1)</script>`
-- context: response Content-Type text/plain; browsers may sniff (legacy IE/Chrome no-sniff disabled)
+- payload: `no payload — control`
+- context: the markup is reflected raw (the value to try is
+  `<script>alert(1)</script>`), but the response is served
+  `Content-Type: text/plain`, which no modern browser sniffs into HTML, so it
+  never parses (verified: `<img … onerror=fetch('/beacon/...')>` stayed silent
+  while a control endpoint fired through the same harness). Reporting no XSS is
+  correct.
 
 ### realworld-level7
 

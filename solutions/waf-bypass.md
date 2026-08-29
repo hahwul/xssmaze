@@ -20,8 +20,14 @@ Classic WAF bypass filters: keyword strip, event strip, quote escape, single-sid
 
 `/waf-bypass/level3/?query=%22%20autofocus%20o%26%23110%3Bfocus=alert(1)%20x=%22`
 
-- payload: `" autofocus o&#110;focus=alert(1) x="`
-- context: angles encoded, `on\w+=` stripped; HTML entity inside attr decodes to `onfocus` after filter
+- payload: `no payload — control`
+- context: reflected into a double-quoted input `value`; angle brackets are
+  entity-encoded (no new tags) and every `on\w+=` handler is stripped. The
+  previously documented `" autofocus o&#110;focus=alert(1) x="` does **not**
+  work: character references are never expanded in attribute *names*, only in
+  attribute values and text. Chrome keeps the attribute literally named
+  `o&#110;focus` (verified with `--dump-dom`: `hasAttribute('onfocus')` is false
+  and the beacon stayed silent). No JS sink is reached.
 
 ### waf-bypass-level4
 
@@ -34,8 +40,10 @@ Classic WAF bypass filters: keyword strip, event strip, quote escape, single-sid
 
 `/waf-bypass/level5/?query=%3Csvg%20onload=alert(1)%3E`
 
-- payload: `<svg onload=alert(1)>`
-- context: only `<` stripped — defensive stub; no working tag-opening bypass
+- payload: `no payload — control`
+- context: every `<` is stripped, so no tag can open in the body context —
+  served output is the inert text `svg onload=alert(1)>`. A defensive stub with
+  no tag-opening bypass.
 
 ### waf-bypass-level6
 

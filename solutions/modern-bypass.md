@@ -133,8 +133,13 @@ Modern real-world XSS bypasses: multi-step state, DOM clobbering config, Vue.js 
 ### modern-bypass-level19
 
 `/modern-bypass/level19/`
-- payload: `window.opener.postMessage({action: 'execute', code: 'alert(1)'}, '*')`
-- context: Client-side `message` listener uses a weak, unanchored RegExp (`/https:\/\/xssmaze\.com/`) to validate sender origin. An attacker hosting a page on a domain like `https://xssmaze.com.attacker.com` can pass origin checks and send execution payloads.
+- payload: `no payload — control`
+- context: the inline script does not parse. `if (/https://xssmaze.com/.test(event.origin))`
+  tokenises as the regex `/https:/` followed by a `//…` line comment, leaving
+  the `if (` unclosed — a genuine SyntaxError (verified: the whole `<script>`
+  fails, so `addEventListener('message', …)` never runs). The listener is never
+  registered and nothing reaches `eval`, no matter what origin trick a sender
+  attempts. A true negative.
 
 ### modern-bypass-level20
 

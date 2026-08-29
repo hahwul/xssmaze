@@ -71,10 +71,11 @@ Client-side DOM sinks driven by URL, hash, query, name, referrer, postMessage.
 
 `/dom/level10/?query=javascript:alert(1)`
 
-- payload: `javascript:alert(1)`
-- context: `img.src = query`. Control / true negative: no modern browser
-  executes a `javascript:` URL from an image src, so the taint reaches a sink
-  but nothing runs. Marked `exploitable: false` in `/map/json`.
+- payload: `no payload — control`
+- context: `img.src = query` — the tainted value only reaches an image URL (the
+  value to try is `javascript:alert(1)`). No modern browser executes a
+  `javascript:` URL from an image src, so the taint reaches a sink but nothing
+  runs. True negative, `exploitable: false` in `/map/json`.
 
 ### dom-level11
 
