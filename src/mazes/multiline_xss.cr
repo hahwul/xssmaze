@@ -2,7 +2,7 @@
 Xssmaze.push("multiline-level1", "/multiline/level1/?query=a", "raw reflection in p tag",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/multiline/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Multiline XSS Level 1</h1>
@@ -15,7 +15,7 @@ end
 Xssmaze.push("multiline-level2", "/multiline/level2/?query=a", "reflected in JS string, newlines not escaped",
   vuln: "reflected-js", delivery: ["query"], note: "double quotes are backslash-escaped but newlines are not, so close the </script> block rather than the string")
 maze_get "/multiline/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Escape quotes but NOT newlines
   escaped = query.gsub("\"", "\\\"")
 
@@ -32,7 +32,7 @@ end
 Xssmaze.push("multiline-level3", "/multiline/level3/?query=a", "reflected in attribute value, newlines allowed",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/multiline/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Multiline XSS Level 3</h1>
@@ -45,7 +45,7 @@ end
 Xssmaze.push("multiline-level4", "/multiline/level4/?query=a", "reflected inside textarea tags",
   vuln: "reflected-html", delivery: ["query"], note: "<textarea> is a raw-text element, so the payload has to open with </textarea>")
 maze_get "/multiline/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Multiline XSS Level 4</h1>
@@ -58,7 +58,7 @@ end
 Xssmaze.push("multiline-level5", "/multiline/level5/?query=a", "split on newlines into li tags",
   vuln: "reflected-html", delivery: ["query"], note: "the value is split on newlines and each line is wrapped raw in its own <li>")
 maze_get "/multiline/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   lines = query.split("\n")
   items = lines.map { |line| "<li>#{line}</li>" }.join("\n")
 
@@ -75,7 +75,7 @@ end
 Xssmaze.push("multiline-level6", "/multiline/level6/?query=a", "reflected inside pre tags",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/multiline/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Multiline XSS Level 6</h1>

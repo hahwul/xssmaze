@@ -3,7 +3,7 @@
 Xssmaze.push("ariaattr-level1", "/ariaattr/level1/?query=a", "reflection in aria-label attribute (double-quoted)",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/ariaattr/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <div role=\"alert\" aria-label=\"#{query}\">notification</div>
@@ -15,7 +15,7 @@ end
 Xssmaze.push("ariaattr-level2", "/ariaattr/level2/?query=a", "reflection in aria-describedby attribute (double-quoted)",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/ariaattr/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <input aria-describedby=\"#{query}\" type=\"text\">
@@ -27,7 +27,7 @@ end
 Xssmaze.push("ariaattr-level3", "/ariaattr/level3/?query=a", "reflection in aria-atomic attribute (double-quoted)",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/ariaattr/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <span aria-live=\"polite\" aria-atomic=\"#{query}\">updates</span>
@@ -39,7 +39,7 @@ end
 Xssmaze.push("ariaattr-level4", "/ariaattr/level4/?query=a", "reflection in aria-hidden attribute (double-quoted)",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/ariaattr/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <div role=\"tooltip\" aria-hidden=\"#{query}\">tooltip text</div>
@@ -51,7 +51,7 @@ end
 Xssmaze.push("ariaattr-level5", "/ariaattr/level5/?query=a", "reflection in nav aria-label attribute (double-quoted)",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/ariaattr/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <nav aria-label=\"#{query}\">
@@ -65,7 +65,7 @@ end
 Xssmaze.push("ariaattr-level6", "/ariaattr/level6/?query=a", "reflection in role attribute (double-quoted)",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/ariaattr/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <div role=\"#{query}\" aria-relevant=\"additions\">content</div>

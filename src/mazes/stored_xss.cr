@@ -18,7 +18,7 @@ maze_get "/stored/level1/" do |_|
   </body></html>"
 end
 maze_post "/stored/level1/" do |env|
-  query = env.params.body["query"].as(String)
+  query = env.params.body.fetch("query", "")
   stored_data["level1"] << query
   entries = stored_data["level1"].entries.map { |e| "<li>#{e}</li>" }.join
   "<html><body>
@@ -39,7 +39,7 @@ maze_get "/stored/level2/" do |_|
   </body></html>"
 end
 maze_post "/stored/level2/" do |env|
-  query = Filters.strip_angles(env.params.body["query"].as(String))
+  query = Filters.strip_angles(env.params.body.fetch("query", ""))
   stored_data["level2"] << query
   entries = stored_data["level2"].entries.map { |e| "<li>#{e}</li>" }.join
   "<html><body>
@@ -60,7 +60,7 @@ maze_get "/stored/level3/" do |_|
   </body></html>"
 end
 maze_post "/stored/level3/" do |env|
-  query = env.params.body["query"].as(String)
+  query = env.params.body.fetch("query", "")
   stored_data["level3"] << query
   entries = stored_data["level3"].entries.map { |e| "<div title=\"#{e}\">#{Filters.encode_angles(e)}</div>" }.join
   "<html><body>
@@ -85,7 +85,7 @@ maze_get "/stored/level4/" do |_|
   </body></html>"
 end
 maze_post "/stored/level4/" do |env|
-  query = env.params.body["query"].as(String)
+  query = env.params.body.fetch("query", "")
   stored_data["level4"] << query
   "<html><body>
   <h1>Stored XSS Level 4</h1>

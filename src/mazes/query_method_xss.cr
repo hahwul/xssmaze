@@ -45,7 +45,7 @@ maze_get "/querymethod/level1/" do |_|
   query_driver("/querymethod/level1/", "QUERY Method XSS Level 1", "query", false)
 end
 maze_query "/querymethod/level1/" do |env|
-  query = env.params.body["query"].as(String)
+  query = env.params.body.fetch("query", "")
 
   "<html><body>#{query}</body></html>"
 end
@@ -59,7 +59,7 @@ maze_get "/querymethod/level2/" do |_|
   query_driver("/querymethod/level2/", "QUERY Method XSS Level 2", "query", true)
 end
 maze_query "/querymethod/level2/" do |env|
-  query = env.params.json["query"].as(String)
+  query = env.params.json.fetch("query", "").as(String)
 
   "<html><body>#{query}</body></html>"
 end
@@ -73,7 +73,7 @@ maze_get "/querymethod/level3/" do |_|
   query_driver("/querymethod/level3/", "QUERY Method XSS Level 3", "query", false)
 end
 maze_query "/querymethod/level3/" do |env|
-  query = env.params.body["query"].as(String)
+  query = env.params.body.fetch("query", "")
 
   "<html><body><input type=\"text\" value=\"#{query}\"></body></html>"
 end
@@ -87,7 +87,7 @@ maze_get "/querymethod/level4/" do |_|
   query_driver("/querymethod/level4/", "QUERY Method XSS Level 4", "query", false)
 end
 maze_query "/querymethod/level4/" do |env|
-  query = env.params.body["query"].as(String)
+  query = env.params.body.fetch("query", "")
 
   "<html><body><script>var q = \"#{query}\";</script></body></html>"
 end
@@ -121,7 +121,7 @@ maze_get "/querymethod/level5/" do |env|
   </body></html>"
 end
 maze_query "/querymethod/level5/" do |env|
-  query = env.params.body["query"].as(String)
+  query = env.params.body.fetch("query", "")
 
   "<html><body>QUERY says: #{query}</body></html>"
 end

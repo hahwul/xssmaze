@@ -6,7 +6,7 @@ require "base64"
 Xssmaze.push("realworld-encoding-level1", "/realworld-encoding/level1/?query=a", "triple URL decode",
   vuln: "reflected-html", delivery: ["query"], note: "the framework decodes once before the handler's own three decodes, and an angle-bracket check runs between them, so the payload has to be percent-encoded four times on the wire, not three")
 maze_get "/realworld-encoding/level1/" do |env|
-  data = URI.decode(env.params.query["query"])
+  data = URI.decode(env.params.query.fetch("query", ""))
   if data.includes?("<") || data.includes?(">")
     "Detect Special Character"
   else
@@ -27,7 +27,7 @@ end
 Xssmaze.push("realworld-encoding-level2", "/realworld-encoding/level2/?query=a", "Unicode NFKC normalization bypass",
   vuln: "reflected-html", delivery: ["query"], note: "literal angle brackets are rejected, but the value is NFKC-normalized afterwards, so fullwidth forms such as U+FF1C become <")
 maze_get "/realworld-encoding/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   if query.includes?("<") || query.includes?(">")
     "Detect Special Character"
   else
@@ -46,7 +46,7 @@ end
 Xssmaze.push("realworld-encoding-level3", "/realworld-encoding/level3/?query=a", "HTML entity double decode",
   vuln: "reflected-html", delivery: ["query"], note: "literal angle brackets are rejected, but the chained entity decodes turn &lt; into a real < before reflection")
 maze_get "/realworld-encoding/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   if query.includes?("<") || query.includes?(">")
     "Detect Special Character"
   else
@@ -76,7 +76,7 @@ end
 Xssmaze.push("realworld-encoding-level4", "/realworld-encoding/level4/?query=a", "base64 then URL decode chain",
   vuln: "reflected-html", delivery: ["query"], note: "the parameter must be base64 of a URL-encoded payload; anything that fails to decode returns a fixed error string instead")
 maze_get "/realworld-encoding/level4/" do |env|
-  data = Base64.decode_string(env.params.query["query"])
+  data = Base64.decode_string(env.params.query.fetch("query", ""))
   decoded = URI.decode(data)
   "<html><body><h1>Mixed Encoding Chain Level</h1><div>#{decoded}</div></body></html>"
 rescue
@@ -89,7 +89,7 @@ end
 Xssmaze.push("realworld-encoding-level5", "/realworld-encoding/level5/?query=a", "CSS style attribute injection",
   vuln: "reflected-attr", delivery: ["query"], note: "expression() and url(javascript:) are long gone; break out of the double-quoted style attribute")
 maze_get "/realworld-encoding/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>CSS Style Attribute Injection Level</h1>
@@ -103,7 +103,7 @@ end
 Xssmaze.push("realworld-encoding-level6", "/realworld-encoding/level6/?query=a", "CSS style tag body injection",
   vuln: "reflected-html", delivery: ["query"], note: "CSS does not execute; close the </style> block and inject markup")
 maze_get "/realworld-encoding/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head>
   <style>
@@ -121,7 +121,7 @@ end
 Xssmaze.push("realworld-encoding-level7", "/realworld-encoding/level7/?query=a", "SVG with URL decode combo",
   vuln: "reflected-html", delivery: ["query"], note: "literal angle brackets are rejected before the handler's single decode, so percent-encode them twice on the wire; the value lands in SVG foreign content, so close </text></svg> before injecting HTML")
 maze_get "/realworld-encoding/level7/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   if query.includes?("<") || query.includes?(">")
     "Detect Special Character"
   else
@@ -142,7 +142,7 @@ end
 Xssmaze.push("realworld-encoding-level8", "/realworld-encoding/level8/?query=a", "JSON string with script tag breakout",
   vuln: "reflected-js", delivery: ["query"], note: "quotes and backslashes are escaped and the DOM sink is textContent, so the only way out is closing the <script> block")
 maze_get "/realworld-encoding/level8/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Escape quotes and backslashes (typical JSON string escaping)
   escaped = query.gsub("\\", "\\\\").gsub("\"", "\\\"").gsub("'", "\\'")
   # But notably does NOT filter </script>

@@ -2,7 +2,7 @@
 Xssmaze.push("tablecontext-level1", "/tablecontext/level1/?query=a", "reflection in td element",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/tablecontext/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Table Context XSS Level 1</h1>
@@ -14,7 +14,7 @@ end
 Xssmaze.push("tablecontext-level2", "/tablecontext/level2/?query=a", "reflection in th element",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/tablecontext/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Table Context XSS Level 2</h1>
@@ -26,7 +26,7 @@ end
 Xssmaze.push("tablecontext-level3", "/tablecontext/level3/?query=a", "reflection in caption element",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/tablecontext/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Table Context XSS Level 3</h1>
@@ -38,7 +38,7 @@ end
 Xssmaze.push("tablecontext-level4", "/tablecontext/level4/?query=a", "reflection in li element",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/tablecontext/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Table Context XSS Level 4</h1>
@@ -50,7 +50,7 @@ end
 Xssmaze.push("tablecontext-level5", "/tablecontext/level5/?query=a", "reflection in dd element",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/tablecontext/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Table Context XSS Level 5</h1>
@@ -62,7 +62,7 @@ end
 Xssmaze.push("tablecontext-level6", "/tablecontext/level6/?query=a", "reflection in figcaption element",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/tablecontext/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Table Context XSS Level 6</h1>

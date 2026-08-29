@@ -2,7 +2,7 @@
 Xssmaze.push("realworld-level1", "/realworld/level1/?query=a", "double reflection (safe comment + unsafe body)",
   vuln: "reflected-html", delivery: ["query"], note: "the HTML-comment copy has its angle brackets stripped; the <h2> copy is raw")
 maze_get "/realworld/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   safe = Filters.strip_angles(query)
 
   "<!-- search: #{safe} --><h2>Results for: #{query}</h2>"
@@ -12,7 +12,7 @@ end
 Xssmaze.push("realworld-level2", "/realworld/level2/?query=a&debug=1", "conditional reflection (requires debug=1)", "GET", ["query", "debug"],
   vuln: "reflected-html", delivery: ["query"], note: "nothing is reflected unless the request also carries debug=1")
 maze_get "/realworld/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   debug = env.params.query.fetch("debug", "0")
 
   if debug == "1"
@@ -26,7 +26,7 @@ end
 Xssmaze.push("realworld-level3", "/realworld/level3/?query=a", "truncated reflection (30 char limit)",
   vuln: "reflected-html", delivery: ["query"], note: "the reflection is truncated to 30 characters")
 maze_get "/realworld/level3/" do |env|
-  query = env.params.query["query"][0, 30]
+  query = env.params.query.fetch("query", "")[0, 30]
 
   "<div>#{query}</div>"
 end
@@ -54,7 +54,7 @@ end
 Xssmaze.push("realworld-level6", "/realworld/level6/?query=a", "content-type sniffing (text/plain)",
   vuln: "non-xss-control", delivery: ["query"], exploitable: false, note: "the markup is reflected raw, but the response is served as text/plain, which no modern browser sniffs into HTML, so it never parses; reporting no XSS here is the correct result")
 maze_get "/realworld/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   env.response.content_type = "text/plain"
 
   "<html><body>#{query}</body></html>"
@@ -64,7 +64,7 @@ end
 Xssmaze.push("realworld-level7", "/realworld/level7/?query=a", "JS newline injection (flawed escaping)",
   vuln: "reflected-js", delivery: ["query"], note: "single quotes are backslash-escaped but backslashes are not, so \\';alert(1)// frees the quote")
 maze_get "/realworld/level7/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Flawed escaping: escapes single quotes but not backslashes
   escaped = query.gsub("'", "\\'")
 
