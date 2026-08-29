@@ -1,5 +1,6 @@
 require "json"
 require "digest/sha1"
+require "./solutions"
 
 # Catalog packages every "static" response served from the maze index:
 # the HTML landing page, /map/* views, /sitemap.xml, /version, /stats, etc.
@@ -39,8 +40,11 @@ module Xssmaze::Catalog
   end
 
   # Endpoints the catalog publishes for tooling. Rendered in the page footer.
+  # `/solutions/basic` stands in for the per-category answer key (`/solutions/
+  # <category>`); `/solutions.json` is the whole key keyed by maze name.
   MAP_LINKS = %w[
     /map/text /map/json /map/categories /map/markdown /map/openapi
+    /solutions.json /solutions/basic
     /stats /payloads /random /health /version
   ]
 
@@ -375,6 +379,19 @@ module Xssmaze::Catalog
     end
   end
 
+  # One cached Entry per solution category, keyed by category name. Built the
+  # same way as the flat catalog views so `/solutions/<category>` gets the same
+  # ETag / gzip / 304 treatment — it just needs a dynamic route to select the
+  # category rather than a fixed STATIC_ROUTES row.
+  def self.build_solution_pages : Hash(String, Entry)
+    pages = Hash(String, Entry).new
+    Xssmaze::Solutions.categories.each do |category|
+      body = Xssmaze::Solutions.markdown(category) || ""
+      pages[category] = Entry.new(body, "text/markdown; charset=utf-8")
+    end
+    pages
+  end
+
   # Build every cached static asset in one shot. The key naming maps 1:1
   # to the route table in server.cr so adding a new catalog view is a
   # matter of: add a builder above, add an Entry here, add a route in
@@ -389,20 +406,21 @@ module Xssmaze::Catalog
     version = {version: Xssmaze::VERSION, endpoints: total, categories: groups.size}.to_json
 
     {
-      "index"      => Entry.new(build_index_html(groups, total), "text/html; charset=utf-8"),
-      "map_text"   => Entry.new(build_map_text(mazes), "text/plain; charset=utf-8"),
-      "map_json"   => Entry.new(map_json, "application/json"),
-      "map_md"     => Entry.new(build_map_markdown(mazes), "text/markdown; charset=utf-8"),
-      "categories" => Entry.new(build_categories_json(groups, total), "application/json"),
-      "openapi"    => Entry.new(build_openapi(mazes), "application/json"),
-      "sitemap"    => Entry.new(build_sitemap(mazes), "application/xml; charset=utf-8"),
-      "version"    => Entry.new(version, "application/json"),
-      "stats"      => Entry.new(build_stats(mazes, groups), "application/json"),
-      "payloads"   => Entry.new(PAYLOADS_BODY, "application/json"),
-      "robots"     => Entry.new(ROBOTS_BODY, "text/plain; charset=utf-8", 3600),
-      "css"        => Entry.new(Xssmaze::Assets::INDEX_CSS, "text/css; charset=utf-8", 86400),
-      "js"         => Entry.new(Xssmaze::Assets::INDEX_JS, "application/javascript; charset=utf-8", 86400),
-      "favicon"    => Entry.new(Xssmaze::Assets::FAVICON_SVG, "image/svg+xml; charset=utf-8", 86400),
+      "index"          => Entry.new(build_index_html(groups, total), "text/html; charset=utf-8"),
+      "map_text"       => Entry.new(build_map_text(mazes), "text/plain; charset=utf-8"),
+      "map_json"       => Entry.new(map_json, "application/json"),
+      "map_md"         => Entry.new(build_map_markdown(mazes), "text/markdown; charset=utf-8"),
+      "solutions_json" => Entry.new(Xssmaze::Solutions.json_body, "application/json"),
+      "categories"     => Entry.new(build_categories_json(groups, total), "application/json"),
+      "openapi"        => Entry.new(build_openapi(mazes), "application/json"),
+      "sitemap"        => Entry.new(build_sitemap(mazes), "application/xml; charset=utf-8"),
+      "version"        => Entry.new(version, "application/json"),
+      "stats"          => Entry.new(build_stats(mazes, groups), "application/json"),
+      "payloads"       => Entry.new(PAYLOADS_BODY, "application/json"),
+      "robots"         => Entry.new(ROBOTS_BODY, "text/plain; charset=utf-8", 3600),
+      "css"            => Entry.new(Xssmaze::Assets::INDEX_CSS, "text/css; charset=utf-8", 86400),
+      "js"             => Entry.new(Xssmaze::Assets::INDEX_JS, "application/javascript; charset=utf-8", 86400),
+      "favicon"        => Entry.new(Xssmaze::Assets::FAVICON_SVG, "image/svg+xml; charset=utf-8", 86400),
     }
   end
 end

