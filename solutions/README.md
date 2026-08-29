@@ -113,6 +113,7 @@ working payload for one or more maze levels.
 | [hidden](hidden.md) | Reflection in hidden / non-visible sinks: `<input type=hidden>`, meta refresh, data attributes, JSON/CSS/noscript blocks. |
 | [history-state](history-state.md) | DOM sinks where `?seed` is stored via `history.replaceState` and then read back into `innerHTML` / `srcdoc`. |
 | [hpp](hpp.md) | HTTP parameter pollution: duplicate names, array suffixes, and dot-notation reflections. |
+| [html5-sanitizer](html5-sanitizer.md) | Historic CVE-style sanitizer bypasses via iframe `srcdoc` re-parse, entity-encoded handlers, single-pass tag-strip splicing, and JS template-literal interpolation. |
 | [htmlunsafe](htmlunsafe.md) | The 2024 native unsafe HTML-parsing sinks (`Element.setHTMLUnsafe` / `Document.parseHTMLUnsafe` / `ShadowRoot.setHTMLUnsafe`) fed from hash / query / reflected / fetch sources. |
 | [import-map](import-map.md) | Reflection into `<script type="importmap">` JSON or dynamic `import()` specifier. A user-controlled module URL can return JS that the browser executes. |
 | [inattr](inattr.md) | Reflection inside a `<div class>` attribute under various quoting and filter combinations. |
@@ -214,9 +215,11 @@ working payload for one or more maze levels.
 | [unicode](unicode.md) | Unicode normalization / charset / null-byte / backslash quirks in filters. |
 | [url-param-ctx](url-param-ctx.md) | Reflection inside URL query parameter values placed in href/src/action attributes; break out of the attribute. |
 | [waf-bypass](waf-bypass.md) | Classic WAF bypass filters: keyword strip, event strip, quote escape, single-side angle strip, lowercase, equals strip. |
+| [waf-facade](waf-facade.md) | Branded WAF/CDN block-page facades (Cloudflare/AWS/ModSecurity/Akamai/F5/Incapsula) whose protection is cosmetic, mis-scoped, or blind to the real sink. |
 | [wafv2](wafv2.md) | Round-2 WAF-style filter bypasses (keyword strip, event-handler strip, function name strip, length cap, partial tag strip, mixed filters). |
 | [websocket](websocket.md) | WebSocket-style message handlers that consume user input into innerHTML, JSON parse, eval, attribute setters, or stream-message bootstraps. |
 | [whitespace](whitespace.md) | Whitespace-normalizing filters; pick delimiters that survive. |
 | [worker](worker.md) | Web Worker relays: payload travels through the worker boundary and the page innerHTMLs the worker's response. |
 | [wrappercontext](wrappercontext.md) | Plain reflections wrapped in inline formatting tags; no filtering. |
 | [xmlctx](xmlctx.md) | XML/XHTML-shaped pages served as text/html; deprecated container elements and PI. |
+| [xsleak](xsleak.md) | Cross-site-leak oracles (non-XSS controls): body-size, frame-count, image load/error, timing, and redirect-chain state differences. |

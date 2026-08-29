@@ -19,8 +19,11 @@ CHANGELOG.md
 
 # Tests & docs
 spec/
-solutions/
 images/
+
+# NB: solutions/ is intentionally NOT ignored — src/solutions.cr embeds it at
+# compile time (read_file), and COPY . . runs before `shards build`, so the
+# directory must be present in the build context.
 
 # Docker itself
 Dockerfile

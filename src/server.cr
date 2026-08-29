@@ -12,6 +12,7 @@ module Xssmaze::Server
     {path: "/", key: "index"},
     {path: "/map/text", key: "map_text"},
     {path: "/map/markdown", key: "map_md"},
+    {path: "/solutions.json", key: "solutions_json"},
     {path: "/map/categories", key: "categories"},
     {path: "/map/openapi", key: "openapi"},
     {path: "/sitemap.xml", key: "sitemap"},
@@ -77,6 +78,25 @@ module Xssmaze::Server
 
   FILTER_PARAMS = %w[type q vuln reach exploitable]
 
+  # Body for the dynamic /map/json path (any filter, or `with=solutions`).
+  # `with=solutions` folds the answer key into each surviving object; it reuses
+  # the same filtered indices, so it composes with every existing filter.
+  def self.filtered_map_json(env, mazes, maze_json_objs, with_solutions : Bool) : String
+    indices = filter_indices(mazes, env)
+    if with_solutions
+      entries = Xssmaze::Solutions.entries
+      folded = indices.map do |i|
+        sol = entries[mazes[i].name]?
+        leaf = sol ? {payload: sol.payload, context: sol.context} : nil
+        maze_json_objs[i].merge({solution: leaf})
+      end
+      {endpoints: folded, total: folded.size}.to_json
+    else
+      objs = indices.map { |i| maze_json_objs[i] }
+      {endpoints: objs, total: objs.size}.to_json
+    end
+  end
+
   def self.json_no_store(env)
     env.response.content_type = "application/json"
     env.response.headers["Access-Control-Allow-Origin"] = "*"
@@ -133,6 +153,7 @@ module Xssmaze::Server
 
     Xssmaze.freeze!
     catalog = Catalog.build_all
+    solution_pages = Catalog.build_solution_pages
     mazes = Xssmaze.get
     maze_json_objs = mazes.map(&.to_json_object)
 
@@ -167,9 +188,14 @@ module Xssmaze::Server
     end
 
     # Filter the pre-materialized JSON objects rather than rebuilding tuples.
+    # `with=solutions` folds the answer key into each object; it composes with
+    # the type/q/vuln/reach/exploitable filters and, like them, forces the
+    # dynamic path. The plain, unparameterised response stays the cached entry
+    # so it is byte-identical for existing consumers.
     map_json_entry = catalog["map_json"]
     get "/map/json" do |env|
-      if FILTER_PARAMS.none? { |p| env.params.query[p]? }
+      with_solutions = env.params.query["with"]? == "solutions"
+      if !with_solutions && FILTER_PARAMS.none? { |p| env.params.query[p]? }
         next Xssmaze::Server.serve(env, map_json_entry, last_modified)
       end
 
@@ -178,8 +204,21 @@ module Xssmaze::Server
       env.response.headers["Cache-Control"] = "public, max-age=60"
       env.response.headers["Vary"] = "Accept-Encoding"
 
-      filtered_objs = Xssmaze::Server.filter_indices(mazes, env).map { |i| maze_json_objs[i] }
-      {endpoints: filtered_objs, total: filtered_objs.size}.to_json
+      Xssmaze::Server.filtered_map_json(env, mazes, maze_json_objs, with_solutions)
+    end
+
+    # /solutions/<category> serves one category's answer-key markdown. Per
+    # category, so it is a dynamic route, but each body is a cached Catalog
+    # Entry (ETag / gzip / 304) like every other catalog view.
+    get "/solutions/:category" do |env|
+      category = env.params.url["category"]
+      if entry = solution_pages[category]?
+        Xssmaze::Server.serve(env, entry, last_modified)
+      else
+        env.response.status_code = 404
+        env.response.content_type = "text/html; charset=utf-8"
+        Catalog.render_404(env.request.path)
+      end
     end
 
     # Pick a random maze and 302 to it. Useful for lab demos and fuzzers
