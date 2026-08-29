@@ -123,8 +123,14 @@ Two things this exists to stop a benchmark getting wrong:
 - **`exploitable: false`** endpoints are not bugs. The whole `xsleak` category is
   cross-site *leaks*, not XSS — a scanner that reports nothing there is correct.
 
-Untriaged endpoints are `"unclassified"` with `reach: "unknown"`, deliberately distinct
-from "reviewed and found safe".
+Every endpoint in the catalog is classified — `unclassified` / `reach: "unknown"` remain in
+the schema for anything added later, deliberately distinct from "reviewed and found safe",
+but nothing currently carries them.
+
+Where the question was whether a payload actually *executes* — CSP levels whose policy turns
+out to block the page's own inline script, an entity inside an attribute name, a `Location`
+header — the call was settled in a real browser against the `/beacon` oracle, not argued from
+the served HTML.
 
 ## Answer key
 

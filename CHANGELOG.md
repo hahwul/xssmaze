@@ -1,5 +1,39 @@
 # Changelog
 
+## Unreleased
+
+- **Every endpoint is classified.** `unclassified` went 838 -> 0 and `reach: "unknown"` with
+  it, so `/map/json?reach=server` now returns the 1040 endpoints a request-only scanner can
+  actually reach instead of the 206 it used to admit to. 28 endpoints are marked
+  `exploitable: false` after review — CSP levels whose policy blocks the page's own inline
+  script, open redirects, `application/json` bodies no browser sniffs — each verified in
+  headless Chrome rather than argued from the served HTML (#47, #48, #49, #50)
+- **Answer key served.** `solutions/` was 1049 ground-truth payloads that nothing referenced
+  and `.dockerignore` excluded; it is now embedded at compile time and served as
+  `/solutions.json`, `/solutions/<category>` and `/map/json?with=solutions`. A spec asserts
+  catalog parity in both directions so it cannot drift again (#46)
+- **Execution oracle.** `/beacon/<token>` records that a payload *ran* and `/beacon/log`
+  reports it with the `Referer` that fired it, so a benchmark can tell execution from
+  reflection and score the DOM flows whose payload never reaches the server response (#44)
+- **Scorecard measures the right thing.** `scripts/benchmark.py` scored controls and
+  client-only endpoints as misses and had no false-positive metric at all; it now reports
+  TP/FN/FP with precision, recall and F1, excludes `exploitable: false` from the denominator
+  and counts a detection there as a false positive, and picks its population with `--reach`.
+  A custom scanner now needs an explicit `--detect-regex`/`--detect-json` contract — the old
+  code marked an endpoint detected whenever the tool merely exited 0, so any well-behaved
+  scanner scored 100% (#45)
+- **Cookie reflections stopped 500ing.** `respheader-level4`, `rsplit-level4` and
+  `realworld-input-level6` raised `IO::Error` on the exact payloads they exist to reflect,
+  because `HTTP::Cookie` rejects the bytes RFC 6265 forbids — `rsplit-level4` is a response
+  splitting level that died on the splitting characters. New `Xssmaze.cookie_value` keeps the
+  reflection and drops the crash, and a smoke spec now walks the whole catalog so a 5xx
+  cannot ship again (#43)
+- **Stored mazes are bounded and resettable.** State grew without limit and never cleared, so
+  a second scanner run read the first run's payloads back out as its own finding. Collections
+  keep their most recent entries and `/reset` clears them between runs (#42)
+- Fixed 26 endpoints whose `params:` named a parameter their handler never reads, which had
+  been pointing scanners at the wrong field
+
 ## v0.4.0
 
 - Kemal 1.13.0, Crystal floor `>= 1.12.0`. Kemal now rejects a WebSocket without an `Origin`, so `/domsource/level7/echo` 403'd wscat, fuzzers and raw curl upgrades — `Server.start!` opts back into allow-all, pinned by a spec (#41)
