@@ -7,8 +7,11 @@
 # where user-supplied HTML/SVG is processed by a headless browser, potentially
 # executing JavaScript in a server-side context.
 
-# Storage for simulating webhook callbacks and execution logs
-HEADLESS_CALLBACK_LOG = Hash(String, Array(String)).new { |h, k| h[k] = [] of String }
+# Storage for simulating webhook callbacks and execution logs. The keys are
+# callback ids the maze itself invents, one per Level 5 form render, so this
+# is the store that grew fastest under a fuzzer — `Store::Group` caps both the
+# id set and each id's log, and `POST /reset` empties it.
+headless_callback_log = Xssmaze::Store.group("headless-generator/level5")
 
 # Level 1: Basic HTML to PDF - No Filtering
 # Accepts HTML input and simulates PDF generation with no sanitization
@@ -155,15 +158,15 @@ maze_post "/headless-generator/level5/" do |env|
     # Extract callback URL if present
     if match = html_input.match(/(?:fetch\s*\(|\.open\s*\([^,]*,)\s*["']([^"']+)["']/)
       callback_url = match[1]
-      HEADLESS_CALLBACK_LOG[callback_id] << "JavaScript fetch/XHR detected: #{callback_url}"
+      headless_callback_log.push(callback_id, "JavaScript fetch/XHR detected: #{callback_url}")
     else
-      HEADLESS_CALLBACK_LOG[callback_id] << "JavaScript execution detected"
+      headless_callback_log.push(callback_id, "JavaScript execution detected")
     end
   end
 
   # Check for image beacons
   if html_input =~ /<img[^>]+src=["']https?:\/\/[^"']+/
-    HEADLESS_CALLBACK_LOG[callback_id] << "Image beacon detected in HTML"
+    headless_callback_log.push(callback_id, "Image beacon detected in HTML")
   end
 
   rendered_output = %(<div class="pdf-preview">
@@ -182,7 +185,7 @@ end
 # Callback log viewer for Level 5
 maze_get "/headless-generator/level5/callback/:id" do |env|
   callback_id = env.params.url["id"]
-  logs = HEADLESS_CALLBACK_LOG[callback_id]? || [] of String
+  logs = headless_callback_log[callback_id]
 
   %(<div class="callback-log">
     <h3>Callback Log for ID: #{HTML.escape(callback_id)}</h3>

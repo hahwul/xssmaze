@@ -5,15 +5,27 @@
 # separate GET still detect the issue. Patterns are picked from
 # recurring bug-bounty reports (comment systems, profile bios, product
 # reviews, support tickets, admin notes).
-store = Hash(String, Array(String)).new { |h, k| h[k] = [] of String }
-single = Hash(String, String).new("")
+#
+# The stores live in `Xssmaze::Store`, so they are capped and clearable
+# via `POST /reset`: a level that never forgets hands the next scanner
+# run the previous run's payloads as a finding of its own.
+store = {
+  "lvl1" => Xssmaze::Store.list("storedpat/level1"),
+  "lvl4" => Xssmaze::Store.list("storedpat/level4"),
+}
+single = {
+  "lvl2" => Xssmaze::Store.single("storedpat/level2"),
+  "lvl3" => Xssmaze::Store.single("storedpat/level3"),
+  "lvl5" => Xssmaze::Store.single("storedpat/level5"),
+  "lvl6" => Xssmaze::Store.single("storedpat/level6"),
+}
 
 # Level 1: comment system storing into attribute context
 # Real shape: comment body escaped for body display but reused
 # *raw* inside an attribute (`title=`, `data-*`). Reviews-style.
 Xssmaze.push("storedpat-level1", "/storedpat/level1/", "comment stored in body (escaped) + title attr (raw)", "POST")
 maze_get "/storedpat/level1/" do |_|
-  items = store["lvl1"].map do |c|
+  items = store["lvl1"].entries.map do |c|
     "<li title=\"#{c}\">#{Xssmaze.html_escape(c)}</li>"
   end.join
   "<!doctype html><html><body>
@@ -25,7 +37,7 @@ end
 maze_post "/storedpat/level1/" do |env|
   body = env.params.body.fetch("body", "")
   store["lvl1"] << body
-  items = store["lvl1"].map do |c|
+  items = store["lvl1"].entries.map do |c|
     "<li title=\"#{c}\">#{Xssmaze.html_escape(c)}</li>"
   end.join
   "<!doctype html><html><body>
@@ -41,7 +53,7 @@ end
 # renderer trusts the saved markdown.
 Xssmaze.push("storedpat-level2", "/storedpat/level2/", "profile bio markdown render (HTML pass-through)", "POST")
 maze_get "/storedpat/level2/" do |_|
-  bio = single["lvl2"]
+  bio = single["lvl2"].value
   rendered = bio.gsub(/\*\*([^*]+)\*\*/) { "<strong>#{$1}</strong>" }
     .gsub(/\*([^*]+)\*/) { "<em>#{$1}</em>" }
   "<!doctype html><html><body>
@@ -52,7 +64,7 @@ maze_get "/storedpat/level2/" do |_|
 end
 maze_post "/storedpat/level2/" do |env|
   bio = env.params.body.fetch("bio", "")
-  single["lvl2"] = bio
+  single["lvl2"].value = bio
   rendered = bio.gsub(/\*\*([^*]+)\*\*/) { "<strong>#{$1}</strong>" }
     .gsub(/\*([^*]+)\*/) { "<em>#{$1}</em>" }
   "<!doctype html><html><body>
@@ -68,7 +80,7 @@ end
 # context — escapes quotes only.
 Xssmaze.push("storedpat-level3", "/storedpat/level3/", "product review stored into <meta og:description>", "POST")
 maze_get "/storedpat/level3/" do |_|
-  last = single["lvl3"]
+  last = single["lvl3"].value
   "<!doctype html><html><head>
   <meta property=\"og:description\" content=\"#{last}\">
   </head><body>
@@ -79,7 +91,7 @@ maze_get "/storedpat/level3/" do |_|
 end
 maze_post "/storedpat/level3/" do |env|
   review = env.params.body.fetch("review", "")
-  single["lvl3"] = review
+  single["lvl3"].value = review
   "<!doctype html><html><head>
   <meta property=\"og:description\" content=\"#{review}\">
   </head><body>
@@ -94,7 +106,7 @@ end
 # appended and the entire thread re-rendered, raw.
 Xssmaze.push("storedpat-level4", "/storedpat/level4/", "chat message thread (raw render)", "POST")
 maze_get "/storedpat/level4/" do |_|
-  msgs = store["lvl4"].map { |m| "<div class='msg'>#{m}</div>" }.join
+  msgs = store["lvl4"].entries.map { |m| "<div class='msg'>#{m}</div>" }.join
   "<!doctype html><html><body>
   <h1>Chat</h1>
   <form method='post'><input name='msg' value='hello'><button>Send</button></form>
@@ -104,7 +116,7 @@ end
 maze_post "/storedpat/level4/" do |env|
   msg = env.params.body.fetch("msg", "")
   store["lvl4"] << msg
-  msgs = store["lvl4"].map { |m| "<div class='msg'>#{m}</div>" }.join
+  msgs = store["lvl4"].entries.map { |m| "<div class='msg'>#{m}</div>" }.join
   "<!doctype html><html><body>
   <h1>Chat</h1>
   <form method='post'><input name='msg' value='hello'><button>Send</button></form>
@@ -118,7 +130,7 @@ end
 # response also shows the stored subject for scanner detection.
 Xssmaze.push("storedpat-level5", "/storedpat/level5/", "ticket subject stored into <title> and <h1>", "POST")
 maze_get "/storedpat/level5/" do |_|
-  subj = single["lvl5"]
+  subj = single["lvl5"].value
   "<!doctype html><html><head>
   <title>Ticket — #{subj}</title>
   </head><body>
@@ -128,7 +140,7 @@ maze_get "/storedpat/level5/" do |_|
 end
 maze_post "/storedpat/level5/" do |env|
   subj = env.params.body.fetch("subject", "")
-  single["lvl5"] = subj
+  single["lvl5"].value = subj
   "<!doctype html><html><head>
   <title>Ticket — #{subj}</title>
   </head><body>
@@ -156,7 +168,7 @@ maze_get "/storedpat/level6/" do |_|
 end
 maze_post "/storedpat/level6/" do |env|
   note = env.params.body.fetch("note", "")
-  single["lvl6"] = note
+  single["lvl6"].value = note
   "<!doctype html><html><body>
   <h1>Admin notes</h1>
   <form method='post'><input name='note' value='ok'><button>Save</button></form>
@@ -170,5 +182,5 @@ maze_post "/storedpat/level6/" do |env|
 end
 get "/storedpat/level6/api" do |env|
   env.response.content_type = "application/json"
-  {note: single["lvl6"]}.to_json
+  {note: single["lvl6"].value}.to_json
 end
