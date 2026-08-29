@@ -1,6 +1,7 @@
 # Level 1: Reflected in <div itemscope itemtype="QUERY">
 # Bypass: break out of itemtype with " then inject event handler
-Xssmaze.push("microdata-level1", "/microdata/level1/?query=a", "reflection in itemtype attribute (double-quoted)")
+Xssmaze.push("microdata-level1", "/microdata/level1/?query=a", "reflection in itemtype attribute (double-quoted)",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/microdata/level1/" do |env|
   query = env.params.query["query"]
 
@@ -11,7 +12,8 @@ end
 
 # Level 2: Reflected in <span itemprop="QUERY">
 # Bypass: break out of itemprop with " then inject event handler
-Xssmaze.push("microdata-level2", "/microdata/level2/?query=a", "reflection in itemprop attribute (double-quoted)")
+Xssmaze.push("microdata-level2", "/microdata/level2/?query=a", "reflection in itemprop attribute (double-quoted)",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/microdata/level2/" do |env|
   query = env.params.query["query"]
 
@@ -24,7 +26,8 @@ end
 
 # Level 3: Reflected in <meta itemprop="name" content="QUERY">
 # Bypass: break out of content with " then inject event handler
-Xssmaze.push("microdata-level3", "/microdata/level3/?query=a", "reflection in meta itemprop content attribute (double-quoted)")
+Xssmaze.push("microdata-level3", "/microdata/level3/?query=a", "reflection in meta itemprop content attribute (double-quoted)",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/microdata/level3/" do |env|
   query = env.params.query["query"]
 
@@ -38,7 +41,8 @@ end
 
 # Level 4: Reflected in <link itemprop="url" href="QUERY">
 # Bypass: use javascript: protocol or break out with " then inject event handler
-Xssmaze.push("microdata-level4", "/microdata/level4/?query=a", "reflection in link itemprop href attribute (double-quoted)")
+Xssmaze.push("microdata-level4", "/microdata/level4/?query=a", "reflection in link itemprop href attribute (double-quoted)",
+  vuln: "reflected-attr", delivery: ["query"], note: "a <link> href does not run javascript: URLs; break out of the double-quoted attribute")
 maze_get "/microdata/level4/" do |env|
   query = env.params.query["query"]
 
@@ -52,7 +56,8 @@ end
 
 # Level 5: Reflected in <div property="name" content="QUERY"> (RDFa)
 # Bypass: break out of content with " then inject event handler
-Xssmaze.push("microdata-level5", "/microdata/level5/?query=a", "reflection in RDFa property content attribute (double-quoted)")
+Xssmaze.push("microdata-level5", "/microdata/level5/?query=a", "reflection in RDFa property content attribute (double-quoted)",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/microdata/level5/" do |env|
   query = env.params.query["query"]
 
@@ -65,7 +70,8 @@ end
 
 # Level 6: Reflected in <span typeof="QUERY"> (RDFa)
 # Bypass: break out of typeof with " then inject event handler
-Xssmaze.push("microdata-level6", "/microdata/level6/?query=a", "reflection in RDFa typeof attribute (double-quoted)")
+Xssmaze.push("microdata-level6", "/microdata/level6/?query=a", "reflection in RDFa typeof attribute (double-quoted)",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/microdata/level6/" do |env|
   query = env.params.query["query"]
 

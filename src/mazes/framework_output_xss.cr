@@ -1,5 +1,6 @@
 # Level 1: Django-style error message - raw reflection inside alert div
-Xssmaze.push("fwoutput-level1", "/fwoutput/level1/?query=a", "Django-style error message, raw reflection in alert div")
+Xssmaze.push("fwoutput-level1", "/fwoutput/level1/?query=a", "Django-style error message, raw reflection in alert div",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/fwoutput/level1/" do |env|
   query = env.params.query["query"]
 
@@ -17,7 +18,8 @@ maze_get "/fwoutput/level1/" do |env|
 end
 
 # Level 2: Rails-style search form - reflection in input value attribute (attr breakout)
-Xssmaze.push("fwoutput-level2", "/fwoutput/level2/?query=a", "Rails-style search form, reflection in input value attribute")
+Xssmaze.push("fwoutput-level2", "/fwoutput/level2/?query=a", "Rails-style search form, reflection in input value attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/fwoutput/level2/" do |env|
   query = env.params.query["query"]
 
@@ -38,7 +40,8 @@ maze_get "/fwoutput/level2/" do |env|
 end
 
 # Level 3: Express-style JSON error - raw reflection inside <pre> served as text/html
-Xssmaze.push("fwoutput-level3", "/fwoutput/level3/?query=a", "Express-style JSON error in pre tag, served as text/html")
+Xssmaze.push("fwoutput-level3", "/fwoutput/level3/?query=a", "Express-style JSON error in pre tag, served as text/html",
+  vuln: "reflected-html", delivery: ["query"], note: "JSON-shaped text inside <pre>, which is ordinary parsed content rather than raw text")
 maze_get "/fwoutput/level3/" do |env|
   query = env.params.query["query"]
 
@@ -53,7 +56,8 @@ maze_get "/fwoutput/level3/" do |env|
 end
 
 # Level 4: Spring-style Thymeleaf template - raw reflection in span with th:text
-Xssmaze.push("fwoutput-level4", "/fwoutput/level4/?query=a", "Spring/Thymeleaf-style span, raw reflection in span element")
+Xssmaze.push("fwoutput-level4", "/fwoutput/level4/?query=a", "Spring/Thymeleaf-style span, raw reflection in span element",
+  vuln: "reflected-attr", delivery: ["query"], note: "no Thymeleaf runs here; th:text is an inert attribute, so break out of its double-quoted value")
 maze_get "/fwoutput/level4/" do |env|
   query = env.params.query["query"]
 
@@ -74,7 +78,8 @@ maze_get "/fwoutput/level4/" do |env|
 end
 
 # Level 5: Laravel-style breadcrumb - raw reflection in breadcrumb item
-Xssmaze.push("fwoutput-level5", "/fwoutput/level5/?query=a", "Laravel-style breadcrumb, raw reflection in breadcrumb item")
+Xssmaze.push("fwoutput-level5", "/fwoutput/level5/?query=a", "Laravel-style breadcrumb, raw reflection in breadcrumb item",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/fwoutput/level5/" do |env|
   query = env.params.query["query"]
 
@@ -98,7 +103,8 @@ maze_get "/fwoutput/level5/" do |env|
 end
 
 # Level 6: .NET-style asp:Label - raw reflection (asp: prefix is just a namespace, doesn't prevent XSS)
-Xssmaze.push("fwoutput-level6", "/fwoutput/level6/?query=a", ".NET-style asp:Label, raw reflection in label element")
+Xssmaze.push("fwoutput-level6", "/fwoutput/level6/?query=a", ".NET-style asp:Label, raw reflection in label element",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/fwoutput/level6/" do |env|
   query = env.params.query["query"]
 

@@ -2,7 +2,8 @@
 # The query is reflected inside a JSON string value, but since Content-Type is text/html,
 # the browser will parse HTML tags embedded in the JSON.
 # Bypass: break out of JSON string with ", inject HTML like <img src=x onerror=alert(1)>
-Xssmaze.push("api-response-level1", "/api-response/level1/?query=a", "JSON-like response with text/html content type")
+Xssmaze.push("api-response-level1", "/api-response/level1/?query=a", "JSON-like response with text/html content type",
+  vuln: "reflected-html", delivery: ["query"], note: "JSON-shaped body served as text/html, so markup inside the string value is parsed as HTML")
 maze_get "/api-response/level1/" do |env|
   query = env.params.query["query"]
   env.response.content_type = "text/html"
@@ -14,7 +15,8 @@ end
 # The query is reflected inside an XML element, but Content-Type is text/html so
 # the browser renders HTML tags within the XML structure.
 # Bypass: inject <script>alert(1)</script> or <img src=x onerror=alert(1)>
-Xssmaze.push("api-response-level2", "/api-response/level2/?query=a", "XML response with text/html content type")
+Xssmaze.push("api-response-level2", "/api-response/level2/?query=a", "XML response with text/html content type",
+  vuln: "reflected-html", delivery: ["query"], note: "XML-shaped body served as text/html, so the element text is parsed as HTML")
 maze_get "/api-response/level2/" do |env|
   query = env.params.query["query"]
   env.response.content_type = "text/html"
@@ -26,7 +28,8 @@ end
 # The query is reflected in a CSV-formatted body, but Content-Type is text/html,
 # so the browser treats the entire body as HTML.
 # Bypass: inject <script>alert(1)</script> directly
-Xssmaze.push("api-response-level3", "/api-response/level3/?query=a", "CSV-like response with text/html content type")
+Xssmaze.push("api-response-level3", "/api-response/level3/?query=a", "CSV-like response with text/html content type",
+  vuln: "reflected-html", delivery: ["query"], note: "CSV-shaped body served as text/html")
 maze_get "/api-response/level3/" do |env|
   query = env.params.query["query"]
   env.response.content_type = "text/html"
@@ -38,7 +41,8 @@ end
 # The query is reflected inside JSONP data, but since Content-Type is text/html
 # the browser will parse any HTML injected into the data string.
 # Bypass: break out of JS string with ", inject </script><img src=x onerror=alert(1)>
-Xssmaze.push("api-response-level4", "/api-response/level4/?query=a", "JSONP callback response with text/html content type")
+Xssmaze.push("api-response-level4", "/api-response/level4/?query=a", "JSONP callback response with text/html content type",
+  vuln: "reflected-html", delivery: ["query"], note: "JSONP-shaped body served as text/html; it is never executed as script, so inject markup instead of breaking out of the JS string")
 maze_get "/api-response/level4/" do |env|
   query = env.params.query["query"]
   env.response.content_type = "text/html"
@@ -49,7 +53,8 @@ end
 # Level 5: HTML fragment response (no doctype/html/body tags)
 # The query is reflected inside a bare HTML fragment with no wrapping document structure.
 # Bypass: inject <script>alert(1)</script> or event handlers to break out of div
-Xssmaze.push("api-response-level5", "/api-response/level5/?query=a", "HTML fragment response without full document structure")
+Xssmaze.push("api-response-level5", "/api-response/level5/?query=a", "HTML fragment response without full document structure",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/api-response/level5/" do |env|
   query = env.params.query["query"]
   env.response.content_type = "text/html"
@@ -61,7 +66,8 @@ end
 # A simple error string with the query reflected, but Content-Type is text/html
 # so the browser will render HTML tags embedded in the error text.
 # Bypass: inject <script>alert(1)</script> directly
-Xssmaze.push("api-response-level6", "/api-response/level6/?query=a", "Plain text error response with text/html content type")
+Xssmaze.push("api-response-level6", "/api-response/level6/?query=a", "Plain text error response with text/html content type",
+  vuln: "reflected-html", delivery: ["query"], note: "plain-text-looking body, but the response is served as text/html")
 maze_get "/api-response/level6/" do |env|
   query = env.params.query["query"]
   env.response.content_type = "text/html"

@@ -1,6 +1,7 @@
 # Level 1: Full SVG document with query reflected in <text> element
 # Bypass: inject SVG event handler, e.g. </text><svg onload=alert(1)>
-Xssmaze.push("svgctx-level1", "/svgctx/level1/?query=a", "SVG text element injection (break out and inject onload)")
+Xssmaze.push("svgctx-level1", "/svgctx/level1/?query=a", "SVG text element injection (break out and inject onload)",
+  vuln: "reflected-html", delivery: ["query"], note: "the reflection sits in SVG foreign content; close </text> before injecting")
 maze_get "/svgctx/level1/" do |env|
   query = env.params.query["query"]
 
@@ -15,7 +16,8 @@ end
 
 # Level 2: SVG <desc> element with query reflected
 # Bypass: </desc><svg onload=alert(1)>
-Xssmaze.push("svgctx-level2", "/svgctx/level2/?query=a", "SVG desc element injection (break out of desc)")
+Xssmaze.push("svgctx-level2", "/svgctx/level2/?query=a", "SVG desc element injection (break out of desc)",
+  vuln: "reflected-html", delivery: ["query"], note: "SVG <desc> holds parsed content; close </desc> before injecting")
 maze_get "/svgctx/level2/" do |env|
   query = env.params.query["query"]
 
@@ -30,7 +32,8 @@ end
 
 # Level 3: SVG <title> element with query reflected
 # Bypass: </title><svg onload=alert(1)>
-Xssmaze.push("svgctx-level3", "/svgctx/level3/?query=a", "SVG title element injection (break out of title)")
+Xssmaze.push("svgctx-level3", "/svgctx/level3/?query=a", "SVG title element injection (break out of title)",
+  vuln: "reflected-html", delivery: ["query"], note: "this is the SVG <title>, not the document title; close </title> before injecting")
 maze_get "/svgctx/level3/" do |env|
   query = env.params.query["query"]
 
@@ -45,7 +48,8 @@ end
 
 # Level 4: SVG <a> with query in xlink:href attribute
 # Bypass: javascript:alert(1)
-Xssmaze.push("svgctx-level4", "/svgctx/level4/?query=a", "SVG xlink:href attribute injection (javascript: protocol)")
+Xssmaze.push("svgctx-level4", "/svgctx/level4/?query=a", "SVG xlink:href attribute injection (javascript: protocol)",
+  vuln: "reflected-attr", delivery: ["query"], note: "an SVG anchor takes a javascript: URL, but that needs a click; a quote breakout does not")
 maze_get "/svgctx/level4/" do |env|
   query = env.params.query["query"]
 
@@ -61,7 +65,8 @@ end
 
 # Level 5: SVG <foreignObject> with query reflected in HTML inside it
 # Bypass: standard HTML injection, e.g. <img src=x onerror=alert(1)>
-Xssmaze.push("svgctx-level5", "/svgctx/level5/?query=a", "SVG foreignObject HTML injection")
+Xssmaze.push("svgctx-level5", "/svgctx/level5/?query=a", "SVG foreignObject HTML injection",
+  vuln: "reflected-html", delivery: ["query"], note: "inside foreignObject the content is ordinary XHTML, so a plain HTML payload works with no SVG-specific tricks")
 maze_get "/svgctx/level5/" do |env|
   query = env.params.query["query"]
 
@@ -79,7 +84,8 @@ end
 
 # Level 6: SVG <animate> with query in values attribute
 # Bypass: break out of attribute, e.g. "><svg onload=alert(1)>
-Xssmaze.push("svgctx-level6", "/svgctx/level6/?query=a", "SVG animate values attribute injection (break out of attribute)")
+Xssmaze.push("svgctx-level6", "/svgctx/level6/?query=a", "SVG animate values attribute injection (break out of attribute)",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/svgctx/level6/" do |env|
   query = env.params.query["query"]
 

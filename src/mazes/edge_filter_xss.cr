@@ -1,5 +1,6 @@
 # Level 1: Strips 'script' keyword (case-insensitive) but allows everything else - use <img onerror>
-Xssmaze.push("edgefilter-level1", "/edgefilter/level1/?query=a", "strips script keyword but allows other tags and event handlers")
+Xssmaze.push("edgefilter-level1", "/edgefilter/level1/?query=a", "strips script keyword but allows other tags and event handlers",
+  vuln: "reflected-html", delivery: ["query"], note: "script is stripped case-insensitively; other tags and their event handlers pass through untouched")
 maze_get "/edgefilter/level1/" do |env|
   query = env.params.query["query"]
   filtered = query.gsub(/script/i, "")
@@ -12,7 +13,8 @@ end
 
 # Level 2: Strips all tags matching <[^>]+> pattern once, but double-wrapped tags survive
 # Outer angle brackets get consumed, leaving inner tag intact
-Xssmaze.push("edgefilter-level2", "/edgefilter/level2/?query=a", "single-pass tag regex strip (double-wrap bypass)")
+Xssmaze.push("edgefilter-level2", "/edgefilter/level2/?query=a", "single-pass tag regex strip (double-wrap bypass)",
+  vuln: "reflected-html", delivery: ["query"], note: "one pass of a <...> regex; nest a throwaway tag inside the payload so the surviving halves rejoin")
 maze_get "/edgefilter/level2/" do |env|
   query = env.params.query["query"]
   # Single-pass strip: matches <...> greedily
@@ -26,7 +28,8 @@ end
 
 # Level 3: Reflection in an attribute value="QUERY" - < encoded only when followed by alpha char
 # Break out of attribute with double-quote instead
-Xssmaze.push("edgefilter-level3", "/edgefilter/level3/?query=a", "angle bracket filter only before alpha chars, reflection in attribute")
+Xssmaze.push("edgefilter-level3", "/edgefilter/level3/?query=a", "angle bracket filter only before alpha chars, reflection in attribute",
+  vuln: "reflected-attr", delivery: ["query"], note: "< is only encoded when a letter follows it; break out of the double-quoted value attribute rather than injecting a tag")
 maze_get "/edgefilter/level3/" do |env|
   query = env.params.query["query"]
   # Encode < only when followed by a letter (tries to block tags but misses attribute escape)
@@ -39,7 +42,8 @@ maze_get "/edgefilter/level3/" do |env|
 end
 
 # Level 4: Strips event handlers (on[a-z]+=) but doesn't strip tags - use <script>alert(1)</script>
-Xssmaze.push("edgefilter-level4", "/edgefilter/level4/?query=a", "strips event handlers but allows script tags")
+Xssmaze.push("edgefilter-level4", "/edgefilter/level4/?query=a", "strips event handlers but allows script tags",
+  vuln: "reflected-html", delivery: ["query"], note: "event-handler attributes are stripped, but tags are not")
 maze_get "/edgefilter/level4/" do |env|
   query = env.params.query["query"]
   # Remove event handler attributes like onclick=, onerror=, onload=, etc.
@@ -53,7 +57,8 @@ end
 
 # Level 5: Strips < > " ' but reflected inside <script>var x=QUERY;</script> (no quotes around QUERY)
 # Inject raw JS like 1;alert(1) since no quotes to break out of and no angle brackets needed
-Xssmaze.push("edgefilter-level5", "/edgefilter/level5/?query=a", "strips angle brackets and quotes but reflects in raw JS context")
+Xssmaze.push("edgefilter-level5", "/edgefilter/level5/?query=a", "strips angle brackets and quotes but reflects in raw JS context",
+  vuln: "reflected-js", delivery: ["query"], note: "angle brackets and both quote characters are stripped, but the value lands unquoted in a JS statement, so plain code such as 1;alert(1) runs")
 maze_get "/edgefilter/level5/" do |env|
   query = env.params.query["query"]
   filtered = query.gsub("<", "").gsub(">", "").gsub("\"", "").gsub("'", "")
@@ -65,7 +70,8 @@ maze_get "/edgefilter/level5/" do |env|
 end
 
 # Level 6: HTML encodes < > " ' & but only in first 20 chars of input, rest is raw
-Xssmaze.push("edgefilter-level6", "/edgefilter/level6/?query=a", "HTML encode first 20 chars only, rest is raw reflection")
+Xssmaze.push("edgefilter-level6", "/edgefilter/level6/?query=a", "HTML encode first 20 chars only, rest is raw reflection",
+  vuln: "reflected-html", delivery: ["query"], note: "only the first 20 characters are entity-encoded; pad the payload past that offset")
 maze_get "/edgefilter/level6/" do |env|
   query = env.params.query["query"]
   if query.size > 20

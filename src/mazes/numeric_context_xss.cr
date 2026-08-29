@@ -1,5 +1,6 @@
 # Level 1: Reflected as raw JS value in script (no quotes around it)
-Xssmaze.push("numericcontext-level1", "/numericcontext/level1/?query=1", "numeric context in script var assignment")
+Xssmaze.push("numericcontext-level1", "/numericcontext/level1/?query=1", "numeric context in script var assignment",
+  vuln: "reflected-js", delivery: ["query"], note: "unquoted JS expression position, so a bare statement runs without any breakout")
 maze_get "/numericcontext/level1/" do |env|
   query = env.params.query["query"]
 
@@ -11,7 +12,8 @@ maze_get "/numericcontext/level1/" do |env|
 end
 
 # Level 2: Reflected in style z-index attribute value (double-quoted)
-Xssmaze.push("numericcontext-level2", "/numericcontext/level2/?query=1", "numeric context in style z-index attribute")
+Xssmaze.push("numericcontext-level2", "/numericcontext/level2/?query=1", "numeric context in style z-index attribute",
+  vuln: "reflected-attr", delivery: ["query"], note: "CSS cannot execute script in a modern browser; break out of the double-quoted style attribute")
 maze_get "/numericcontext/level2/" do |env|
   query = env.params.query["query"]
 
@@ -22,7 +24,8 @@ maze_get "/numericcontext/level2/" do |env|
 end
 
 # Level 3: Reflected in input max attribute value (double-quoted)
-Xssmaze.push("numericcontext-level3", "/numericcontext/level3/?query=100", "numeric context in input range max attribute")
+Xssmaze.push("numericcontext-level3", "/numericcontext/level3/?query=100", "numeric context in input range max attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/numericcontext/level3/" do |env|
   query = env.params.query["query"]
 
@@ -33,7 +36,8 @@ maze_get "/numericcontext/level3/" do |env|
 end
 
 # Level 4: Reflected in table border attribute value (double-quoted)
-Xssmaze.push("numericcontext-level4", "/numericcontext/level4/?query=1", "numeric context in table border attribute")
+Xssmaze.push("numericcontext-level4", "/numericcontext/level4/?query=1", "numeric context in table border attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/numericcontext/level4/" do |env|
   query = env.params.query["query"]
 
@@ -44,7 +48,8 @@ maze_get "/numericcontext/level4/" do |env|
 end
 
 # Level 5: Reflected in img width attribute value (double-quoted)
-Xssmaze.push("numericcontext-level5", "/numericcontext/level5/?query=200", "numeric context in img width attribute")
+Xssmaze.push("numericcontext-level5", "/numericcontext/level5/?query=200", "numeric context in img width attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/numericcontext/level5/" do |env|
   query = env.params.query["query"]
 
@@ -55,7 +60,8 @@ maze_get "/numericcontext/level5/" do |env|
 end
 
 # Level 6: Reflected as raw JS value in setTimeout delay (no quotes)
-Xssmaze.push("numericcontext-level6", "/numericcontext/level6/?query=1000", "numeric context in setTimeout delay")
+Xssmaze.push("numericcontext-level6", "/numericcontext/level6/?query=1000", "numeric context in setTimeout delay",
+  vuln: "reflected-js", delivery: ["query"], note: "the delay argument is an unquoted JS expression position, so the injection runs no matter what setTimeout does with the value")
 maze_get "/numericcontext/level6/" do |env|
   query = env.params.query["query"]
 

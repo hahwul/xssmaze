@@ -1,6 +1,7 @@
 # Level 1: WordPress post title - raw reflection in entry-title h1
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("cmspattern-level1", "/cmspattern/level1/?query=a", "WordPress post title raw reflection")
+Xssmaze.push("cmspattern-level1", "/cmspattern/level1/?query=a", "WordPress post title raw reflection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/cmspattern/level1/" do |env|
   query = env.params.query["query"]
 
@@ -9,7 +10,8 @@ end
 
 # Level 2: WordPress widget title - raw reflection in widget-title h3
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("cmspattern-level2", "/cmspattern/level2/?query=a", "WordPress widget title raw reflection")
+Xssmaze.push("cmspattern-level2", "/cmspattern/level2/?query=a", "WordPress widget title raw reflection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/cmspattern/level2/" do |env|
   query = env.params.query["query"]
 
@@ -18,7 +20,8 @@ end
 
 # Level 3: Drupal field body - raw reflection in field paragraph
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("cmspattern-level3", "/cmspattern/level3/?query=a", "Drupal field body raw reflection")
+Xssmaze.push("cmspattern-level3", "/cmspattern/level3/?query=a", "Drupal field body raw reflection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/cmspattern/level3/" do |env|
   query = env.params.query["query"]
 
@@ -27,7 +30,8 @@ end
 
 # Level 4: Joomla module - raw reflection in module heading
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("cmspattern-level4", "/cmspattern/level4/?query=a", "Joomla module heading raw reflection")
+Xssmaze.push("cmspattern-level4", "/cmspattern/level4/?query=a", "Joomla module heading raw reflection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/cmspattern/level4/" do |env|
   query = env.params.query["query"]
 
@@ -36,7 +40,8 @@ end
 
 # Level 5: Ghost blog excerpt - raw reflection in post-card-excerpt
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("cmspattern-level5", "/cmspattern/level5/?query=a", "Ghost blog excerpt raw reflection")
+Xssmaze.push("cmspattern-level5", "/cmspattern/level5/?query=a", "Ghost blog excerpt raw reflection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/cmspattern/level5/" do |env|
   query = env.params.query["query"]
 
@@ -45,7 +50,8 @@ end
 
 # Level 6: Medium-style article section - raw reflection in nested article content
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("cmspattern-level6", "/cmspattern/level6/?query=a", "Medium-style article content raw reflection")
+Xssmaze.push("cmspattern-level6", "/cmspattern/level6/?query=a", "Medium-style article content raw reflection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/cmspattern/level6/" do |env|
   query = env.params.query["query"]
 

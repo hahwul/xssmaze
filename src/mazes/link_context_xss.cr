@@ -1,5 +1,6 @@
 # Level 1: Reflected in <a href="QUERY">
-Xssmaze.push("linkcontext-level1", "/linkcontext/level1/?query=a", "reflection in a href attribute")
+Xssmaze.push("linkcontext-level1", "/linkcontext/level1/?query=a", "reflection in a href attribute",
+  vuln: "reflected-attr", delivery: ["query"], note: "an anchor href takes a javascript: URL, but that needs a click; a quote breakout does not")
 maze_get "/linkcontext/level1/" do |env|
   query = env.params.query["query"]
 
@@ -10,7 +11,8 @@ maze_get "/linkcontext/level1/" do |env|
 end
 
 # Level 2: Reflected in <link rel="stylesheet" href="QUERY">
-Xssmaze.push("linkcontext-level2", "/linkcontext/level2/?query=a", "reflection in link href attribute")
+Xssmaze.push("linkcontext-level2", "/linkcontext/level2/?query=a", "reflection in link href attribute",
+  vuln: "reflected-attr", delivery: ["query"], note: "a stylesheet href does not run javascript: URLs; break out of the double-quoted attribute")
 maze_get "/linkcontext/level2/" do |env|
   query = env.params.query["query"]
 
@@ -23,7 +25,8 @@ maze_get "/linkcontext/level2/" do |env|
 end
 
 # Level 3: Reflected in <a ping="QUERY">
-Xssmaze.push("linkcontext-level3", "/linkcontext/level3/?query=a", "reflection in a ping attribute")
+Xssmaze.push("linkcontext-level3", "/linkcontext/level3/?query=a", "reflection in a ping attribute",
+  vuln: "reflected-attr", delivery: ["query"], note: "the ping attribute only fires a background POST and never executes; break out of the quote")
 maze_get "/linkcontext/level3/" do |env|
   query = env.params.query["query"]
 
@@ -34,7 +37,8 @@ maze_get "/linkcontext/level3/" do |env|
 end
 
 # Level 4: Reflected in <area href="QUERY"> inside <map>
-Xssmaze.push("linkcontext-level4", "/linkcontext/level4/?query=a", "reflection in area href attribute inside map")
+Xssmaze.push("linkcontext-level4", "/linkcontext/level4/?query=a", "reflection in area href attribute inside map",
+  vuln: "reflected-attr", delivery: ["query"], note: "the usemap image does not exist, so the area is not clickable; break out of the quoted attribute instead of using a javascript: URL")
 maze_get "/linkcontext/level4/" do |env|
   query = env.params.query["query"]
 
@@ -46,7 +50,8 @@ maze_get "/linkcontext/level4/" do |env|
 end
 
 # Level 5: Reflected in <base href="QUERY">
-Xssmaze.push("linkcontext-level5", "/linkcontext/level5/?query=a", "reflection in base href attribute")
+Xssmaze.push("linkcontext-level5", "/linkcontext/level5/?query=a", "reflection in base href attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/linkcontext/level5/" do |env|
   query = env.params.query["query"]
 
@@ -59,7 +64,8 @@ maze_get "/linkcontext/level5/" do |env|
 end
 
 # Level 6: Reflected in <a href="/page" title="QUERY">
-Xssmaze.push("linkcontext-level6", "/linkcontext/level6/?query=a", "reflection in a title attribute")
+Xssmaze.push("linkcontext-level6", "/linkcontext/level6/?query=a", "reflection in a title attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/linkcontext/level6/" do |env|
   query = env.params.query["query"]
 

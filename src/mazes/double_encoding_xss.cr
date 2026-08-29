@@ -3,7 +3,8 @@ require "base64"
 # Level 1: Server performs double URL decode before reflection
 # Exploit: Send double-URL-encoded payload e.g. %253Cscript%253Ealert(1)%253C/script%253E
 # First decode: %3Cscript%3Ealert(1)%3C/script%3E, second decode: <script>alert(1)</script>
-Xssmaze.push("dblenc-level1", "/dblenc/level1/?query=a", "double URL decode before reflection")
+Xssmaze.push("dblenc-level1", "/dblenc/level1/?query=a", "double URL decode before reflection",
+  vuln: "reflected-html", delivery: ["query"], note: "two extra URL decodes on top of the framework's own, so percent-encoded payloads arrive as raw markup")
 maze_get "/dblenc/level1/" do |env|
   query = env.params.query["query"]
 
@@ -21,7 +22,8 @@ end
 
 # Level 2: Server HTML-decodes entities then reflects raw
 # Exploit: Send &lt;script&gt;alert(1)&lt;/script&gt; which becomes <script>alert(1)</script>
-Xssmaze.push("dblenc-level2", "/dblenc/level2/?query=a", "HTML entity decode before reflection")
+Xssmaze.push("dblenc-level2", "/dblenc/level2/?query=a", "HTML entity decode before reflection",
+  vuln: "reflected-html", delivery: ["query"], note: "&lt; and &gt; are decoded back to angle brackets before reflection")
 maze_get "/dblenc/level2/" do |env|
   query = env.params.query["query"]
 
@@ -40,7 +42,8 @@ end
 
 # Level 3: Server base64-decodes query then reflects raw
 # Exploit: Send base64-encoded payload e.g. PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==
-Xssmaze.push("dblenc-level3", "/dblenc/level3/?query=YQ==", "base64 decode before reflection")
+Xssmaze.push("dblenc-level3", "/dblenc/level3/?query=YQ==", "base64 decode before reflection",
+  vuln: "reflected-html", delivery: ["query"], note: "the parameter must be base64; anything that fails to decode is replaced with a fixed error string, so a raw payload never reaches the page")
 maze_get "/dblenc/level3/" do |env|
   query = env.params.query["query"]
 
@@ -58,7 +61,8 @@ end
 
 # Level 4: Server performs single URL decode then reflects raw
 # Exploit: Send %3Cscript%3Ealert(1)%3C/script%3E which decodes to <script>alert(1)</script>
-Xssmaze.push("dblenc-level4", "/dblenc/level4/?query=a", "single URL decode before reflection")
+Xssmaze.push("dblenc-level4", "/dblenc/level4/?query=a", "single URL decode before reflection",
+  vuln: "reflected-html", delivery: ["query"], note: "the server URL-decodes once before reflecting")
 maze_get "/dblenc/level4/" do |env|
   query = env.params.query["query"]
 

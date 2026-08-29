@@ -1,7 +1,8 @@
 # Level 1: Raw reflection inside a custom element
 # Bypass: inject arbitrary HTML since no escaping is applied
 # e.g. <script>alert(1)</script>
-Xssmaze.push("customtag-level1", "/customtag/level1/?query=a", "raw reflection in custom element")
+Xssmaze.push("customtag-level1", "/customtag/level1/?query=a", "raw reflection in custom element",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/customtag/level1/" do |env|
   query = env.params.query["query"]
 
@@ -11,7 +12,8 @@ end
 # Level 2: Reflection in data-value attribute of custom element
 # Bypass: break out of attribute with " then inject new tag
 # e.g. "><script>alert(1)</script>
-Xssmaze.push("customtag-level2", "/customtag/level2/?query=a", "reflection in custom element data-value attribute")
+Xssmaze.push("customtag-level2", "/customtag/level2/?query=a", "reflection in custom element data-value attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/customtag/level2/" do |env|
   query = env.params.query["query"]
 
@@ -21,7 +23,8 @@ end
 # Level 3: Raw reflection inside div with is= custom element extension
 # Bypass: inject arbitrary HTML since no escaping is applied
 # e.g. <script>alert(1)</script>
-Xssmaze.push("customtag-level3", "/customtag/level3/?query=a", "raw reflection in customized built-in element (is= attribute)")
+Xssmaze.push("customtag-level3", "/customtag/level3/?query=a", "raw reflection in customized built-in element (is= attribute)",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/customtag/level3/" do |env|
   query = env.params.query["query"]
 
@@ -31,7 +34,8 @@ end
 # Level 4: Reflection in slot name attribute
 # Bypass: break out of name attribute with " then inject new tag
 # e.g. "><script>alert(1)</script>
-Xssmaze.push("customtag-level4", "/customtag/level4/?query=a", "reflection in slot name attribute")
+Xssmaze.push("customtag-level4", "/customtag/level4/?query=a", "reflection in slot name attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/customtag/level4/" do |env|
   query = env.params.query["query"]
 
@@ -42,7 +46,8 @@ end
 # Template contents are inert in browser but visible in response source
 # Bypass: inject arbitrary HTML (detectable by response-body scanner)
 # e.g. <script>alert(1)</script>
-Xssmaze.push("customtag-level5", "/customtag/level5/?query=a", "raw reflection inside template element")
+Xssmaze.push("customtag-level5", "/customtag/level5/?query=a", "raw reflection inside template element",
+  vuln: "reflected-html", delivery: ["query"], note: "content parsed inside <template> is inert and never executes; close the template tag first, then inject")
 maze_get "/customtag/level5/" do |env|
   query = env.params.query["query"]
 
@@ -52,7 +57,8 @@ end
 # Level 6: Raw reflection inside output element
 # Bypass: inject arbitrary HTML since no escaping is applied
 # e.g. <script>alert(1)</script>
-Xssmaze.push("customtag-level6", "/customtag/level6/?query=a", "raw reflection in output element")
+Xssmaze.push("customtag-level6", "/customtag/level6/?query=a", "raw reflection in output element",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/customtag/level6/" do |env|
   query = env.params.query["query"]
 

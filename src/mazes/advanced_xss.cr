@@ -1,4 +1,5 @@
-Xssmaze.push("advanced-xss-level1", "/advanced/level1/?query=a", "XSS with WAF bypass using encoding")
+Xssmaze.push("advanced-xss-level1", "/advanced/level1/?query=a", "XSS with WAF bypass using encoding",
+  vuln: "reflected-html", delivery: ["query"], note: "the filter strips script/javascript/onload in a single pass, so scrscriptipt survives; onerror is not filtered at all")
 maze_get "/advanced/level1/" do |env|
   query = env.params.query["query"]
   # Simulate basic WAF filtering
@@ -10,7 +11,8 @@ maze_get "/advanced/level1/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("advanced-xss-level2", "/advanced/level2/?query=a", "XSS with mutation observer")
+Xssmaze.push("advanced-xss-level2", "/advanced/level2/?query=a", "XSS with mutation observer",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "the value is server-inlined into a JS string; a MutationObserver then re-applies the added text node's textContent as innerHTML")
 maze_get "/advanced/level2/" do |env|
   query = env.params.query["query"]
 
@@ -42,7 +44,8 @@ maze_get "/advanced/level2/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("advanced-xss-level3", "/advanced/level3/?query=a", "XSS with Service Worker")
+Xssmaze.push("advanced-xss-level3", "/advanced/level3/?query=a", "XSS with Service Worker",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "no service worker is ever registered; the value is server-inlined into a JS object literal and written to innerHTML on load")
 maze_get "/advanced/level3/" do |env|
   query = env.params.query["query"]
 
@@ -64,7 +67,8 @@ maze_get "/advanced/level3/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("advanced-xss-level4", "/advanced/level4/?query=a", "XSS with Web Components")
+Xssmaze.push("advanced-xss-level4", "/advanced/level4/?query=a", "XSS with Web Components",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "the value is server-inlined into the custom element's connectedCallback innerHTML string")
 maze_get "/advanced/level4/" do |env|
   query = env.params.query["query"]
 
@@ -88,7 +92,8 @@ maze_get "/advanced/level4/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("advanced-xss-level5", "/advanced/level5/?query=a", "XSS with Trusted Types bypass")
+Xssmaze.push("advanced-xss-level5", "/advanced/level5/?query=a", "XSS with Trusted Types bypass",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["trustedtypes.createHTML", "innerHTML"], delivery: ["query"], note: "the policy returns its input unchanged, and browsers without Trusted Types take an identical unguarded innerHTML path")
 maze_get "/advanced/level5/" do |env|
   query = env.params.query["query"]
 
@@ -118,7 +123,8 @@ maze_get "/advanced/level5/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("advanced-xss-level6", "/advanced/level6/?query=a", "XSS with Proxy object manipulation")
+Xssmaze.push("advanced-xss-level6", "/advanced/level6/?query=a", "XSS with Proxy object manipulation",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "the value is server-inlined into a JS string that a Proxy get trap forwards to innerHTML")
 maze_get "/advanced/level6/" do |env|
   query = env.params.query["query"]
 

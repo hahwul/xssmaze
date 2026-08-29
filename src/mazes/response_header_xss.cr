@@ -1,6 +1,7 @@
 # Level 1: X-Content-Type-Options: nosniff with text/html content type
 # Standard XSS works - nosniff just prevents MIME type sniffing
-Xssmaze.push("respheader-level1", "/respheader/level1/?query=a", "nosniff header with text/html, raw reflection")
+Xssmaze.push("respheader-level1", "/respheader/level1/?query=a", "nosniff header with text/html, raw reflection",
+  vuln: "reflected-html", delivery: ["query"], note: "nosniff is not a control here: the response really is text/html, so the reflection executes")
 maze_get "/respheader/level1/" do |env|
   query = env.params.query["query"]
   env.response.content_type = "text/html"
@@ -14,7 +15,8 @@ end
 
 # Level 2: X-XSS-Protection: 0 - XSS auditor explicitly disabled
 # Standard injection works
-Xssmaze.push("respheader-level2", "/respheader/level2/?query=a", "X-XSS-Protection disabled, raw reflection")
+Xssmaze.push("respheader-level2", "/respheader/level2/?query=a", "X-XSS-Protection disabled, raw reflection",
+  vuln: "reflected-html", delivery: ["query"], note: "X-XSS-Protection is dead in every current browser, so the header changes nothing either way")
 maze_get "/respheader/level2/" do |env|
   query = env.params.query["query"]
   env.response.content_type = "text/html"
@@ -28,7 +30,8 @@ end
 
 # Level 3: Cache-Control headers present but query still reflected raw
 # Caching headers have no effect on XSS
-Xssmaze.push("respheader-level3", "/respheader/level3/?query=a", "cache-control headers with raw reflection")
+Xssmaze.push("respheader-level3", "/respheader/level3/?query=a", "cache-control headers with raw reflection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/respheader/level3/" do |env|
   query = env.params.query["query"]
   env.response.content_type = "text/html"
@@ -44,7 +47,8 @@ end
 
 # Level 4: Query reflected in Set-Cookie value AND body
 # Body injection works regardless of cookie setting
-Xssmaze.push("respheader-level4", "/respheader/level4/?query=a", "query in Set-Cookie and body reflection")
+Xssmaze.push("respheader-level4", "/respheader/level4/?query=a", "query in Set-Cookie and body reflection",
+  vuln: "reflected-html", delivery: ["query"], note: "the two Set-Cookie copies drop the bytes a cookie value cannot carry; the body reflection is the raw one")
 maze_get "/respheader/level4/" do |env|
   query = env.params.query["query"]
   env.response.content_type = "text/html"
@@ -61,7 +65,8 @@ end
 
 # Level 5: CORS header Access-Control-Allow-Origin: * with raw reflection
 # CORS does not prevent XSS in the page itself
-Xssmaze.push("respheader-level5", "/respheader/level5/?query=a", "CORS allow-all with raw reflection")
+Xssmaze.push("respheader-level5", "/respheader/level5/?query=a", "CORS allow-all with raw reflection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/respheader/level5/" do |env|
   query = env.params.query["query"]
   env.response.content_type = "text/html"
@@ -77,7 +82,8 @@ end
 
 # Level 6: All security headers EXCEPT CSP, query reflected raw
 # Without CSP, inline scripts still execute
-Xssmaze.push("respheader-level6", "/respheader/level6/?query=a", "all security headers except CSP, raw reflection")
+Xssmaze.push("respheader-level6", "/respheader/level6/?query=a", "all security headers except CSP, raw reflection",
+  vuln: "reflected-html", delivery: ["query"], note: "every security header here is present except the one that would matter; with no CSP the inline reflection still runs")
 maze_get "/respheader/level6/" do |env|
   query = env.params.query["query"]
   env.response.content_type = "text/html"
