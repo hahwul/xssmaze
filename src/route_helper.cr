@@ -14,6 +14,16 @@ macro maze_post(path, &block)
   {% end %}
 end
 
+# HTTP QUERY (RFC 10008): a GET-shaped, body-carrying request. Kemal exposes
+# it as its own route DSL from 1.13, and Kemal rejects a QUERY request that
+# has a body but no `Content-Type` with 400 before the handler runs.
+macro maze_query(path, &block)
+  query {{ path }} {{ block }}
+  {% if path.ends_with?("/") %}
+    query {{ path[0...-1] }} {{ block }}
+  {% end %}
+end
+
 module Xssmaze::SecurityHeaders
   def self.apply_overrides(headers : HTTP::Headers, query : HTTP::Params) : Nil
     # Every value is run through `header_value` first: these overrides are a

@@ -4,7 +4,7 @@ Per-category exploit notes for every endpoint in the lab. The lab itself runs
 `./bin/xssmaze` (default `http://127.0.0.1:3000`); each entry below shows a
 working payload for one or more maze levels.
 
-**Total**: 167 categories · 980 levels.
+**Total**: 175 categories · 1064 levels.
 
 ## How to read an entry
 
@@ -167,6 +167,7 @@ working payload for one or more maze levels.
 | [post](post.md) | Basic POST body reflection (form + JSON). |
 | [postmethod](postmethod.md) | POST method reflection variants (form, JSON, value attr, script string). |
 | [prototype](prototype.md) | JS prototype-pollution gadgets and CMS/framework-style raw reflections. |
+| [querymethod](querymethod.md) | HTTP QUERY (RFC 10008) body reflection: form, JSON, attribute, script string, and a GET-safe/QUERY-vulnerable method confusion. |
 | [racecon](racecon.md) | Reflections in special-tag contents (style, textarea, svg text, title). |
 | [realworld-input](realworld-input.md) | Real-world input vectors: headers, JSON/multipart bodies, redirect sinks, cookies, paths, JSONP. |
 | [realworld](realworld.md) | Real-world reflection patterns: double sinks, debug flags, truncation, headers, encoding chains. |

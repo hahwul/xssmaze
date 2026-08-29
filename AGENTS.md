@@ -186,10 +186,10 @@ The application includes these vulnerability categories:
 ### Dependency Issues
 - If `shards install` fails due to network issues, check internet connectivity
 - Dependency resolution can fail if GitHub is inaccessible
-- The application requires the Kemal framework (version 1.7.3)
+- The application requires the Kemal framework (version 1.13.x)
 
 ### Build Failures
-- Ensure Crystal version matches shard.yml specification (1.8.2)
+- Ensure Crystal version matches shard.yml specification (>= 1.12.0; CI builds on 1.20.x)
 - Build failures often relate to syntax errors in .cr files
 - Production builds are more strict than development builds
 
@@ -265,5 +265,9 @@ When adding new vulnerability scenarios, follow these patterns:
 ### Crystal Language Patterns
 - Use `env.params.query["parameter"]` to access GET parameters
 - Use `env.params.body["parameter"]` for POST parameters  
+- `maze_get` / `maze_post` / `maze_query` (`src/route_helper.cr`) register a
+  route plus its trailing-slash-less alias. `maze_query` is the HTTP QUERY
+  method (RFC 10008, Kemal >= 1.13): body-carrying but GET-shaped, and Kemal
+  answers 400 when such a request has a body and no `Content-Type`.
 - String manipulation: `.gsub("old", "new")` for replacements
 - HTML escaping methods available through Kemal framework

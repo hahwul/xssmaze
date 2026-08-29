@@ -580,3 +580,73 @@ describe "index chrome" do
     response.body.should contain("no-such-maze")
   end
 end
+
+# Kemal 1.13 added the HTTP QUERY method (RFC 10008). spec-kemal only
+# generates helpers for the classic verbs, so drive the handler chain
+# directly the same way they do.
+private def query_request(path : String, body : String,
+                          content_type : String? = "application/x-www-form-urlencoded") : HTTP::Client::Response
+  headers = HTTP::Headers.new
+  headers["Content-Type"] = content_type if content_type
+  SpecKemal.process_request(HTTP::Request.new("QUERY", path, headers, body))
+end
+
+describe "HTTP QUERY mazes" do
+  it "reflects a form-encoded QUERY body raw" do
+    payload = "<script>alert(1)</script>"
+    query_request("/querymethod/level1/", "query=#{URI.encode_www_form(payload)}")
+    response.status_code.should eq 200
+    response.body.should contain(payload)
+  end
+
+  it "reflects a JSON QUERY body raw" do
+    payload = "<img src=x onerror=alert(1)>"
+    query_request("/querymethod/level2/", {query: payload}.to_json, "application/json")
+    response.status_code.should eq 200
+    response.body.should contain(payload)
+  end
+
+  it "serves the trailing-slash-less alias too" do
+    query_request("/querymethod/level1", "query=#{URI.encode_www_form("<b>x</b>")}")
+    response.status_code.should eq 200
+    response.body.should contain("<b>x</b>")
+  end
+
+  it "escapes on GET but reflects raw on QUERY for the method-confusion level" do
+    payload = "<script>alert(1)</script>"
+
+    get "/querymethod/level5/?query=#{URI.encode_www_form(payload)}"
+    response.status_code.should eq 200
+    response.body.should_not contain("GET says: #{payload}")
+
+    query_request("/querymethod/level5/", "query=#{URI.encode_www_form(payload)}")
+    response.status_code.should eq 200
+    response.body.should contain("QUERY says: #{payload}")
+  end
+
+  it "rejects a QUERY body with no Content-Type per RFC 10008" do
+    query_request("/querymethod/level1/", "query=a", nil)
+    response.status_code.should eq 400
+  end
+
+  it "keeps the OpenAPI document free of non-standard path item operations" do
+    get "/map/openapi"
+    doc = JSON.parse(response.body)
+    item = doc["paths"]["/querymethod/level1/"]
+    item.as_h.keys.each do |field|
+      next if field.starts_with?("x-")
+      Xssmaze::Catalog::OPENAPI_METHODS.should contain(field)
+    end
+    item["x-additional-operations"]["QUERY"]["summary"].should eq("querymethod-level1")
+  end
+end
+
+# Kemal >= 1.13 validates the WebSocket Origin against the request Host by
+# default and 403s a client that sends none. This lab is deliberately
+# reachable by non-browser tooling, so the opt-out in `Server.start!` is part
+# of the contract, not an accident.
+describe "websocket origin policy" do
+  it "accepts any WebSocket origin so non-browser clients can reach ws mazes" do
+    Kemal.config.websocket_allowed_origins.should eq(["*"])
+  end
+end

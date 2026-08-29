@@ -96,6 +96,14 @@ module Xssmaze::Server
     Kemal.config.host_binding = "127.0.0.1"
     Kemal.config.env = "production" unless ENV["KEMAL_ENV"]?
     Kemal.config.app_name = "XSSMaze"
+    # Kemal >= 1.13 validates the WebSocket `Origin` against the request Host
+    # by default and answers 403 when it is missing. A browser always sends
+    # one, so the maze itself still works — but the non-browser clients this
+    # lab exists for (wscat, custom fuzzers, a raw `curl` upgrade) do not, and
+    # would never reach `/domsource/level7/echo`. The lab is loopback-bound and
+    # vulnerable on purpose, so opt back into allow-all rather than hand
+    # scanners a 403 that has nothing to do with the maze under test.
+    Kemal.config.websocket_allowed_origins = ["*"]
 
     # 2. Own the command line and the console output.
     #
