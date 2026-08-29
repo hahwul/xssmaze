@@ -1,6 +1,7 @@
 # Level 1: Welcome email - raw reflection in table cell h2
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("email-template-level1", "/email-template/level1/?query=a", "welcome email raw reflection in table cell")
+Xssmaze.push("email-template-level1", "/email-template/level1/?query=a", "welcome email raw reflection in table cell",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/email-template/level1/" do |env|
   query = env.params.query["query"]
 
@@ -9,7 +10,8 @@ end
 
 # Level 2: Password reset link - reflection inside href attribute
 # Bypass: break out of href with ", e.g. "><script>alert(1)</script>
-Xssmaze.push("email-template-level2", "/email-template/level2/?query=a", "password reset link reflection in href attribute")
+Xssmaze.push("email-template-level2", "/email-template/level2/?query=a", "password reset link reflection in href attribute",
+  vuln: "reflected-attr", delivery: ["query"], note: "reflected into a double-quoted href; break out with the quote")
 maze_get "/email-template/level2/" do |env|
   query = env.params.query["query"]
 
@@ -18,7 +20,8 @@ end
 
 # Level 3: Order confirmation - raw reflection in product name table cell
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("email-template-level3", "/email-template/level3/?query=a", "order confirmation raw reflection in table cell")
+Xssmaze.push("email-template-level3", "/email-template/level3/?query=a", "order confirmation raw reflection in table cell",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/email-template/level3/" do |env|
   query = env.params.query["query"]
 
@@ -27,7 +30,8 @@ end
 
 # Level 4: Newsletter article - raw reflection in article heading
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("email-template-level4", "/email-template/level4/?query=a", "newsletter article heading raw reflection")
+Xssmaze.push("email-template-level4", "/email-template/level4/?query=a", "newsletter article heading raw reflection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/email-template/level4/" do |env|
   query = env.params.query["query"]
 
@@ -36,7 +40,8 @@ end
 
 # Level 5: Alert notification - raw reflection in colored table cell
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("email-template-level5", "/email-template/level5/?query=a", "alert notification raw reflection in colored cell")
+Xssmaze.push("email-template-level5", "/email-template/level5/?query=a", "alert notification raw reflection in colored cell",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/email-template/level5/" do |env|
   query = env.params.query["query"]
 
@@ -45,7 +50,8 @@ end
 
 # Level 6: Invoice - raw reflection in description cell of complex table
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("email-template-level6", "/email-template/level6/?query=a", "invoice description cell raw reflection in complex table")
+Xssmaze.push("email-template-level6", "/email-template/level6/?query=a", "invoice description cell raw reflection in complex table",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/email-template/level6/" do |env|
   query = env.params.query["query"]
 

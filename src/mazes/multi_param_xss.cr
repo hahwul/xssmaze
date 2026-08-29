@@ -1,6 +1,7 @@
 # Level 1: Two params q1 and q2, both reflected raw in body
 # Either param can be exploited independently
-Xssmaze.push("multiparam-level1", "/multiparam/level1/?q1=a&q2=b", "two params both reflected raw (either exploitable)", params: ["q1", "q2"])
+Xssmaze.push("multiparam-level1", "/multiparam/level1/?q1=a&q2=b", "two params both reflected raw (either exploitable)", params: ["q1", "q2"],
+  vuln: "reflected-html", delivery: ["query"], note: "both parameters reflect raw into the body")
 maze_get "/multiparam/level1/" do |env|
   q1 = env.params.query.fetch("q1", "a")
   q2 = env.params.query.fetch("q2", "b")
@@ -14,7 +15,8 @@ end
 
 # Level 2: Param "query" reflected raw, but only if param "page" also exists
 # Tests scanner's ability to discover required companion parameters
-Xssmaze.push("multiparam-level2", "/multiparam/level2/?query=a&page=1", "query reflected only when page param exists", params: ["query", "page"])
+Xssmaze.push("multiparam-level2", "/multiparam/level2/?query=a&page=1", "query reflected only when page param exists", params: ["query", "page"],
+  vuln: "reflected-html", delivery: ["query"], note: "query reflects only when page is present; page is also reflected raw")
 maze_get "/multiparam/level2/" do |env|
   query = env.params.query.fetch("query", "a")
   page = env.params.query.fetch("page", "")
@@ -34,7 +36,8 @@ end
 
 # Level 3: Param "search" in input value, param "sort" in input value, both breakable
 # Bypass: break out of attribute with "><img src=x onerror=alert(1)>
-Xssmaze.push("multiparam-level3", "/multiparam/level3/?search=a&sort=b", "two params in input value attributes (both breakable)", params: ["search", "sort"])
+Xssmaze.push("multiparam-level3", "/multiparam/level3/?search=a&sort=b", "two params in input value attributes (both breakable)", params: ["search", "sort"],
+  vuln: "reflected-attr", delivery: ["query"], note: "both parameters break out of their input value attribute")
 maze_get "/multiparam/level3/" do |env|
   search = env.params.query.fetch("search", "a")
   sort = env.params.query.fetch("sort", "b")
@@ -51,7 +54,8 @@ end
 
 # Level 4: Param "query" reflected raw, but only when param "token" equals "valid"
 # Tests scanner's ability to provide a required token value
-Xssmaze.push("multiparam-level4", "/multiparam/level4/?query=a&token=valid", "query reflected only when token=valid", params: ["query", "token"])
+Xssmaze.push("multiparam-level4", "/multiparam/level4/?query=a&token=valid", "query reflected only when token=valid", params: ["query", "token"],
+  vuln: "reflected-html", delivery: ["query"], note: "query reflects raw only when token=valid")
 maze_get "/multiparam/level4/" do |env|
   query = env.params.query.fetch("query", "a")
   token = env.params.query.fetch("token", "")
@@ -71,7 +75,8 @@ end
 
 # Level 5: Param "name" reflected raw between "prefix" and "suffix" which are HTML-encoded
 # Only "name" is exploitable; prefix and suffix are safe
-Xssmaze.push("multiparam-level5", "/multiparam/level5/?prefix=a&name=b&suffix=c", "name reflected raw between HTML-encoded prefix and suffix", params: ["prefix", "name", "suffix"])
+Xssmaze.push("multiparam-level5", "/multiparam/level5/?prefix=a&name=b&suffix=c", "name reflected raw between HTML-encoded prefix and suffix", params: ["prefix", "name", "suffix"],
+  vuln: "reflected-html", delivery: ["query"], note: "only name is exploitable; prefix and suffix are angle-encoded")
 maze_get "/multiparam/level5/" do |env|
   prefix = Filters.encode_angles(env.params.query.fetch("prefix", "a"))
   name = env.params.query.fetch("name", "b")
@@ -86,7 +91,8 @@ end
 # Level 6: Three params a, b, c reflected in different contexts:
 #   a -> HTML body (raw), b -> attribute value, c -> JS string
 # All three are exploitable in their respective contexts
-Xssmaze.push("multiparam-level6", "/multiparam/level6/?a=x&b=y&c=z", "three params in body, attribute, and JS string contexts", params: ["a", "b", "c"])
+Xssmaze.push("multiparam-level6", "/multiparam/level6/?a=x&b=y&c=z", "three params in body, attribute, and JS string contexts", params: ["a", "b", "c"],
+  vuln: "reflected-html", delivery: ["query"], note: "a lands in the body (raw), b in a double-quoted attribute, c in a single-quoted JS string; all three are exploitable")
 maze_get "/multiparam/level6/" do |env|
   a = env.params.query.fetch("a", "x")
   b = env.params.query.fetch("b", "y")

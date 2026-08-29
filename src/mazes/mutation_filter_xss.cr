@@ -1,6 +1,7 @@
 # Level 1: Replace < with %3C (URL encode) before reflecting in body
 # Double URL decode might get it back
-Xssmaze.push("mutfilter-level1", "/mutfilter/level1/?query=a", "< replaced with %3C in body")
+Xssmaze.push("mutfilter-level1", "/mutfilter/level1/?query=a", "< replaced with %3C in body",
+  vuln: "non-xss-control", delivery: ["query"], exploitable: false, note: "< and > are replaced with the literal text %3C/%3E and nothing decodes them client-side, so no tag can form")
 maze_get "/mutfilter/level1/" do |env|
   query = env.params.query["query"]
   query = query.gsub("<", "%3C").gsub(">", "%3E")
@@ -9,7 +10,8 @@ maze_get "/mutfilter/level1/" do |env|
 end
 
 # Level 2: Strip HTML comments but allow everything else
-Xssmaze.push("mutfilter-level2", "/mutfilter/level2/?query=a", "HTML comment strip only")
+Xssmaze.push("mutfilter-level2", "/mutfilter/level2/?query=a", "HTML comment strip only",
+  vuln: "reflected-html", delivery: ["query"], note: "only HTML comments are stripped; other tags survive")
 maze_get "/mutfilter/level2/" do |env|
   query = env.params.query["query"]
   query = query.gsub(/<!--.*?-->/m, "")
@@ -18,7 +20,8 @@ maze_get "/mutfilter/level2/" do |env|
 end
 
 # Level 3: Replace 'on' prefix with 'off' (breaks event handlers)
-Xssmaze.push("mutfilter-level3", "/mutfilter/level3/?query=a", "on* prefix replaced with off*")
+Xssmaze.push("mutfilter-level3", "/mutfilter/level3/?query=a", "on* prefix replaced with off*",
+  vuln: "reflected-html", delivery: ["query"], note: "on* handlers are rewritten to off*; use a <script> tag or other non-event vector")
 maze_get "/mutfilter/level3/" do |env|
   query = env.params.query["query"]
   query = query.gsub(/\bon(\w)/i) { "off#{$1}" }
@@ -27,7 +30,8 @@ maze_get "/mutfilter/level3/" do |env|
 end
 
 # Level 4: Strip src/href/action attributes but allow tags
-Xssmaze.push("mutfilter-level4", "/mutfilter/level4/?query=a", "dangerous attribute strip (src/href/action)")
+Xssmaze.push("mutfilter-level4", "/mutfilter/level4/?query=a", "dangerous attribute strip (src/href/action)",
+  vuln: "reflected-html", delivery: ["query"], note: "src/href/action attributes are neutralized; use a <script> tag or an event handler")
 maze_get "/mutfilter/level4/" do |env|
   query = env.params.query["query"]
   query = query.gsub(/\b(src|href|action|formaction)\s*=/i, "data-removed=")
@@ -36,7 +40,8 @@ maze_get "/mutfilter/level4/" do |env|
 end
 
 # Level 5: Reverse string then unreverse (can be bypassed with palindrome payloads)
-Xssmaze.push("mutfilter-level5", "/mutfilter/level5/?query=a", "no filter (basic reflection)")
+Xssmaze.push("mutfilter-level5", "/mutfilter/level5/?query=a", "no filter (basic reflection)",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/mutfilter/level5/" do |env|
   query = env.params.query["query"]
 
@@ -44,7 +49,8 @@ maze_get "/mutfilter/level5/" do |env|
 end
 
 # Level 6: Remove all whitespace characters
-Xssmaze.push("mutfilter-level6", "/mutfilter/level6/?query=a", "all whitespace removed in body reflection")
+Xssmaze.push("mutfilter-level6", "/mutfilter/level6/?query=a", "all whitespace removed in body reflection",
+  vuln: "reflected-html", delivery: ["query"], note: "whitespace is stripped; use / as an attribute separator or a <script> tag")
 maze_get "/mutfilter/level6/" do |env|
   query = env.params.query["query"]
   query = query.gsub(/\s/, "")

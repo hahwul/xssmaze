@@ -55,8 +55,8 @@ require "html"
 Xssmaze.push(
   "html5-sanitizer-level1",
   "/html5-sanitizer/level1/?query=a",
-  "Mock sanitizer: strips <script>/<iframe>/<object> but allows MathML structures"
-)
+  "Mock sanitizer: strips <script>/<iframe>/<object> but allows MathML structures",
+  vuln: "reflected-html", delivery: ["query"], note: "server reflects raw into a <div>; the tag/event blacklist misses MathML namespace vectors")
 maze_get "/html5-sanitizer/level1/" do |env|
   query = env.params.query["query"]
 
@@ -83,8 +83,8 @@ end
 Xssmaze.push(
   "html5-sanitizer-level2",
   "/html5-sanitizer/level2/?query=a",
-  "Parser differential: <math><xmp><iframe srcdoc=...></xmp></math> namespace confusion"
-)
+  "Parser differential: <math><xmp><iframe srcdoc=...></xmp></math> namespace confusion",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected raw into a <div>; the recursive script/event/js: filters miss the math/xmp/iframe-srcdoc parser differential")
 maze_get "/html5-sanitizer/level2/" do |env|
   query = env.params.query["query"]
 
@@ -127,8 +127,8 @@ end
 Xssmaze.push(
   "html5-sanitizer-level3",
   "/html5-sanitizer/level3/?query=a",
-  "MathML annotation-xml encoding=text/html with iframe srcdoc bypass"
-)
+  "MathML annotation-xml encoding=text/html with iframe srcdoc bypass",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected raw into a <div>; iframe is stripped in HTML context but annotation-xml switches to HTML parsing")
 maze_get "/html5-sanitizer/level3/" do |env|
   query = env.params.query["query"]
 
@@ -151,8 +151,8 @@ end
 Xssmaze.push(
   "html5-sanitizer-level4",
   "/html5-sanitizer/level4/?query=a",
-  "Template + MathML double namespace confusion with srcdoc"
-)
+  "Template + MathML double namespace confusion with srcdoc",
+  vuln: "reflected-js", sinks: ["innerHTML"], delivery: ["query"], note: "reflected raw into a backtick template literal, then assigned to innerHTML; break out with a backtick or use ${...}")
 maze_get "/html5-sanitizer/level4/" do |env|
   query = env.params.query["query"]
 
@@ -180,8 +180,8 @@ end
 Xssmaze.push(
   "html5-sanitizer-level5",
   "/html5-sanitizer/level5/?query=a",
-  "SVG foreignObject + MathML namespace chain with srcdoc bypass"
-)
+  "SVG foreignObject + MathML namespace chain with srcdoc bypass",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected raw into a <div>; script/js: filters miss the SVG foreignObject to MathML namespace chain")
 maze_get "/html5-sanitizer/level5/" do |env|
   query = env.params.query["query"]
 
@@ -205,8 +205,8 @@ end
 Xssmaze.push(
   "html5-sanitizer-level6",
   "/html5-sanitizer/level6/?query=a",
-  "MathML with form element name collision + srcdoc XSS"
-)
+  "MathML with form element name collision + srcdoc XSS",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected raw into a <div>; leaves the MathML form-name-clobbering + iframe srcdoc vector")
 maze_get "/html5-sanitizer/level6/" do |env|
   query = env.params.query["query"]
 
@@ -234,8 +234,8 @@ end
 Xssmaze.push(
   "html5-sanitizer-level7",
   "/html5-sanitizer/level7/?query=a",
-  "MathML + srcdoc with data URI base64 encoding bypass"
-)
+  "MathML + srcdoc with data URI base64 encoding bypass",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected raw into a <div>; the single data:/script strip is bypassable with entity-encoded data: URIs")
 maze_get "/html5-sanitizer/level7/" do |env|
   query = env.params.query["query"]
 
@@ -260,8 +260,8 @@ end
 Xssmaze.push(
   "html5-sanitizer-level8",
   "/html5-sanitizer/level8/?query=a",
-  "Shadow DOM slot + MathML namespace with srcdoc bypass"
-)
+  "Shadow DOM slot + MathML namespace with srcdoc bypass",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected raw into a <div>; script/event filters miss the declarative-shadow-DOM template vector")
 maze_get "/html5-sanitizer/level8/" do |env|
   query = env.params.query["query"]
 

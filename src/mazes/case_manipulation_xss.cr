@@ -1,6 +1,7 @@
 # Level 1: Server lowercases only tag names (replaces <[A-Z]+ with lowercase)
 # but not attributes - standard lowercase payloads work fine
-Xssmaze.push("casemanip-level1", "/casemanip/level1/?query=a", "lowercase tag names only, attributes untouched")
+Xssmaze.push("casemanip-level1", "/casemanip/level1/?query=a", "lowercase tag names only, attributes untouched",
+  vuln: "reflected-html", delivery: ["query"], note: "only tag names are lowercased; lowercase payloads reflect unchanged into the body")
 maze_get "/casemanip/level1/" do |env|
   query = env.params.query["query"]
   # Lowercase only the tag name portion: <TAG -> <tag
@@ -14,7 +15,8 @@ end
 
 # Level 2: Server capitalizes first letter of input, rest unchanged
 # <img src=x onerror=alert(1)> becomes <Img src=x onerror=alert(1)> which is valid HTML
-Xssmaze.push("casemanip-level2", "/casemanip/level2/?query=a", "capitalize first letter only, HTML still valid")
+Xssmaze.push("casemanip-level2", "/casemanip/level2/?query=a", "capitalize first letter only, HTML still valid",
+  vuln: "reflected-html", delivery: ["query"], note: "only the first letter is uppercased; <Img ...> is still valid HTML")
 maze_get "/casemanip/level2/" do |env|
   query = env.params.query["query"]
   result = if query.size > 0
@@ -28,7 +30,8 @@ end
 
 # Level 3: Server swaps case of all alpha chars
 # HTML is case-insensitive so swapped tags still work
-Xssmaze.push("casemanip-level3", "/casemanip/level3/?query=a", "swap case of all alpha chars, HTML case-insensitive")
+Xssmaze.push("casemanip-level3", "/casemanip/level3/?query=a", "swap case of all alpha chars, HTML case-insensitive",
+  vuln: "reflected-html", delivery: ["query"], note: "case is swapped, but HTML tags are case-insensitive")
 maze_get "/casemanip/level3/" do |env|
   query = env.params.query["query"]
   result = query.chars.map do |ch|
@@ -46,7 +49,8 @@ end
 
 # Level 4: Server ROT13 encodes alpha chars in displayed output
 # BUT also reflects original unmodified query in a hidden input - exploitable
-Xssmaze.push("casemanip-level4", "/casemanip/level4/?query=a", "ROT13 display but raw reflection in hidden input")
+Xssmaze.push("casemanip-level4", "/casemanip/level4/?query=a", "ROT13 display but raw reflection in hidden input",
+  vuln: "reflected-attr", delivery: ["query"], note: "the ROT13 body copy is a decoy; the raw value is reflected into a hidden input value attribute")
 maze_get "/casemanip/level4/" do |env|
   query = env.params.query["query"]
   rot13 = query.chars.map do |ch|
@@ -64,7 +68,8 @@ end
 
 # Level 5: Server strips uppercase letters only, leaves lowercase and everything else
 # Use all-lowercase payload: <img src=x onerror=alert(1)>
-Xssmaze.push("casemanip-level5", "/casemanip/level5/?query=a", "strip uppercase letters only, lowercase payloads work")
+Xssmaze.push("casemanip-level5", "/casemanip/level5/?query=a", "strip uppercase letters only, lowercase payloads work",
+  vuln: "reflected-html", delivery: ["query"], note: "only uppercase letters are stripped; an all-lowercase payload survives")
 maze_get "/casemanip/level5/" do |env|
   query = env.params.query["query"]
   result = query.gsub(/[A-Z]/, "")
@@ -74,7 +79,8 @@ end
 
 # Level 6: Server titlecases words (first letter of each word uppercase)
 # HTML tags still work since they are case-insensitive
-Xssmaze.push("casemanip-level6", "/casemanip/level6/?query=a", "titlecase words, HTML case-insensitive")
+Xssmaze.push("casemanip-level6", "/casemanip/level6/?query=a", "titlecase words, HTML case-insensitive",
+  vuln: "reflected-html", delivery: ["query"], note: "words are title-cased, but HTML tags are case-insensitive")
 maze_get "/casemanip/level6/" do |env|
   query = env.params.query["query"]
   result = query.split(" ").map do |word|

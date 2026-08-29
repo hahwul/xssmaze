@@ -1,5 +1,6 @@
 # Level 1: XHTML page with query in <p> element, served as text/html - standard injection
-Xssmaze.push("xmlctx-level1", "/xmlctx/level1/?query=a", "XHTML page with query in p element (text/html)")
+Xssmaze.push("xmlctx-level1", "/xmlctx/level1/?query=a", "XHTML page with query in p element (text/html)",
+  vuln: "reflected-html", delivery: ["query"], note: "served as text/html despite the XHTML prolog, so markup in the <p> renders")
 maze_get "/xmlctx/level1/" do |env|
   query = env.params.query["query"]
 
@@ -12,7 +13,8 @@ maze_get "/xmlctx/level1/" do |env|
 end
 
 # Level 2: XML-like CDATA section inside script, served as text/html - close CDATA and script
-Xssmaze.push("xmlctx-level2", "/xmlctx/level2/?query=a", "query in CDATA section inside script tag")
+Xssmaze.push("xmlctx-level2", "/xmlctx/level2/?query=a", "query in CDATA section inside script tag",
+  vuln: "reflected-js", delivery: ["query"], note: "reflected into a double-quoted JS string inside a CDATA section; break the string or close the </script>")
 maze_get "/xmlctx/level2/" do |env|
   query = env.params.query["query"]
 
@@ -26,7 +28,8 @@ var data = \"#{query}\";
 end
 
 # Level 3: Query in XML processing instruction, served as text/html - inject HTML after
-Xssmaze.push("xmlctx-level3", "/xmlctx/level3/?query=a", "query in XML processing instruction context")
+Xssmaze.push("xmlctx-level3", "/xmlctx/level3/?query=a", "query in XML processing instruction context",
+  vuln: "reflected-html", delivery: ["query"], note: "served as text/html, so the <?xml ...?> is a bogus comment; a > ends it and the following bytes are HTML")
 maze_get "/xmlctx/level3/" do |env|
   query = env.params.query["query"]
 
@@ -36,7 +39,8 @@ maze_get "/xmlctx/level3/" do |env|
 end
 
 # Level 4: Query in <xmp> tag (deprecated but still parsed) - break out with </xmp>
-Xssmaze.push("xmlctx-level4", "/xmlctx/level4/?query=a", "query in deprecated xmp tag")
+Xssmaze.push("xmlctx-level4", "/xmlctx/level4/?query=a", "query in deprecated xmp tag",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected inside <xmp> raw-text; close it with </xmp>")
 maze_get "/xmlctx/level4/" do |env|
   query = env.params.query["query"]
 
@@ -45,7 +49,8 @@ maze_get "/xmlctx/level4/" do |env|
 end
 
 # Level 5: Query in <listing> tag (deprecated) - break out with </listing>
-Xssmaze.push("xmlctx-level5", "/xmlctx/level5/?query=a", "query in deprecated listing tag")
+Xssmaze.push("xmlctx-level5", "/xmlctx/level5/?query=a", "query in deprecated listing tag",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected inside <listing> raw-text; close it with </listing>")
 maze_get "/xmlctx/level5/" do |env|
   query = env.params.query["query"]
 
@@ -54,7 +59,8 @@ maze_get "/xmlctx/level5/" do |env|
 end
 
 # Level 6: Query reflected BEFORE plaintext tag (plaintext disables all parsing after it)
-Xssmaze.push("xmlctx-level6", "/xmlctx/level6/?query=a", "query reflected before plaintext tag")
+Xssmaze.push("xmlctx-level6", "/xmlctx/level6/?query=a", "query reflected before plaintext tag",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected in a <div> before the <plaintext> tag, so normal HTML injection works")
 maze_get "/xmlctx/level6/" do |env|
   query = env.params.query["query"]
 
