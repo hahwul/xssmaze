@@ -3,7 +3,7 @@
 Xssmaze.push("encodingedge-level1", "/encodingedge/level1/?query=a", "only adjacent <> pair encoded, individual < > pass through",
   vuln: "reflected-html", delivery: ["query"], note: "only the adjacent pair <> is entity-encoded; a lone < or > passes through")
 maze_get "/encodingedge/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Only encode the exact string "<>" — individual angle brackets survive
   filtered = query.gsub("<>", "&lt;&gt;")
 
@@ -15,7 +15,7 @@ end
 Xssmaze.push("encodingedge-level2", "/encodingedge/level2/?query=a", "case-sensitive <script strip (mixed case bypass)",
   vuln: "reflected-html", delivery: ["query"], note: "only the lowercase <script prefix is stripped; <Script> or any other tag passes")
 maze_get "/encodingedge/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Case-sensitive strip — only lowercase "<script" is removed
   filtered = query.gsub("<script", "")
 
@@ -27,7 +27,7 @@ end
 Xssmaze.push("encodingedge-level3", "/encodingedge/level3/?query=a", "only first double-quote encoded (sub not gsub)",
   vuln: "reflected-attr", delivery: ["query"], note: "only the first double quote is encoded (sub, not gsub); send a sacrificial quote before the real breakout")
 maze_get "/encodingedge/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Only first " is escaped — second " can break out of attribute
   filtered = query.sub("\"", "&quot;")
 
@@ -39,7 +39,7 @@ end
 Xssmaze.push("encodingedge-level4", "/encodingedge/level4/?query=a", "first 10 chars alpha hex-encoded, rest raw",
   vuln: "reflected-html", delivery: ["query"], note: "alphabetic characters in the first 10 are entity-encoded so they cannot form a tag name; pad with 10 digits before the payload")
 maze_get "/encodingedge/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Hex-encode alpha chars in first 10 characters only
   prefix = query[0, Math.min(10, query.size)]
   suffix = query.size > 10 ? query[10..] : ""
@@ -54,7 +54,7 @@ end
 Xssmaze.push("encodingedge-level5", "/encodingedge/level5/?query=a", "angle brackets to fullwidth, reflected in attribute (quote breakout)",
   vuln: "reflected-attr", delivery: ["query"], note: "angle brackets become fullwidth look-alikes, so no tag can be opened; break out of the double-quoted input value and add an event handler")
 maze_get "/encodingedge/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Convert angle brackets to fullwidth Unicode equivalents
   filtered = query.gsub("<", "\uFF1C").gsub(">", "\uFF1E")
 
@@ -67,7 +67,7 @@ end
 Xssmaze.push("encodingedge-level6", "/encodingedge/level6/?query=a", "regex strips <...> tags from input, reflected in attribute (no angles needed)",
   vuln: "reflected-attr", delivery: ["query"], note: "anything shaped like a tag is regex-stripped; break out of the double-quoted input value and add an event handler, which needs no angle brackets")
 maze_get "/encodingedge/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Strip anything that looks like an HTML tag
   filtered = query.gsub(/<[^>]*>/, "")
 

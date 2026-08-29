@@ -2,7 +2,7 @@
 Xssmaze.push("xmlctx-level1", "/xmlctx/level1/?query=a", "XHTML page with query in p element (text/html)",
   vuln: "reflected-html", delivery: ["query"], note: "served as text/html despite the XHTML prolog, so markup in the <p> renders")
 maze_get "/xmlctx/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">
@@ -16,7 +16,7 @@ end
 Xssmaze.push("xmlctx-level2", "/xmlctx/level2/?query=a", "query in CDATA section inside script tag",
   vuln: "reflected-js", delivery: ["query"], note: "reflected into a double-quoted JS string inside a CDATA section; break the string or close the </script>")
 maze_get "/xmlctx/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head></head><body>
 <script type=\"text/javascript\">
@@ -31,7 +31,7 @@ end
 Xssmaze.push("xmlctx-level3", "/xmlctx/level3/?query=a", "query in XML processing instruction context",
   vuln: "reflected-html", delivery: ["query"], note: "served as text/html, so the <?xml ...?> is a bogus comment; a > ends it and the following bytes are HTML")
 maze_get "/xmlctx/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<?xml version=\"1.0\" #{query} ?>
 <html><head><title>XML PI</title></head>
@@ -42,7 +42,7 @@ end
 Xssmaze.push("xmlctx-level4", "/xmlctx/level4/?query=a", "query in deprecated xmp tag",
   vuln: "reflected-html", delivery: ["query"], note: "reflected inside <xmp> raw-text; close it with </xmp>")
 maze_get "/xmlctx/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head><title>XMP Context</title></head>
 <body><xmp>#{query}</xmp></body></html>"
@@ -52,7 +52,7 @@ end
 Xssmaze.push("xmlctx-level5", "/xmlctx/level5/?query=a", "query in deprecated listing tag",
   vuln: "reflected-html", delivery: ["query"], note: "reflected inside <listing> raw-text; close it with </listing>")
 maze_get "/xmlctx/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head><title>Listing Context</title></head>
 <body><listing>#{query}</listing></body></html>"
@@ -62,7 +62,7 @@ end
 Xssmaze.push("xmlctx-level6", "/xmlctx/level6/?query=a", "query reflected before plaintext tag",
   vuln: "reflected-html", delivery: ["query"], note: "reflected in a <div> before the <plaintext> tag, so normal HTML injection works")
 maze_get "/xmlctx/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head><title>Plaintext Context</title></head>
 <body><div>#{query}</div><plaintext>This text is rendered as plain text and no HTML is parsed after this tag.</plaintext></body></html>"

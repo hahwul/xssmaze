@@ -4,7 +4,7 @@
 Xssmaze.push("tplinject-level1", "/tplinject/level1/?query=a", "reflection inside JS template literal interpolation",
   vuln: "reflected-js", delivery: ["query"], note: "reflected inside a ${\"...\"} expression in a JS template literal; break out of the double-quoted string or the </script>")
 maze_get "/tplinject/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Template Injection XSS Level 1</h1>
@@ -21,7 +21,7 @@ end
 Xssmaze.push("tplinject-level2", "/tplinject/level2/?query=a", "HTML template element cloned to innerHTML",
   vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "reflected into an inert <template>, whose innerHTML is then re-injected into the page via innerHTML, executing it")
 maze_get "/tplinject/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Template Injection XSS Level 2</h1>
@@ -40,7 +40,7 @@ end
 Xssmaze.push("tplinject-level3", "/tplinject/level3/?query=a", "JS string assigned to innerHTML (indirect DOM sink)",
   vuln: "reflected-js", sinks: ["innerHTML"], delivery: ["query"], note: "reflected raw into a single-quoted JS string that is concatenated into innerHTML; break out with a single quote")
 maze_get "/tplinject/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Template Injection XSS Level 3</h1>
@@ -59,7 +59,7 @@ end
 Xssmaze.push("tplinject-level4", "/tplinject/level4/?query=a", "script type=text/template rendered via innerHTML",
   vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "reflected into an inert <script type=text/template>, whose innerHTML is re-injected via innerHTML")
 maze_get "/tplinject/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Template Injection XSS Level 4</h1>
@@ -83,7 +83,7 @@ end
 Xssmaze.push("tplinject-level5", "/tplinject/level5/?query=a", "server-side double template render",
   vuln: "reflected-html", delivery: ["query"], note: "server-side placeholder substitution places the value raw into the page body")
 maze_get "/tplinject/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   # First pass: build template with placeholder
   template = "<div class='wrapper'>{{content}}</div>"
@@ -104,7 +104,7 @@ end
 Xssmaze.push("tplinject-level6", "/tplinject/level6/?query=a", "data-attribute read by JS and written to innerHTML",
   vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "reflected into a data-user attribute that JS reads and writes to innerHTML")
 maze_get "/tplinject/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Template Injection XSS Level 6</h1>

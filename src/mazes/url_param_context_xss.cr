@@ -4,7 +4,7 @@
 Xssmaze.push("url-param-ctx-level1", "/url-param-ctx/level1/?query=a", "reflection in a href URL query parameter value",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/url-param-ctx/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><a href=\"https://example.com/search?q=#{query}\">Search link</a></body></html>"
 end
@@ -15,7 +15,7 @@ end
 Xssmaze.push("url-param-ctx-level2", "/url-param-ctx/level2/?query=a", "reflection in form action URL query parameter value",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/url-param-ctx/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><form action=\"/submit?token=#{query}\"><input type=\"submit\" value=\"Go\"></form></body></html>"
 end
@@ -26,7 +26,7 @@ end
 Xssmaze.push("url-param-ctx-level3", "/url-param-ctx/level3/?query=a", "reflection in img src URL query parameter value",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/url-param-ctx/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><img src=\"/image?name=#{query}\"></body></html>"
 end
@@ -37,7 +37,7 @@ end
 Xssmaze.push("url-param-ctx-level4", "/url-param-ctx/level4/?query=a", "reflection in link href URL query parameter value",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/url-param-ctx/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head><link href=\"/css?theme=#{query}\" rel=\"stylesheet\"></head><body><p>Styled page</p></body></html>"
 end
@@ -48,7 +48,7 @@ end
 Xssmaze.push("url-param-ctx-level5", "/url-param-ctx/level5/?query=a", "reflection in script src URL query parameter value",
   vuln: "reflected-attr", delivery: ["query"], note: "double-quoted script src; break out with the quote and > then close the </script> to inject a tag")
 maze_get "/url-param-ctx/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head><script src=\"/js?v=#{query}\"></script></head><body><p>Script loaded</p></body></html>"
 end
@@ -59,7 +59,7 @@ end
 Xssmaze.push("url-param-ctx-level6", "/url-param-ctx/level6/?query=a", "reflection in iframe src URL query parameter value",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/url-param-ctx/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><iframe src=\"/embed?id=#{query}\"></iframe></body></html>"
 end

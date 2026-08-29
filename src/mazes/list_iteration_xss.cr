@@ -2,7 +2,7 @@
 Xssmaze.push("listiteration-level1", "/listiteration/level1/?query=apple,banana,cherry", "list iteration split by comma into li elements",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/listiteration/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   parts = query.split(",")
   items = parts.map { |part| "<li>#{part}</li>" }.join("\n    ")
 
@@ -18,7 +18,7 @@ end
 Xssmaze.push("listiteration-level2", "/listiteration/level2/?query=col1|col2|col3", "list iteration split by pipe into td elements",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/listiteration/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   parts = query.split("|")
   cells = parts.map { |part| "<td>#{part}</td>" }.join("")
 
@@ -32,7 +32,7 @@ end
 Xssmaze.push("listiteration-level3", "/listiteration/level3/?query=line1%0Aline2%0Aline3", "list iteration split by newline into p elements",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/listiteration/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   parts = query.split("\n")
   paragraphs = parts.map { |part| "<p>#{part}</p>" }.join("\n    ")
 
@@ -46,7 +46,7 @@ end
 Xssmaze.push("listiteration-level4", "/listiteration/level4/?query=red+green+blue", "list iteration split by space into span tags",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/listiteration/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   parts = query.split(" ")
   spans = parts.map { |part| "<span class=\"tag\">#{part}</span>" }.join(" ")
 
@@ -60,7 +60,7 @@ end
 Xssmaze.push("listiteration-level5", "/listiteration/level5/?query=opt1;opt2;opt3", "list iteration split by semicolon into option elements",
   vuln: "reflected-html", delivery: ["query"], note: "each part is reflected into an <option> body and value; close </option></select> to inject")
 maze_get "/listiteration/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   parts = query.split(";")
   options = parts.map { |part| "<option value=\"#{part}\">#{part}</option>" }.join("\n    ")
 
@@ -76,7 +76,7 @@ end
 Xssmaze.push("listiteration-level6", "/listiteration/level6/?query=a", "single dynamic item among 20 static li elements",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/listiteration/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   static_items = (1..20).map { |i| "<li>Static Item #{i}</li>" }.join("\n    ")
 
   "<html><body>

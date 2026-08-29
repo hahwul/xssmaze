@@ -6,7 +6,7 @@ maze_get "/postmethod/level1/" do |_|
   "<html><body><form action='/postmethod/level1/' method='post'><input type='text' name='query' value='a'><input type='submit'></form></body></html>"
 end
 maze_post "/postmethod/level1/" do |env|
-  query = env.params.body["query"].as(String)
+  query = env.params.body.fetch("query", "")
 
   "<html><body>#{query}</body></html>"
 end
@@ -19,7 +19,7 @@ maze_get "/postmethod/level2/" do |_|
   "<html><body><form action='/postmethod/level2/' method='post'><input type='text' name='query' value='a'><input type='submit'></form></body></html>"
 end
 maze_post "/postmethod/level2/" do |env|
-  query = env.params.body["query"].as(String)
+  query = env.params.body.fetch("query", "")
 
   "<html><body><input type=\"text\" value=\"#{query}\"></body></html>"
 end
@@ -33,7 +33,7 @@ maze_get "/postmethod/level3/" do |_|
   <script>function send(){var x=new XMLHttpRequest();x.open('POST','/postmethod/level3/');x.setRequestHeader('Content-Type','application/json;charset=UTF-8');x.send(JSON.stringify({query:document.querySelector('input[name=query]').value}));}</script></body></html>"
 end
 maze_post "/postmethod/level3/" do |env|
-  query = env.params.json["query"].as(String)
+  query = env.params.json.fetch("query", "").as(String)
 
   "<html><body>#{query}</body></html>"
 end
@@ -46,7 +46,7 @@ maze_get "/postmethod/level4/" do |_|
   "<html><body><form action='/postmethod/level4/' method='post'><input type='text' name='query' value='a'><input type='submit'></form></body></html>"
 end
 maze_post "/postmethod/level4/" do |env|
-  query = env.params.body["query"].as(String)
+  query = env.params.body.fetch("query", "")
 
   "<html><body><script>var x = \"#{query}\";</script></body></html>"
 end
@@ -59,7 +59,7 @@ maze_get "/postmethod/level5/" do |_|
   "<html><body><form action='/postmethod/level5/' method='post'><input type='text' name='name' value='a'><input type='submit'></form></body></html>"
 end
 maze_post "/postmethod/level5/" do |env|
-  query = env.params.body["name"].as(String)
+  query = env.params.body.fetch("name", "")
 
   "<html><body>#{query}</body></html>"
 end
@@ -72,7 +72,7 @@ maze_get "/postmethod/level6/" do |_|
   "<html><body><form action='/postmethod/level6/' method='post'><input type='text' name='query' value='a'><input type='submit'></form></body></html>"
 end
 maze_post "/postmethod/level6/" do |env|
-  query = Filters.strip_angles(env.params.body["query"].as(String))
+  query = Filters.strip_angles(env.params.body.fetch("query", ""))
 
   "<html><body><input type=\"text\" value=\"#{query}\"></body></html>"
 end

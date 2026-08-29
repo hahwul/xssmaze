@@ -6,7 +6,7 @@ require "base64"
 Xssmaze.push("dblenc-level1", "/dblenc/level1/?query=a", "double URL decode before reflection",
   vuln: "reflected-html", delivery: ["query"], note: "two extra URL decodes on top of the framework's own, so percent-encoded payloads arrive as raw markup")
 maze_get "/dblenc/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   begin
     decoded = URI.decode(URI.decode(query))
@@ -25,7 +25,7 @@ end
 Xssmaze.push("dblenc-level2", "/dblenc/level2/?query=a", "HTML entity decode before reflection",
   vuln: "reflected-html", delivery: ["query"], note: "&lt; and &gt; are decoded back to angle brackets before reflection")
 maze_get "/dblenc/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   decoded = query
     .gsub("&lt;", "<")
@@ -45,7 +45,7 @@ end
 Xssmaze.push("dblenc-level3", "/dblenc/level3/?query=YQ==", "base64 decode before reflection",
   vuln: "reflected-html", delivery: ["query"], note: "the parameter must be base64; anything that fails to decode is replaced with a fixed error string, so a raw payload never reaches the page")
 maze_get "/dblenc/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   begin
     decoded = Base64.decode_string(query)
@@ -64,7 +64,7 @@ end
 Xssmaze.push("dblenc-level4", "/dblenc/level4/?query=a", "single URL decode before reflection",
   vuln: "reflected-html", delivery: ["query"], note: "the server URL-decodes once before reflecting")
 maze_get "/dblenc/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   begin
     decoded = URI.decode(query)
