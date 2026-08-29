@@ -11,6 +11,7 @@ require "./assets"
 require "./catalog"
 require "./ui"
 require "./banner"
+require "./store"
 require "./mazes/**"
 require "./server"
 
