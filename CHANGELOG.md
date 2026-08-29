@@ -31,8 +31,12 @@
 - **Stored mazes are bounded and resettable.** State grew without limit and never cleared, so
   a second scanner run read the first run's payloads back out as its own finding. Collections
   keep their most recent entries and `/reset` clears them between runs (#42)
-- Fixed 26 endpoints whose `params:` named a parameter their handler never reads, which had
-  been pointing scanners at the wrong field
+- Fixed the `params:` lists that named a parameter the handler never reads, which had been
+  telling a scanner reading `/map/json` to fuzz the wrong field — `rsplit-level4` advertised
+  `query` while its sink is `pref`, `sink-level8` advertised `query` while only `callback` is
+  read. 26 endpoints declared a parameter their own catalog URL contradicted; that is now 0
+  (the 3 still flagged by that check are `multipart-*`, where `params` correctly names a
+  header or body field and only the vestigial `?query=a` in the URL differs)
 
 ## v0.4.0
 
