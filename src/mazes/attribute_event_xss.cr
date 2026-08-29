@@ -4,7 +4,7 @@
 Xssmaze.push("attr-event-level1", "/attr-event/level1/?query=a", "reflection in onmouseover JS string context",
   vuln: "reflected-attr", delivery: ["query"], note: "the handler only runs on hover; the enclosing attribute is double-quoted, so break out of it to inject a self-firing tag")
 maze_get "/attr-event/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><div onmouseover=\"show('#{query}')\">hover me</div></body></html>"
 end
@@ -15,7 +15,7 @@ end
 Xssmaze.push("attr-event-level2", "/attr-event/level2/?query=a", "reflection in onsubmit JS string context",
   vuln: "reflected-attr", delivery: ["query"], note: "the handler only runs on form submit; the enclosing attribute is double-quoted, so break out of it to inject a self-firing tag")
 maze_get "/attr-event/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><form onsubmit=\"validate('#{query}'); return false\"><input type=\"submit\" value=\"Submit\"></form></body></html>"
 end
@@ -26,7 +26,7 @@ end
 Xssmaze.push("attr-event-level3", "/attr-event/level3/?query=a", "reflection in body onload JS string context",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/attr-event/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body onload=\"init('#{query}')\"><p>Page loaded</p></body></html>"
 end
@@ -38,7 +38,7 @@ end
 Xssmaze.push("attr-event-level4", "/attr-event/level4/?query=a", "reflection in img onerror JS string context",
   vuln: "reflected-attr", delivery: ["query"], note: "the img src is deliberately broken, so the onerror handler fires without interaction")
 maze_get "/attr-event/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><img src=\"/nonexistent.jpg\" onerror=\"report('#{query}')\"></body></html>"
 end
@@ -49,7 +49,7 @@ end
 Xssmaze.push("attr-event-level5", "/attr-event/level5/?query=a", "reflection in input onblur JS string context",
   vuln: "reflected-attr", delivery: ["query"], note: "the handler only runs when the input loses focus; the enclosing attribute is double-quoted, so break out of it to inject a self-firing tag")
 maze_get "/attr-event/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><input value=\"test\" onblur=\"save('#{query}')\"></body></html>"
 end
@@ -60,7 +60,7 @@ end
 Xssmaze.push("attr-event-level6", "/attr-event/level6/?query=a", "reflection in button onclick JS string context",
   vuln: "reflected-attr", delivery: ["query"], note: "the handler only runs on click; the enclosing attribute is double-quoted, so break out of it to inject a self-firing tag")
 maze_get "/attr-event/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><button onclick=\"action('#{query}')\">Click</button></body></html>"
 end

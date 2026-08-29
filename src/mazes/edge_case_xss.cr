@@ -2,7 +2,7 @@
 Xssmaze.push("edge-level1", "/edge/level1/?query=a", "null byte before filter",
   vuln: "reflected-html", delivery: ["query"], note: "the angle-bracket check only inspects the bytes before the first NUL, so a %00 prefix carries the payload past it unfiltered")
 maze_get "/edge/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Strip everything after null byte for filter, but reflect original
   check = query.split('\0').first || query
   if check.includes?("<") || check.includes?(">")
@@ -25,7 +25,7 @@ end
 Xssmaze.push("edge-level3", "/edge/level3/?query=a", "JSON island in script tag",
   vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "the value is placed in a <script type=application/json> island with its double quotes escaped, then JSON.parse'd and written with innerHTML — a tag payload reaches the sink with no breakout")
 maze_get "/edge/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   escaped = query.gsub("\"", "\\\"")
 
   "<html><body>
@@ -44,7 +44,7 @@ end
 Xssmaze.push("edge-level4", "/edge/level4/?query=a", "HTML entity in event handler attribute",
   vuln: "reflected-attr", delivery: ["query"], note: "angle brackets are entity-encoded, but the value sits in a single-quoted JS string inside an onclick handler; the handler only runs on click, so break out of the double-quoted attribute to inject a self-firing tag")
 maze_get "/edge/level4/" do |env|
-  query = Filters.encode_angles(env.params.query["query"])
+  query = Filters.encode_angles(env.params.query.fetch("query", ""))
 
   "<html><body><div onclick=\"handle('#{query}')\">Click</div></body></html>"
 end
@@ -63,7 +63,7 @@ end
 Xssmaze.push("edge-level6", "/edge/level6/?query=a", "SVG fill attribute injection",
   vuln: "reflected-attr", delivery: ["query"], note: "reflected into an SVG <rect fill>; inside <svg> an injected <script> is an SVG script element and still runs")
 maze_get "/edge/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><svg><rect fill=\"#{query}\" width=\"100\" height=\"100\"/></svg></body></html>"
 end
@@ -83,7 +83,7 @@ end
 Xssmaze.push("edge-level8", "/edge/level8/?query=a", "textarea body (close tag allowed)",
   vuln: "reflected-html", delivery: ["query"], note: "reflected into <textarea> RCDATA; close </textarea> first")
 maze_get "/edge/level8/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><textarea>#{query}</textarea></body></html>"
 end

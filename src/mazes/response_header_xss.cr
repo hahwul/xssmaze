@@ -3,7 +3,7 @@
 Xssmaze.push("respheader-level1", "/respheader/level1/?query=a", "nosniff header with text/html, raw reflection",
   vuln: "reflected-html", delivery: ["query"], note: "nosniff is not a control here: the response really is text/html, so the reflection executes")
 maze_get "/respheader/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   env.response.content_type = "text/html"
   env.response.headers["X-Content-Type-Options"] = "nosniff"
 
@@ -18,7 +18,7 @@ end
 Xssmaze.push("respheader-level2", "/respheader/level2/?query=a", "X-XSS-Protection disabled, raw reflection",
   vuln: "reflected-html", delivery: ["query"], note: "X-XSS-Protection is dead in every current browser, so the header changes nothing either way")
 maze_get "/respheader/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   env.response.content_type = "text/html"
   env.response.headers["X-XSS-Protection"] = "0"
 
@@ -33,7 +33,7 @@ end
 Xssmaze.push("respheader-level3", "/respheader/level3/?query=a", "cache-control headers with raw reflection",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/respheader/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   env.response.content_type = "text/html"
   env.response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
   env.response.headers["Pragma"] = "no-cache"
@@ -50,7 +50,7 @@ end
 Xssmaze.push("respheader-level4", "/respheader/level4/?query=a", "query in Set-Cookie and body reflection",
   vuln: "reflected-html", delivery: ["query"], note: "the two Set-Cookie copies drop the bytes a cookie value cannot carry; the body reflection is the raw one")
 maze_get "/respheader/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   env.response.content_type = "text/html"
   # The cookie copies drop the bytes RFC 6265 forbids because Crystal
   # refuses to emit them; the body reflection below stays raw.
@@ -68,7 +68,7 @@ end
 Xssmaze.push("respheader-level5", "/respheader/level5/?query=a", "CORS allow-all with raw reflection",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/respheader/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   env.response.content_type = "text/html"
   env.response.headers["Access-Control-Allow-Origin"] = "*"
   env.response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
@@ -85,7 +85,7 @@ end
 Xssmaze.push("respheader-level6", "/respheader/level6/?query=a", "all security headers except CSP, raw reflection",
   vuln: "reflected-html", delivery: ["query"], note: "every security header here is present except the one that would matter; with no CSP the inline reflection still runs")
 maze_get "/respheader/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   env.response.content_type = "text/html"
   env.response.headers["X-Content-Type-Options"] = "nosniff"
   env.response.headers["X-Frame-Options"] = "DENY"

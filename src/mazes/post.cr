@@ -4,7 +4,7 @@ maze_get "/post/level1/" do |_|
   "<form action='/post/level1/' method='post'><input type='text' name='query' value='a'><input type='submit'></form>"
 end
 maze_post "/post/level1/" do |env|
-  query = env.params.body["query"].as(String)
+  query = env.params.body.fetch("query", "").as(String)
   "query: #{query}"
 end
 
@@ -22,6 +22,6 @@ maze_get "/post/level2/" do |_|
        </script>"
 end
 maze_post "/post/level2/" do |env|
-  query = env.params.json["query"].as(String)
+  query = env.params.json.fetch("query", "").as(String)
   "query: #{query}"
 end

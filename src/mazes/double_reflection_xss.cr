@@ -2,7 +2,7 @@
 Xssmaze.push("doublereflect-level1", "/doublereflect/level1/?query=a", "query reflected twice in body",
   vuln: "reflected-html", delivery: ["query"], note: "the same value is reflected twice into paragraph text")
 maze_get "/doublereflect/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Double Reflection Level 1</h1>
@@ -15,7 +15,7 @@ end
 Xssmaze.push("doublereflect-level2", "/doublereflect/level2/?query=a", "body raw + attribute with quotes encoded",
   vuln: "reflected-html", delivery: ["query"], note: "the input value attribute entity-encodes double quotes; the div copy is raw")
 maze_get "/doublereflect/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   attr_escaped = query.gsub("\"", "&quot;")
 
   "<html><body>
@@ -29,7 +29,7 @@ end
 Xssmaze.push("doublereflect-level3", "/doublereflect/level3/?query=a", "first reflection encoded, second raw",
   vuln: "reflected-html", delivery: ["query"], note: "the first copy entity-encodes angle brackets; the second is raw")
 maze_get "/doublereflect/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   encoded = Filters.encode_angles(query)
 
   "<html><body>
@@ -43,7 +43,7 @@ end
 Xssmaze.push("doublereflect-level4", "/doublereflect/level4/?query=a", "reflection in title + body",
   vuln: "reflected-html", delivery: ["query"], note: "the <title> copy is RCDATA; the div copy is a plain HTML context")
 maze_get "/doublereflect/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head>
   <title>#{query}</title>
@@ -57,7 +57,7 @@ end
 Xssmaze.push("doublereflect-level5", "/doublereflect/level5/?query=a", "4 encoded reflections + 1 raw at end",
   vuln: "reflected-html", delivery: ["query"], note: "four copies entity-encode angle brackets; only the fifth is raw")
 maze_get "/doublereflect/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   encoded = Filters.encode_angles(query)
 
   "<html><body>
@@ -74,7 +74,7 @@ end
 Xssmaze.push("doublereflect-level6", "/doublereflect/level6/?query=a", "script string (quotes escaped) + div raw",
   vuln: "reflected-html", delivery: ["query"], note: "the <script> copy escapes double quotes but not </script>; the div copy is raw")
 maze_get "/doublereflect/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   js_escaped = query.gsub("\"", "\\\"")
 
   "<html><body>
