@@ -1,6 +1,7 @@
 # Level 1: Reflected in <object data="QUERY" type="text/html">
 # Break out of data attribute with "
-Xssmaze.push("embedctx-level1", "/embedctx/level1/?query=a", "reflection in object data attribute")
+Xssmaze.push("embedctx-level1", "/embedctx/level1/?query=a", "reflection in object data attribute",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/embedctx/level1/" do |env|
   query = env.params.query["query"]
 
@@ -12,7 +13,8 @@ end
 
 # Level 2: Reflected in <embed type="text/html" src="QUERY">
 # Break out of src attribute with "
-Xssmaze.push("embedctx-level2", "/embedctx/level2/?query=a", "reflection in embed src attribute with text/html type")
+Xssmaze.push("embedctx-level2", "/embedctx/level2/?query=a", "reflection in embed src attribute with text/html type",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/embedctx/level2/" do |env|
   query = env.params.query["query"]
 
@@ -24,7 +26,8 @@ end
 
 # Level 3: Reflected in <param name="movie" value="QUERY"> inside <object>
 # Break out of value attribute with "
-Xssmaze.push("embedctx-level3", "/embedctx/level3/?query=a", "reflection in param value inside object tag")
+Xssmaze.push("embedctx-level3", "/embedctx/level3/?query=a", "reflection in param value inside object tag",
+  vuln: "reflected-attr", delivery: ["query"], note: "reflected into a <param value> nested inside <object>")
 maze_get "/embedctx/level3/" do |env|
   query = env.params.query["query"]
 
@@ -39,7 +42,8 @@ end
 
 # Level 4: Reflected in <applet code="QUERY"> (deprecated but parsed)
 # Break out of code attribute with "
-Xssmaze.push("embedctx-level4", "/embedctx/level4/?query=a", "reflection in deprecated applet code attribute")
+Xssmaze.push("embedctx-level4", "/embedctx/level4/?query=a", "reflection in deprecated applet code attribute",
+  vuln: "reflected-attr", delivery: ["query"], note: "<applet> is not a recognised element in modern parsers, but its start tag still tokenises, so the attribute breakout works")
 maze_get "/embedctx/level4/" do |env|
   query = env.params.query["query"]
 
@@ -51,7 +55,8 @@ end
 
 # Level 5: Reflected in <param name="src" value="QUERY"> inside nested <object>
 # Break out of value attribute with "
-Xssmaze.push("embedctx-level5", "/embedctx/level5/?query=a", "reflection in param value inside nested object")
+Xssmaze.push("embedctx-level5", "/embedctx/level5/?query=a", "reflection in param value inside nested object",
+  vuln: "reflected-attr", delivery: ["query"], note: "reflected into a <param value> nested inside <object>")
 maze_get "/embedctx/level5/" do |env|
   query = env.params.query["query"]
 
@@ -66,7 +71,8 @@ end
 
 # Level 6: Reflected in <embed src="QUERY"> with explicit dimensions
 # Break out of src attribute with "
-Xssmaze.push("embedctx-level6", "/embedctx/level6/?query=a", "reflection in embed src with dimensions")
+Xssmaze.push("embedctx-level6", "/embedctx/level6/?query=a", "reflection in embed src with dimensions",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/embedctx/level6/" do |env|
   query = env.params.query["query"]
 

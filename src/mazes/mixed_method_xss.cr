@@ -1,6 +1,7 @@
 # Level 1: GET param 'query' reflected raw — standard baseline
 # Bypass: <script>alert(1)</script>
-Xssmaze.push("mixedmethod-level1", "/mixed-method/level1/?query=a", "GET param query reflected raw (also works via query string on POST)")
+Xssmaze.push("mixedmethod-level1", "/mixed-method/level1/?query=a", "GET param query reflected raw (also works via query string on POST)",
+  vuln: "reflected-html", delivery: ["query"], note: "the route also answers POST, but the parameter is read from the query string either way")
 maze_get "/mixed-method/level1/" do |env|
   query = env.params.query["query"]
 
@@ -14,7 +15,8 @@ end
 
 # Level 2: Param name is 'input' (not 'query') reflected raw
 # Bypass: <script>alert(1)</script>
-Xssmaze.push("mixedmethod-level2", "/mixed-method/level2/?input=a", "GET param 'input' reflected raw (non-standard param name)", "GET", ["input"])
+Xssmaze.push("mixedmethod-level2", "/mixed-method/level2/?input=a", "GET param 'input' reflected raw (non-standard param name)", "GET", ["input"],
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/mixed-method/level2/" do |env|
   query = env.params.query["input"]
 
@@ -23,7 +25,8 @@ end
 
 # Level 3: Param name is 'search' reflected in <h2>Results for: SEARCH</h2>
 # Bypass: </h2><script>alert(1)</script>
-Xssmaze.push("mixedmethod-level3", "/mixed-method/level3/?search=a", "GET param 'search' reflected in h2 heading", "GET", ["search"])
+Xssmaze.push("mixedmethod-level3", "/mixed-method/level3/?search=a", "GET param 'search' reflected in h2 heading", "GET", ["search"],
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/mixed-method/level3/" do |env|
   query = env.params.query["search"]
 
@@ -32,7 +35,8 @@ end
 
 # Level 4: Param name is 'q' (short) reflected raw
 # Bypass: <script>alert(1)</script>
-Xssmaze.push("mixedmethod-level4", "/mixed-method/level4/?q=a", "GET param 'q' reflected raw (short param name)", "GET", ["q"])
+Xssmaze.push("mixedmethod-level4", "/mixed-method/level4/?q=a", "GET param 'q' reflected raw (short param name)", "GET", ["q"],
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/mixed-method/level4/" do |env|
   query = env.params.query["q"]
 
@@ -41,7 +45,8 @@ end
 
 # Level 5: Param name is 'callback' reflected raw — JSONP-style param discovery
 # Bypass: <script>alert(1)</script>
-Xssmaze.push("mixedmethod-level5", "/mixed-method/level5/?callback=a", "GET param 'callback' reflected raw in HTML body", "GET", ["callback"])
+Xssmaze.push("mixedmethod-level5", "/mixed-method/level5/?callback=a", "GET param 'callback' reflected raw in HTML body", "GET", ["callback"],
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/mixed-method/level5/" do |env|
   query = env.params.query["callback"]
 
@@ -50,7 +55,8 @@ end
 
 # Level 6: Param name is 'redirect_url' reflected in <a href="QUERY">
 # Bypass: javascript:alert(1)
-Xssmaze.push("mixedmethod-level6", "/mixed-method/level6/?redirect_url=a", "GET param 'redirect_url' reflected in href (javascript: protocol)", "GET", ["redirect_url"])
+Xssmaze.push("mixedmethod-level6", "/mixed-method/level6/?redirect_url=a", "GET param 'redirect_url' reflected in href (javascript: protocol)", "GET", ["redirect_url"],
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/mixed-method/level6/" do |env|
   query = env.params.query["redirect_url"]
 

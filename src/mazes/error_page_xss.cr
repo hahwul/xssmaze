@@ -1,5 +1,6 @@
 # Level 1: 404-like error page with raw reflection in heading
-Xssmaze.push("errpage-level1", "/errpage/level1/?query=a", "404 error page with raw reflection in h1")
+Xssmaze.push("errpage-level1", "/errpage/level1/?query=a", "404 error page with raw reflection in h1",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/errpage/level1/" do |env|
   query = env.params.query["query"]
 
@@ -7,7 +8,8 @@ maze_get "/errpage/level1/" do |env|
 end
 
 # Level 2: Error message with raw reflection in div
-Xssmaze.push("errpage-level2", "/errpage/level2/?query=a", "error message div with raw reflection")
+Xssmaze.push("errpage-level2", "/errpage/level2/?query=a", "error message div with raw reflection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/errpage/level2/" do |env|
   query = env.params.query["query"]
 
@@ -16,7 +18,8 @@ end
 
 # Level 3: Debug page with query reflected in <pre> block
 # Break out of pre and inject
-Xssmaze.push("errpage-level3", "/errpage/level3/?query=a", "debug page with reflection in pre tag")
+Xssmaze.push("errpage-level3", "/errpage/level3/?query=a", "debug page with reflection in pre tag",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/errpage/level3/" do |env|
   query = env.params.query["query"]
 
@@ -25,7 +28,8 @@ end
 
 # Level 4: Search results page with query in paragraph text
 # Break out of quoted text and inject HTML
-Xssmaze.push("errpage-level4", "/errpage/level4/?query=a", "search results page with reflection in paragraph")
+Xssmaze.push("errpage-level4", "/errpage/level4/?query=a", "search results page with reflection in paragraph",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/errpage/level4/" do |env|
   query = env.params.query["query"]
 
@@ -34,7 +38,8 @@ end
 
 # Level 5: Error page with query in both <title> and <h1>
 # Both contexts are exploitable
-Xssmaze.push("errpage-level5", "/errpage/level5/?query=a", "error page with reflection in title and h1")
+Xssmaze.push("errpage-level5", "/errpage/level5/?query=a", "error page with reflection in title and h1",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected into both <title> RCDATA and the <h1> body")
 maze_get "/errpage/level5/" do |env|
   query = env.params.query["query"]
 
@@ -43,7 +48,8 @@ end
 
 # Level 6: Stack trace page with query reflected in <code> block
 # Break out of code tag and inject
-Xssmaze.push("errpage-level6", "/errpage/level6/?query=a", "stack trace page with reflection in code tag")
+Xssmaze.push("errpage-level6", "/errpage/level6/?query=a", "stack trace page with reflection in code tag",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/errpage/level6/" do |env|
   query = env.params.query["query"]
 

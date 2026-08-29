@@ -1,5 +1,6 @@
 # Level 1: Reflected in <td> inside a table
-Xssmaze.push("tablecontext-level1", "/tablecontext/level1/?query=a", "reflection in td element")
+Xssmaze.push("tablecontext-level1", "/tablecontext/level1/?query=a", "reflection in td element",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/tablecontext/level1/" do |env|
   query = env.params.query["query"]
 
@@ -10,7 +11,8 @@ maze_get "/tablecontext/level1/" do |env|
 end
 
 # Level 2: Reflected in <th> inside a table
-Xssmaze.push("tablecontext-level2", "/tablecontext/level2/?query=a", "reflection in th element")
+Xssmaze.push("tablecontext-level2", "/tablecontext/level2/?query=a", "reflection in th element",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/tablecontext/level2/" do |env|
   query = env.params.query["query"]
 
@@ -21,7 +23,8 @@ maze_get "/tablecontext/level2/" do |env|
 end
 
 # Level 3: Reflected in <caption> inside a table
-Xssmaze.push("tablecontext-level3", "/tablecontext/level3/?query=a", "reflection in caption element")
+Xssmaze.push("tablecontext-level3", "/tablecontext/level3/?query=a", "reflection in caption element",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/tablecontext/level3/" do |env|
   query = env.params.query["query"]
 
@@ -32,7 +35,8 @@ maze_get "/tablecontext/level3/" do |env|
 end
 
 # Level 4: Reflected in <li> inside a <ul>
-Xssmaze.push("tablecontext-level4", "/tablecontext/level4/?query=a", "reflection in li element")
+Xssmaze.push("tablecontext-level4", "/tablecontext/level4/?query=a", "reflection in li element",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/tablecontext/level4/" do |env|
   query = env.params.query["query"]
 
@@ -43,7 +47,8 @@ maze_get "/tablecontext/level4/" do |env|
 end
 
 # Level 5: Reflected in <dd> inside a <dl>
-Xssmaze.push("tablecontext-level5", "/tablecontext/level5/?query=a", "reflection in dd element")
+Xssmaze.push("tablecontext-level5", "/tablecontext/level5/?query=a", "reflection in dd element",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/tablecontext/level5/" do |env|
   query = env.params.query["query"]
 
@@ -54,7 +59,8 @@ maze_get "/tablecontext/level5/" do |env|
 end
 
 # Level 6: Reflected in <figcaption> inside a <figure>
-Xssmaze.push("tablecontext-level6", "/tablecontext/level6/?query=a", "reflection in figcaption element")
+Xssmaze.push("tablecontext-level6", "/tablecontext/level6/?query=a", "reflection in figcaption element",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/tablecontext/level6/" do |env|
   query = env.params.query["query"]
 
