@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 #
-# benchmark.sh - Shell wrapper for XSSMaze benchmark tool
+# benchmark.sh - Shell wrapper for the XSSMaze benchmark scorecard
 #
-# This script provides a convenient shell interface to the Python benchmark tool.
-# It handles common setup tasks and provides helpful error messages.
+# Checks the Python side is usable, then hands every argument straight to
+# benchmark.py. See scripts/README.md for the scoring model and the detection
+# contract a custom scanner has to satisfy.
+#
+#   ./benchmark.sh http://localhost:3000 --scanner nuclei
+#   ./benchmark.sh http://localhost:3000 --scanner none \
+#       --custom-scanner "mytool -l {URLFILE} -json" --detect-json 'results[].url'
 
 set -e
 
@@ -30,7 +35,9 @@ check_python_deps() {
         echo "Installing requests package..." >&2
         python3 -m pip install requests --quiet --user || {
             echo "Error: Failed to install requests package" >&2
-            echo "Please run: pip3 install requests" >&2
+            echo "Run 'pip3 install requests', or use a virtualenv:" >&2
+            echo "  python3 -m venv .venv && .venv/bin/pip install requests" >&2
+            echo "  .venv/bin/python ${BENCHMARK_PY} <target>" >&2
             return 1
         }
     fi
