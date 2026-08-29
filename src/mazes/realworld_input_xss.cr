@@ -1,6 +1,7 @@
 # Level 1: X-Forwarded-For header reflection in error page
 # Common in reverse proxy setups where the header is logged/displayed
-Xssmaze.push("realworld_input-level1", "/realworld-input/level1/", "X-Forwarded-For header reflection")
+Xssmaze.push("realworld_input-level1", "/realworld-input/level1/", "X-Forwarded-For header reflection",
+  vuln: "reflected-html", params: ["X-Forwarded-For"], delivery: ["header"], note: "reflects the X-Forwarded-For header into the error page")
 maze_get "/realworld-input/level1/" do |env|
   xff = env.request.headers.fetch("X-Forwarded-For", "127.0.0.1")
 
@@ -9,7 +10,8 @@ end
 
 # Level 2: POST JSON body reflection
 # Accepts JSON body with {"name": "value"} and reflects without escaping
-Xssmaze.push("realworld_input-level2", "/realworld-input/level2/", "POST JSON body reflection (name field)")
+Xssmaze.push("realworld_input-level2", "/realworld-input/level2/", "POST JSON body reflection (name field)",
+  vuln: "reflected-html", method: "POST", params: ["name"], delivery: ["body"], note: "reflects the name field from a JSON POST body")
 maze_get "/realworld-input/level2/" do |_|
   "<html><body><h2>API Endpoint</h2><p>POST JSON with {\"name\": \"value\"}</p></body></html>"
 end
@@ -21,7 +23,8 @@ end
 
 # Level 3: POST multipart form reflection
 # Reflects a form field from multipart/form-data upload
-Xssmaze.push("realworld_input-level3", "/realworld-input/level3/", "POST multipart form field reflection")
+Xssmaze.push("realworld_input-level3", "/realworld-input/level3/", "POST multipart form field reflection",
+  vuln: "reflected-html", method: "POST", params: ["username"], delivery: ["body"], note: "reflects the username field from a multipart POST body")
 maze_get "/realworld-input/level3/" do |_|
   "<html><body><form action='/realworld-input/level3/' method='post' enctype='multipart/form-data'><input type='text' name='username' value='test'><input type='file' name='avatar'><input type='submit' value='Upload'></form></body></html>"
 end
@@ -33,7 +36,8 @@ end
 
 # Level 4: Location header injection via parameter
 # Redirects to user-controlled URL; javascript: protocol triggers XSS
-Xssmaze.push("realworld_input-level4", "/realworld-input/level4/?url=https://example.com", "Location header redirect (javascript: sink)")
+Xssmaze.push("realworld_input-level4", "/realworld-input/level4/?url=https://example.com", "Location header redirect (javascript: sink)",
+  vuln: "non-xss-control", params: ["url"], delivery: ["query"], exploitable: false, note: "open redirect via the Location header; browsers do not execute javascript:/data: from a Location redirect and CR/LF is stripped, so this is not XSS")
 maze_get "/realworld-input/level4/" do |env|
   url = env.params.query.fetch("url", "/")
   env.response.headers["Location"] = Xssmaze.header_value(url)
@@ -44,7 +48,8 @@ end
 
 # Level 5: Meta refresh redirect
 # Uses <meta http-equiv="refresh"> with user-controlled URL
-Xssmaze.push("realworld_input-level5", "/realworld-input/level5/?url=https://example.com", "meta refresh redirect sink")
+Xssmaze.push("realworld_input-level5", "/realworld-input/level5/?url=https://example.com", "meta refresh redirect sink",
+  vuln: "reflected-attr", params: ["url"], delivery: ["query"], note: "reflected into the meta-refresh content attribute; break out with the quote and > to inject HTML (javascript: in meta refresh is blocked by modern browsers)")
 maze_get "/realworld-input/level5/" do |env|
   url = env.params.query.fetch("url", "/")
 
@@ -53,7 +58,8 @@ end
 
 # Level 6: Cookie value reflection
 # First request sets cookie from query param, subsequent requests reflect cookie value
-Xssmaze.push("realworld_input-level6", "/realworld-input/level6/?lang=en", "cookie value reflection (stored via param)")
+Xssmaze.push("realworld_input-level6", "/realworld-input/level6/?lang=en", "cookie value reflection (stored via param)",
+  vuln: "reflected-html", params: ["lang"], delivery: ["query", "cookie"], note: "the lang parameter reflects on the same request and is also stored in a cookie that reflects on later requests")
 maze_get "/realworld-input/level6/" do |env|
   lang_param = env.params.query.fetch("lang", "")
 
@@ -76,7 +82,8 @@ end
 
 # Level 7: Full URL / path reflection in link tag
 # Allows injection via path: /realworld-input/level7/"><script>alert(1)</script>
-Xssmaze.push("realworld_input-level7", "/realworld-input/level7/test", "path reflection in link href")
+Xssmaze.push("realworld_input-level7", "/realworld-input/level7/test", "path reflection in link href",
+  vuln: "reflected-attr", params: [":path"], delivery: ["path"], note: "reflected into the canonical link href; the body copy is angle-stripped but the href is not, so break out with the quote and >")
 maze_get "/realworld-input/level7/:path" do |env|
   path = env.params.url["path"]
 
@@ -85,7 +92,8 @@ end
 
 # Level 8: JSONP callback injection
 # Returns callback({"data":"value"}) with application/javascript content-type
-Xssmaze.push("realworld_input-level8", "/realworld-input/level8/?callback=myFunc", "JSONP callback injection")
+Xssmaze.push("realworld_input-level8", "/realworld-input/level8/?callback=myFunc", "JSONP callback injection",
+  vuln: "reflected-js", params: ["callback"], delivery: ["query"], note: "JSONP: the callback name is reflected raw into an application/javascript response, executing when the response is loaded as a script")
 maze_get "/realworld-input/level8/" do |env|
   callback = env.params.query.fetch("callback", "callback")
   env.response.content_type = "application/javascript"

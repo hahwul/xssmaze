@@ -1,6 +1,7 @@
 # Level 1: progress element - reflection inside title attribute
 # Bypass: break out of title with ", e.g. " onmouseover="alert(1)"
-Xssmaze.push("misc-context-level1", "/misc-context/level1/?query=a", "progress element title attribute reflection")
+Xssmaze.push("misc-context-level1", "/misc-context/level1/?query=a", "progress element title attribute reflection",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/misc-context/level1/" do |env|
   query = env.params.query["query"]
 
@@ -9,7 +10,8 @@ end
 
 # Level 2: meter element - reflection inside title attribute
 # Bypass: break out of title with ", e.g. " onmouseover="alert(1)"
-Xssmaze.push("misc-context-level2", "/misc-context/level2/?query=a", "meter element title attribute reflection")
+Xssmaze.push("misc-context-level2", "/misc-context/level2/?query=a", "meter element title attribute reflection",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/misc-context/level2/" do |env|
   query = env.params.query["query"]
 
@@ -18,7 +20,8 @@ end
 
 # Level 3: time element - reflection inside datetime attribute
 # Bypass: break out of datetime with ", e.g. " onmouseover="alert(1)"
-Xssmaze.push("misc-context-level3", "/misc-context/level3/?query=a", "time element datetime attribute reflection")
+Xssmaze.push("misc-context-level3", "/misc-context/level3/?query=a", "time element datetime attribute reflection",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/misc-context/level3/" do |env|
   query = env.params.query["query"]
 
@@ -27,7 +30,8 @@ end
 
 # Level 4: data element - reflection inside value attribute
 # Bypass: break out of value with ", e.g. " onmouseover="alert(1)"
-Xssmaze.push("misc-context-level4", "/misc-context/level4/?query=a", "data element value attribute reflection")
+Xssmaze.push("misc-context-level4", "/misc-context/level4/?query=a", "data element value attribute reflection",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/misc-context/level4/" do |env|
   query = env.params.query["query"]
 
@@ -36,7 +40,8 @@ end
 
 # Level 5: cite element - reflection inside title attribute
 # Bypass: break out of title with ", e.g. " onmouseover="alert(1)"
-Xssmaze.push("misc-context-level5", "/misc-context/level5/?query=a", "cite element title attribute reflection")
+Xssmaze.push("misc-context-level5", "/misc-context/level5/?query=a", "cite element title attribute reflection",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/misc-context/level5/" do |env|
   query = env.params.query["query"]
 
@@ -45,7 +50,8 @@ end
 
 # Level 6: q element - reflection inside cite attribute
 # Bypass: break out of cite with ", e.g. " onmouseover="alert(1)"
-Xssmaze.push("misc-context-level6", "/misc-context/level6/?query=a", "q element cite attribute reflection")
+Xssmaze.push("misc-context-level6", "/misc-context/level6/?query=a", "q element cite attribute reflection",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/misc-context/level6/" do |env|
   query = env.params.query["query"]
 

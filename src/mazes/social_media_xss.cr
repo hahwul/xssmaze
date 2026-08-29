@@ -1,6 +1,7 @@
 # Level 1: Tweet/post content - raw reflection in tweet text paragraph
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("social-media-level1", "/social-media/level1/?query=a", "tweet/post content raw reflection")
+Xssmaze.push("social-media-level1", "/social-media/level1/?query=a", "tweet/post content raw reflection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/social-media/level1/" do |env|
   query = env.params.query["query"]
 
@@ -9,7 +10,8 @@ end
 
 # Level 2: Username mention - raw reflection in mention link text
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("social-media-level2", "/social-media/level2/?query=a", "username mention raw reflection in link text")
+Xssmaze.push("social-media-level2", "/social-media/level2/?query=a", "username mention raw reflection in link text",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/social-media/level2/" do |env|
   query = env.params.query["query"]
 
@@ -19,7 +21,8 @@ end
 # Level 3: Hashtag - dual reflection in href attribute AND link text
 # Bypass: break out of href with ", e.g. "><script>alert(1)</script>
 # or inject directly in the text portion
-Xssmaze.push("social-media-level3", "/social-media/level3/?query=a", "hashtag dual reflection in href and link text")
+Xssmaze.push("social-media-level3", "/social-media/level3/?query=a", "hashtag dual reflection in href and link text",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected into both the href and the link text; the text is a direct HTML injection")
 maze_get "/social-media/level3/" do |env|
   query = env.params.query["query"]
 
@@ -28,7 +31,8 @@ end
 
 # Level 4: Bio/description - raw reflection in bio paragraph
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("social-media-level4", "/social-media/level4/?query=a", "user bio/description raw reflection")
+Xssmaze.push("social-media-level4", "/social-media/level4/?query=a", "user bio/description raw reflection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/social-media/level4/" do |env|
   query = env.params.query["query"]
 
@@ -37,7 +41,8 @@ end
 
 # Level 5: Comment reply - raw reflection in reply text span
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("social-media-level5", "/social-media/level5/?query=a", "comment reply raw reflection in text span")
+Xssmaze.push("social-media-level5", "/social-media/level5/?query=a", "comment reply raw reflection in text span",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/social-media/level5/" do |env|
   query = env.params.query["query"]
 
@@ -46,7 +51,8 @@ end
 
 # Level 6: Share link - reflection inside href attribute of share button
 # Bypass: break out of href with ", e.g. "><script>alert(1)</script>
-Xssmaze.push("social-media-level6", "/social-media/level6/?query=a", "share link reflection in href attribute")
+Xssmaze.push("social-media-level6", "/social-media/level6/?query=a", "share link reflection in href attribute",
+  vuln: "reflected-attr", delivery: ["query"], note: "reflected into the share href; break out with the quote and >")
 maze_get "/social-media/level6/" do |env|
   query = env.params.query["query"]
 

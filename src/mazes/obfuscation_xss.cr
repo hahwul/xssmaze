@@ -1,6 +1,7 @@
 # Level 1: Server lowercases the entire input then reflects in body
 # Bypass: lowercase payloads work fine, e.g. <img src=x onerror=alert(1)>
-Xssmaze.push("obfuscation-level1", "/obfuscation/level1/?query=a", "server lowercases input then reflects (lowercase payloads work)")
+Xssmaze.push("obfuscation-level1", "/obfuscation/level1/?query=a", "server lowercases input then reflects (lowercase payloads work)",
+  vuln: "reflected-html", delivery: ["query"], note: "input lowercased; lowercase payloads survive")
 maze_get "/obfuscation/level1/" do |env|
   query = env.params.query["query"].downcase
 
@@ -12,7 +13,8 @@ end
 
 # Level 2: Server uppercases the entire input then reflects in body
 # Bypass: HTML tags are case-insensitive, <IMG SRC=X ONERROR=ALERT(1)> works
-Xssmaze.push("obfuscation-level2", "/obfuscation/level2/?query=a", "server uppercases input then reflects (HTML is case-insensitive)")
+Xssmaze.push("obfuscation-level2", "/obfuscation/level2/?query=a", "server uppercases input then reflects (HTML is case-insensitive)",
+  vuln: "reflected-html", delivery: ["query"], note: "input uppercased, but HTML tags are case-insensitive")
 maze_get "/obfuscation/level2/" do |env|
   query = env.params.query["query"].upcase
 
@@ -24,7 +26,8 @@ end
 
 # Level 3: Server reflects both reversed and original copy of input
 # The original (non-reversed) copy is exploitable by standard payloads
-Xssmaze.push("obfuscation-level3", "/obfuscation/level3/?query=a", "reflects reversed + original (original is exploitable)")
+Xssmaze.push("obfuscation-level3", "/obfuscation/level3/?query=a", "reflects reversed + original (original is exploitable)",
+  vuln: "reflected-html", delivery: ["query"], note: "the reversed copy is a decoy; the original is reflected raw")
 maze_get "/obfuscation/level3/" do |env|
   query = env.params.query["query"]
   reversed = query.reverse
@@ -38,7 +41,8 @@ end
 
 # Level 4: Server removes all spaces then reflects in body
 # Bypass: use / as attribute separator, e.g. <img/src=x/onerror=alert(1)>
-Xssmaze.push("obfuscation-level4", "/obfuscation/level4/?query=a", "server strips all spaces then reflects (use / separator)")
+Xssmaze.push("obfuscation-level4", "/obfuscation/level4/?query=a", "server strips all spaces then reflects (use / separator)",
+  vuln: "reflected-html", delivery: ["query"], note: "spaces stripped; use / as an attribute separator")
 maze_get "/obfuscation/level4/" do |env|
   query = env.params.query["query"].gsub(" ", "")
 
@@ -50,7 +54,8 @@ end
 
 # Level 5: Server removes all = characters then reflects inside <div>
 # Bypass: use tags that don't need =, e.g. <script>alert(1)</script>
-Xssmaze.push("obfuscation-level5", "/obfuscation/level5/?query=a", "server strips = chars then reflects (use script tag)")
+Xssmaze.push("obfuscation-level5", "/obfuscation/level5/?query=a", "server strips = chars then reflects (use script tag)",
+  vuln: "reflected-html", delivery: ["query"], note: "= is stripped; use a tag that needs no attribute value")
 maze_get "/obfuscation/level5/" do |env|
   query = env.params.query["query"].gsub("=", "")
 
@@ -63,7 +68,8 @@ end
 # Level 6: Server removes ( and ) parentheses then reflects inside <div>
 # Bypass: use backticks for function calls, e.g. <img src=x onerror=alert`1`>
 # Or use tags that don't need parens at all
-Xssmaze.push("obfuscation-level6", "/obfuscation/level6/?query=a", "server strips parentheses then reflects (use backticks)")
+Xssmaze.push("obfuscation-level6", "/obfuscation/level6/?query=a", "server strips parentheses then reflects (use backticks)",
+  vuln: "reflected-html", delivery: ["query"], note: "parentheses stripped; use backticks or a paren-free vector")
 maze_get "/obfuscation/level6/" do |env|
   query = env.params.query["query"].gsub("(", "").gsub(")", "")
 

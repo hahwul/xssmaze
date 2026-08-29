@@ -1,7 +1,8 @@
 # Level 1: Reflection inside JS template literal ${...} in a script tag
 # Exploit: Close the template literal expression and inject, e.g. };alert(1)//
 # Or break out of script entirely: </script><img src=x onerror=alert(1)>
-Xssmaze.push("tplinject-level1", "/tplinject/level1/?query=a", "reflection inside JS template literal interpolation")
+Xssmaze.push("tplinject-level1", "/tplinject/level1/?query=a", "reflection inside JS template literal interpolation",
+  vuln: "reflected-js", delivery: ["query"], note: "reflected inside a ${\"...\"} expression in a JS template literal; break out of the double-quoted string or the </script>")
 maze_get "/tplinject/level1/" do |env|
   query = env.params.query["query"]
 
@@ -17,7 +18,8 @@ end
 # Level 2: Reflection inside an HTML <template> element that gets cloned and inserted via innerHTML
 # The template content is inert until cloned, but innerHTML assignment makes it live
 # Exploit: <img src=x onerror=alert(1)> or <script>alert(1)</script>
-Xssmaze.push("tplinject-level2", "/tplinject/level2/?query=a", "HTML template element cloned to innerHTML")
+Xssmaze.push("tplinject-level2", "/tplinject/level2/?query=a", "HTML template element cloned to innerHTML",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "reflected into an inert <template>, whose innerHTML is then re-injected into the page via innerHTML, executing it")
 maze_get "/tplinject/level2/" do |env|
   query = env.params.query["query"]
 
@@ -35,7 +37,8 @@ end
 # Level 3: Reflection in a JS variable that's passed to innerHTML via indirect DOM sink
 # Exploit: Break out of JS string with '</script><img src=x onerror=alert(1)>'
 # Or inject into the JS string which flows to innerHTML: <img src=x onerror=alert(1)>
-Xssmaze.push("tplinject-level3", "/tplinject/level3/?query=a", "JS string assigned to innerHTML (indirect DOM sink)")
+Xssmaze.push("tplinject-level3", "/tplinject/level3/?query=a", "JS string assigned to innerHTML (indirect DOM sink)",
+  vuln: "reflected-js", sinks: ["innerHTML"], delivery: ["query"], note: "reflected raw into a single-quoted JS string that is concatenated into innerHTML; break out with a single quote")
 maze_get "/tplinject/level3/" do |env|
   query = env.params.query["query"]
 
@@ -53,7 +56,8 @@ end
 # Level 4: Reflection inside a script type="text/template" block, rendered via innerHTML
 # The browser ignores script type="text/template" but JS reads and renders it
 # Exploit: <img src=x onerror=alert(1)> gets stored in the template and rendered to innerHTML
-Xssmaze.push("tplinject-level4", "/tplinject/level4/?query=a", "script type=text/template rendered via innerHTML")
+Xssmaze.push("tplinject-level4", "/tplinject/level4/?query=a", "script type=text/template rendered via innerHTML",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "reflected into an inert <script type=text/template>, whose innerHTML is re-injected via innerHTML")
 maze_get "/tplinject/level4/" do |env|
   query = env.params.query["query"]
 
@@ -76,7 +80,8 @@ end
 # Level 5: Server-side double render - first pass resolves {{query}}, second inserts raw HTML
 # The server replaces {{query}} with input, then the result is placed directly in the page
 # Exploit: Payload like <img src=x onerror=alert(1)> is placed via template substitution
-Xssmaze.push("tplinject-level5", "/tplinject/level5/?query=a", "server-side double template render")
+Xssmaze.push("tplinject-level5", "/tplinject/level5/?query=a", "server-side double template render",
+  vuln: "reflected-html", delivery: ["query"], note: "server-side placeholder substitution places the value raw into the page body")
 maze_get "/tplinject/level5/" do |env|
   query = env.params.query["query"]
 
@@ -96,7 +101,8 @@ end
 # Level 6: Reflection inside a data-attribute that JavaScript reads and writes to innerHTML
 # Exploit: Break out of the attribute with "> and inject HTML: "><img src=x onerror=alert(1)>
 # Or the data value itself flows to innerHTML: <img src=x onerror=alert(1)>
-Xssmaze.push("tplinject-level6", "/tplinject/level6/?query=a", "data-attribute read by JS and written to innerHTML")
+Xssmaze.push("tplinject-level6", "/tplinject/level6/?query=a", "data-attribute read by JS and written to innerHTML",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "reflected into a data-user attribute that JS reads and writes to innerHTML")
 maze_get "/tplinject/level6/" do |env|
   query = env.params.query["query"]
 

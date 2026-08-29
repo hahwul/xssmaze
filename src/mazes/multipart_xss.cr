@@ -1,5 +1,6 @@
 # Level 1: POST endpoint reflecting filename from multipart form
-Xssmaze.push("multipart-level1", "/multipart/level1/?query=a", "POST reflecting filename from multipart form", "POST", ["filename"])
+Xssmaze.push("multipart-level1", "/multipart/level1/?query=a", "POST reflecting filename from multipart form", "POST", ["filename"],
+  vuln: "reflected-html", delivery: ["body"], note: "reflects the filename field from the multipart POST body")
 maze_get "/multipart/level1/" do |_|
   "<html><body>
   <h1>Multipart XSS Level 1</h1>
@@ -16,7 +17,8 @@ maze_post "/multipart/level1/" do |env|
 end
 
 # Level 2: POST reflecting raw JSON body
-Xssmaze.push("multipart-level2", "/multipart/level2/", "POST reflecting raw JSON body", "POST", ["query"])
+Xssmaze.push("multipart-level2", "/multipart/level2/", "POST reflecting raw JSON body", "POST", ["query"],
+  vuln: "reflected-html", delivery: ["body"], note: "reflects the entire raw request body; the page posts a JSON body")
 maze_get "/multipart/level2/" do |_|
   "<html><body>
   <h1>Multipart XSS Level 2</h1>
@@ -38,7 +40,8 @@ maze_post "/multipart/level2/" do |env|
 end
 
 # Level 3: GET endpoint reflecting Accept header value
-Xssmaze.push("multipart-level3", "/multipart/level3/?query=a", "GET reflecting Accept header in body", "GET", ["query"])
+Xssmaze.push("multipart-level3", "/multipart/level3/?query=a", "GET reflecting Accept header in body", "GET", ["Accept"],
+  vuln: "reflected-html", delivery: ["header"], note: "reflects the Accept request header, not a query parameter")
 maze_get "/multipart/level3/" do |env|
   accept = env.request.headers.fetch("Accept", "text/html")
 
@@ -49,7 +52,8 @@ maze_get "/multipart/level3/" do |env|
 end
 
 # Level 4: GET reflecting User-Agent header in body
-Xssmaze.push("multipart-level4", "/multipart/level4/?query=a", "GET reflecting User-Agent header in body")
+Xssmaze.push("multipart-level4", "/multipart/level4/?query=a", "GET reflecting User-Agent header in body",
+  vuln: "reflected-html", params: ["User-Agent"], delivery: ["header"], note: "reflects the User-Agent header, not a query parameter")
 maze_get "/multipart/level4/" do |env|
   ua = env.request.headers.fetch("User-Agent", "")
 

@@ -1,6 +1,7 @@
 # Level 1: Dashboard card title - raw reflection in card-header div
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("dashboard-level1", "/dashboard/level1/?query=a", "dashboard card header raw reflection")
+Xssmaze.push("dashboard-level1", "/dashboard/level1/?query=a", "dashboard card header raw reflection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/dashboard/level1/" do |env|
   query = env.params.query["query"]
 
@@ -10,7 +11,8 @@ end
 # Level 2: Admin table cell - dual reflection in title attribute AND body
 # Bypass: break out of title attribute with " or inject in body directly
 # e.g. "><script>alert(1)</script> or just <script>alert(1)</script>
-Xssmaze.push("dashboard-level2", "/dashboard/level2/?query=a", "admin table cell dual reflection (attr + body)")
+Xssmaze.push("dashboard-level2", "/dashboard/level2/?query=a", "admin table cell dual reflection (attr + body)",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected into both a title attribute and the cell body; the body is a direct HTML injection")
 maze_get "/dashboard/level2/" do |env|
   query = env.params.query["query"]
 
@@ -19,7 +21,8 @@ end
 
 # Level 3: Notification alert - raw reflection in alert div
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("dashboard-level3", "/dashboard/level3/?query=a", "notification alert raw reflection")
+Xssmaze.push("dashboard-level3", "/dashboard/level3/?query=a", "notification alert raw reflection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/dashboard/level3/" do |env|
   query = env.params.query["query"]
 
@@ -28,7 +31,8 @@ end
 
 # Level 4: Sidebar menu item - raw reflection in nav-link anchor
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("dashboard-level4", "/dashboard/level4/?query=a", "sidebar nav-link raw reflection")
+Xssmaze.push("dashboard-level4", "/dashboard/level4/?query=a", "sidebar nav-link raw reflection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/dashboard/level4/" do |env|
   query = env.params.query["query"]
 
@@ -37,7 +41,8 @@ end
 
 # Level 5: Modal body content - raw reflection in modal-body paragraph
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("dashboard-level5", "/dashboard/level5/?query=a", "modal body raw reflection")
+Xssmaze.push("dashboard-level5", "/dashboard/level5/?query=a", "modal body raw reflection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/dashboard/level5/" do |env|
   query = env.params.query["query"]
 
@@ -46,7 +51,8 @@ end
 
 # Level 6: Status badge - raw reflection in badge span
 # Bypass: direct HTML injection, e.g. <script>alert(1)</script>
-Xssmaze.push("dashboard-level6", "/dashboard/level6/?query=a", "status badge raw reflection")
+Xssmaze.push("dashboard-level6", "/dashboard/level6/?query=a", "status badge raw reflection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/dashboard/level6/" do |env|
   query = env.params.query["query"]
 

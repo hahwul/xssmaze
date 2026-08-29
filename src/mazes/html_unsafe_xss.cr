@@ -13,7 +13,8 @@
 
 # Level 1: Element.setHTMLUnsafe() fed from location.hash — the canonical
 # client-side source -> new sink flow, no quote breakout needed.
-Xssmaze.push("htmlunsafe-level1", "/htmlunsafe/level1/", "Element.setHTMLUnsafe() of location.hash", "GET", ["#hash"])
+Xssmaze.push("htmlunsafe-level1", "/htmlunsafe/level1/", "Element.setHTMLUnsafe() of location.hash", "GET", ["#hash"],
+  vuln: "dom", sources: ["location.hash"], sinks: ["setHTMLUnsafe"], delivery: ["fragment"], note: "setHTMLUnsafe parses HTML with no sanitizer; <img onerror>/<svg onload> fire, inline <script> stays inert")
 maze_get "/htmlunsafe/level1/" do |_env|
   "<html><body>
   <h1>Preview</h1>
@@ -27,7 +28,8 @@ maze_get "/htmlunsafe/level1/" do |_env|
 end
 
 # Level 2: Element.setHTMLUnsafe() fed from a location.search query param.
-Xssmaze.push("htmlunsafe-level2", "/htmlunsafe/level2/?query=a", "Element.setHTMLUnsafe() of a location.search value")
+Xssmaze.push("htmlunsafe-level2", "/htmlunsafe/level2/?query=a", "Element.setHTMLUnsafe() of a location.search value",
+  vuln: "dom", sources: ["location.search"], sinks: ["setHTMLUnsafe"], delivery: ["query"], note: "the query param is read client-side and passed to setHTMLUnsafe")
 maze_get "/htmlunsafe/level2/" do |_env|
   "<html><body>
   <h1>Notes</h1>
@@ -42,7 +44,8 @@ end
 # Level 3: server-reflected value inlined into a JS string then handed to
 # setHTMLUnsafe(). The reflection is visible in the served HTML source, so
 # this is detectable as a reflected sink too.
-Xssmaze.push("htmlunsafe-level3", "/htmlunsafe/level3/?query=a", "server-reflected string passed to setHTMLUnsafe()")
+Xssmaze.push("htmlunsafe-level3", "/htmlunsafe/level3/?query=a", "server-reflected string passed to setHTMLUnsafe()",
+  vuln: "reflected-js", sinks: ["setHTMLUnsafe"], delivery: ["query"], note: "server reflects raw into a single-quoted JS string that is then passed to setHTMLUnsafe; break out with a single quote")
 maze_get "/htmlunsafe/level3/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -58,7 +61,8 @@ end
 
 # Level 4: Document.parseHTMLUnsafe() builds a detached Document from the
 # string; its parsed body nodes are then adopted into the live page.
-Xssmaze.push("htmlunsafe-level4", "/htmlunsafe/level4/?query=a", "Document.parseHTMLUnsafe() result appended to the page")
+Xssmaze.push("htmlunsafe-level4", "/htmlunsafe/level4/?query=a", "Document.parseHTMLUnsafe() result appended to the page",
+  vuln: "dom", sources: ["location.search"], sinks: ["parseHTMLUnsafe"], delivery: ["query"], note: "query read client-side, parsed by Document.parseHTMLUnsafe, then adopted into the page")
 maze_get "/htmlunsafe/level4/" do |_env|
   "<html><body>
   <h1>Importer</h1>
@@ -73,7 +77,8 @@ end
 
 # Level 5: ShadowRoot.setHTMLUnsafe() — the same sink on a web component's
 # shadow root, a common place real code reaches for the Unsafe variant.
-Xssmaze.push("htmlunsafe-level5", "/htmlunsafe/level5/", "ShadowRoot.setHTMLUnsafe() of location.hash", "GET", ["#hash"])
+Xssmaze.push("htmlunsafe-level5", "/htmlunsafe/level5/", "ShadowRoot.setHTMLUnsafe() of location.hash", "GET", ["#hash"],
+  vuln: "dom", sources: ["location.hash"], sinks: ["setHTMLUnsafe"], delivery: ["fragment"], note: "ShadowRoot.setHTMLUnsafe; fires inside the shadow root")
 maze_get "/htmlunsafe/level5/" do |_env|
   "<html><body>
   <h1>Widget</h1>
@@ -90,7 +95,8 @@ end
 # Level 6: Document.parseHTMLUnsafe() of an async fetch() API response — ties
 # the new sink to the modern fetch-response-into-sink data flow. The companion
 # /api route echoes the forwarded param raw as text/html.
-Xssmaze.push("htmlunsafe-level6", "/htmlunsafe/level6/?query=a", "Document.parseHTMLUnsafe() of a fetch() API response")
+Xssmaze.push("htmlunsafe-level6", "/htmlunsafe/level6/?query=a", "Document.parseHTMLUnsafe() of a fetch() API response",
+  vuln: "dom", sources: ["location.search", "fetch-response"], sinks: ["parseHTMLUnsafe"], delivery: ["query"], note: "query is forwarded to the level6 api, which echoes it raw as text/html; the fetch response is parsed by parseHTMLUnsafe")
 maze_get "/htmlunsafe/level6/" do |_env|
   "<html><body>
   <h1>Feed</h1>

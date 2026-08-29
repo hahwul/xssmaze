@@ -1,7 +1,8 @@
 # Level 1: Reflection inside an HTML comment <!-- QUERY -->
 # Bypass: close the comment with --> then inject HTML
 # e.g. --><script>alert(1)</script><!-- or --><img src=x onerror=alert(1)>
-Xssmaze.push("ctxv2-level1", "/ctxv2/level1/?query=a", "reflection inside HTML comment (close with -->)")
+Xssmaze.push("ctxv2-level1", "/ctxv2/level1/?query=a", "reflection inside HTML comment (close with -->)",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected inside an HTML comment; close it with -->")
 maze_get "/ctxv2/level1/" do |env|
   query = env.params.query["query"]
 
@@ -12,7 +13,8 @@ end
 # Content inside <textarea> is treated as raw text by the HTML parser.
 # Bypass: close the textarea first with </textarea> then inject HTML
 # e.g. </textarea><script>alert(1)</script>
-Xssmaze.push("ctxv2-level2", "/ctxv2/level2/?query=a", "reflection inside textarea tag (close tag escape)")
+Xssmaze.push("ctxv2-level2", "/ctxv2/level2/?query=a", "reflection inside textarea tag (close tag escape)",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected inside <textarea> raw-text; close it with </textarea>")
 maze_get "/ctxv2/level2/" do |env|
   query = env.params.query["query"]
 
@@ -23,7 +25,8 @@ end
 # Content inside <title> is treated as raw text by the HTML parser.
 # Bypass: close the title first with </title> then inject HTML
 # e.g. </title><script>alert(1)</script>
-Xssmaze.push("ctxv2-level3", "/ctxv2/level3/?query=a", "reflection inside title tag (close tag escape)")
+Xssmaze.push("ctxv2-level3", "/ctxv2/level3/?query=a", "reflection inside title tag (close tag escape)",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected inside <title> raw-text; close it with </title>")
 maze_get "/ctxv2/level3/" do |env|
   query = env.params.query["query"]
 
@@ -34,7 +37,8 @@ end
 # Content inside <style> is treated as raw text by the HTML parser.
 # Bypass: close the style tag with </style> then inject HTML
 # e.g. </style><script>alert(1)</script>
-Xssmaze.push("ctxv2-level4", "/ctxv2/level4/?query=a", "reflection inside style tag (close tag escape)")
+Xssmaze.push("ctxv2-level4", "/ctxv2/level4/?query=a", "reflection inside style tag (close tag escape)",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected inside <style>; close it with </style> to inject markup")
 maze_get "/ctxv2/level4/" do |env|
   query = env.params.query["query"]
 
@@ -45,7 +49,8 @@ end
 # Content inside <noscript> is parsed as raw text when scripting is enabled.
 # Bypass: close the noscript tag with </noscript> then inject HTML
 # e.g. </noscript><script>alert(1)</script>
-Xssmaze.push("ctxv2-level5", "/ctxv2/level5/?query=a", "reflection inside noscript tag (close tag escape)")
+Xssmaze.push("ctxv2-level5", "/ctxv2/level5/?query=a", "reflection inside noscript tag (close tag escape)",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected inside <noscript>; close it with </noscript>")
 maze_get "/ctxv2/level5/" do |env|
   query = env.params.query["query"]
 
@@ -59,7 +64,8 @@ end
 # survive encoding and get decoded when the browser parses the srcdoc HTML.
 # Bypass: use HTML entities e.g. &lt;img src=x onerror=alert(1)&gt;
 # which the server leaves as-is (& not encoded), and the browser decodes inside srcdoc.
-Xssmaze.push("ctxv2-level6", "/ctxv2/level6/?query=a", "reflection in iframe srcdoc (HTML entity injection via unescaped &)")
+Xssmaze.push("ctxv2-level6", "/ctxv2/level6/?query=a", "reflection in iframe srcdoc (HTML entity injection via unescaped &)",
+  vuln: "reflected-attr", delivery: ["query"], note: "reflected into an iframe srcdoc; < and > are entity-encoded but the quote and & are not, so break the attribute or send pre-encoded entities that decode inside the srcdoc")
 maze_get "/ctxv2/level6/" do |env|
   query = env.params.query["query"]
   # Encode < and > to prevent direct attribute breakout, but leave & intact

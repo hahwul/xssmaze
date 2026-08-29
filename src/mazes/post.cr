@@ -1,4 +1,5 @@
-Xssmaze.push("post-level1", "/post/level1/", "POST-Form => 'query=a'", "POST")
+Xssmaze.push("post-level1", "/post/level1/", "POST-Form => 'query=a'", "POST",
+  vuln: "reflected-html", delivery: ["body"], note: "reflects the query field from the POST form body")
 maze_get "/post/level1/" do |_|
   "<form action='/post/level1/' method='post'><input type='text' name='query' value='a'><input type='submit'></form>"
 end
@@ -7,7 +8,8 @@ maze_post "/post/level1/" do |env|
   "query: #{query}"
 end
 
-Xssmaze.push("post-level2", "/post/level2/", "POST-Json => {\"query\":\"a\"}", "POST")
+Xssmaze.push("post-level2", "/post/level2/", "POST-Json => {\"query\":\"a\"}", "POST",
+  vuln: "reflected-html", delivery: ["body"], note: "reflects the query field from the JSON POST body")
 maze_get "/post/level2/" do |_|
   "<button onclick=send()>run</button>
        <script>
