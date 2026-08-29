@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- **`modern-bypass-level19` works again.** Its inline script never parsed:
+  `/https://xssmaze.com/.test(...)` tokenises as the regex `/https:/` followed by a `//` line
+  comment, leaving the `if (` unclosed, so the whole `<script>` was a SyntaxError, the
+  `message` listener was never registered and the `eval` sink was unreachable. That is a typo,
+  not a filter. The slashes are escaped, the level is a real postMessage → `eval` DOM flow
+  again, and its deliberately unanchored origin RegExp still accepts
+  `https://xssmaze.com.attacker.com` — verified end to end in headless Chrome via the
+  `/beacon` oracle (matching origin fires, unrelated origin does not)
 - **The lab stopped 500ing on a bare request.** 768 of 1031 GET mazes answered HTTP 500 to a
   path with no query string, because `env.params.query["x"]` raises `KeyError` when the
   parameter is absent. That is what a crawler saw first: `/sitemap.xml` publishes paths with

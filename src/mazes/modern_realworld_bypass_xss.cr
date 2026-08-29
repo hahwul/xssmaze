@@ -491,7 +491,7 @@ end
 # Level 19: Web Messaging (postMessage) Origin RegExp Bypass
 # Evaluates event data from postMessage listeners where origin validation has weak unanchored RegExp.
 Xssmaze.push("modern-bypass-level19", "/modern-bypass/level19/", "Web Messaging (postMessage) origin RegExp bypass", "GET", [] of String,
-  vuln: "non-xss-control", sources: ["postMessage"], sinks: ["eval"], delivery: ["postmessage"], exploitable: false, note: "the inline script does not parse: `/https://xssmaze.com/.test(...)` tokenises as a regex followed by a line comment, so the if is never closed and the message listener is never registered. Nothing reaches eval, so reporting no XSS here is the correct result")
+  vuln: "dom", sources: ["postMessage"], sinks: ["eval"], delivery: ["postmessage"], note: "needs a real browser: the payload is a postMessage, so a request-only scanner cannot deliver it. The origin check is an unanchored RegExp, so any origin merely containing `https://xssmaze.com` passes — `https://xssmaze.com.attacker.com` is the intended bypass")
 maze_get "/modern-bypass/level19/" do |_env|
   "<!doctype html><html><head><meta charset='utf-8'><title>PostMessage Portal</title></head><body>
   <h1>Modern Bypass Level 19</h1>
@@ -501,7 +501,7 @@ maze_get "/modern-bypass/level19/" do |_env|
   <script>
     window.addEventListener('message', function(event) {
       // Weak origin validation: unanchored RegExp allowing domains like https://xssmaze.com.attacker.com
-      if (/https://xssmaze.com/.test(event.origin)) {
+      if (/https:\\/\\/xssmaze.com/.test(event.origin)) {
         var data = event.data;
         if (data && data.action === 'execute') {
           // Dynamic execution of message payload code
