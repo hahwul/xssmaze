@@ -1,6 +1,7 @@
 # Level 1: Reflection in <input type="text" value="QUERY">
 # Bypass: break out with " onmouseover=alert(1) x="
-Xssmaze.push("attrctx-level1", "/attrctx/level1/?query=a", "reflection in input value attribute (double-quoted)")
+Xssmaze.push("attrctx-level1", "/attrctx/level1/?query=a", "reflection in input value attribute (double-quoted)",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/attrctx/level1/" do |env|
   query = env.params.query["query"]
 
@@ -9,7 +10,8 @@ end
 
 # Level 2: Reflection in <a href="QUERY">
 # Bypass: use javascript:alert(1) protocol
-Xssmaze.push("attrctx-level2", "/attrctx/level2/?query=a", "reflection in href attribute (javascript: protocol)")
+Xssmaze.push("attrctx-level2", "/attrctx/level2/?query=a", "reflection in href attribute (javascript: protocol)",
+  vuln: "reflected-attr", delivery: ["query"], note: "reflected into an <a href>; the attribute is unescaped, so a \" breakout fires without the click a javascript: URL would need")
 maze_get "/attrctx/level2/" do |env|
   query = env.params.query["query"]
 
@@ -18,7 +20,8 @@ end
 
 # Level 3: Reflection in <img src="QUERY"> with " encoded to &quot; but ' allowed
 # Bypass: use ' onerror=alert(1) x='
-Xssmaze.push("attrctx-level3", "/attrctx/level3/?query=a", "reflection in img src (double-quote encoded, single-quote allowed)")
+Xssmaze.push("attrctx-level3", "/attrctx/level3/?query=a", "reflection in img src (double-quote encoded, single-quote allowed)",
+  vuln: "reflected-attr", delivery: ["query"], note: "double quotes are entity-encoded, but the attribute is single-quoted, so break out with '")
 maze_get "/attrctx/level3/" do |env|
   query = Filters.escape_double_quote(env.params.query["query"])
 
@@ -27,7 +30,8 @@ end
 
 # Level 4: Reflection in <div style="color: QUERY">
 # Bypass: break out with " onmouseover=alert(1) x="
-Xssmaze.push("attrctx-level4", "/attrctx/level4/?query=a", "reflection in style attribute (double-quoted)")
+Xssmaze.push("attrctx-level4", "/attrctx/level4/?query=a", "reflection in style attribute (double-quoted)",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/attrctx/level4/" do |env|
   query = env.params.query["query"]
 
@@ -36,7 +40,8 @@ end
 
 # Level 5: Reflection in <iframe src="QUERY">
 # Bypass: use javascript:alert(1)
-Xssmaze.push("attrctx-level5", "/attrctx/level5/?query=a", "reflection in iframe src attribute (javascript: protocol)")
+Xssmaze.push("attrctx-level5", "/attrctx/level5/?query=a", "reflection in iframe src attribute (javascript: protocol)",
+  vuln: "reflected-attr", delivery: ["query"], note: "reflected into an <iframe src>; the double-quoted attribute is unescaped, so the breakout is the reliable route rather than the scheme")
 maze_get "/attrctx/level5/" do |env|
   query = env.params.query["query"]
 
@@ -45,7 +50,8 @@ end
 
 # Level 6: Reflection in <input type="hidden" value="QUERY">
 # Bypass: break out with " type=text onfocus=alert(1) autofocus x="
-Xssmaze.push("attrctx-level6", "/attrctx/level6/?query=a", "reflection in hidden input value (type override to trigger focus)")
+Xssmaze.push("attrctx-level6", "/attrctx/level6/?query=a", "reflection in hidden input value (type override to trigger focus)",
+  vuln: "reflected-attr", delivery: ["query"], note: "a hidden input never renders, so the payload has to bring its own trigger, e.g. \" type=text autofocus onfocus=alert(1) x=\"")
 maze_get "/attrctx/level6/" do |env|
   query = env.params.query["query"]
 

@@ -1,7 +1,8 @@
 require "html"
 
 # Level 1: Strips all tags but reflects in input value attribute — attribute breakout with "
-Xssmaze.push("sanitizer-edge-level1", "/sanitizer-edge/level1/?query=a", "strip tags, reflect in input value (attribute breakout)")
+Xssmaze.push("sanitizer-edge-level1", "/sanitizer-edge/level1/?query=a", "strip tags, reflect in input value (attribute breakout)",
+  vuln: "reflected-attr", delivery: ["query"], note: "tags are stripped but quotes are not escaped, so break out of the input value attribute")
 maze_get "/sanitizer-edge/level1/" do |env|
   query = env.params.query["query"]
   # Strip all HTML tags but don't escape quotes
@@ -11,7 +12,8 @@ maze_get "/sanitizer-edge/level1/" do |env|
 end
 
 # Level 2: HTML-encodes <>"' but reflects inside script without quotes — raw JS injection
-Xssmaze.push("sanitizer-edge-level2", "/sanitizer-edge/level2/?query=a", "HTML-encode special chars, reflect in unquoted script var")
+Xssmaze.push("sanitizer-edge-level2", "/sanitizer-edge/level2/?query=a", "HTML-encode special chars, reflect in unquoted script var",
+  vuln: "reflected-js", delivery: ["query"], note: "<>\"' are all entity-encoded, but the value lands as a bare JS expression with no quotes to break out of, so plain JavaScript such as alert(1) runs as-is")
 maze_get "/sanitizer-edge/level2/" do |env|
   query = env.params.query["query"]
   # Encode HTML special chars: < > " '
@@ -21,7 +23,8 @@ maze_get "/sanitizer-edge/level2/" do |env|
 end
 
 # Level 3: Strips <script> recursively but allows other tags — use img/svg onerror
-Xssmaze.push("sanitizer-edge-level3", "/sanitizer-edge/level3/?query=a", "recursive script strip, other tags allowed")
+Xssmaze.push("sanitizer-edge-level3", "/sanitizer-edge/level3/?query=a", "recursive script strip, other tags allowed",
+  vuln: "reflected-html", delivery: ["query"], note: "script tags are stripped recursively, so nesting does not help; use another tag")
 maze_get "/sanitizer-edge/level3/" do |env|
   query = env.params.query["query"]
   # Recursively strip <script> and </script> tags
@@ -36,7 +39,8 @@ maze_get "/sanitizer-edge/level3/" do |env|
 end
 
 # Level 4: Tag whitelist (b/i/u/em/strong) — but attributes on whitelisted tags not checked
-Xssmaze.push("sanitizer-edge-level4", "/sanitizer-edge/level4/?query=a", "tag whitelist but event attributes allowed on whitelisted tags")
+Xssmaze.push("sanitizer-edge-level4", "/sanitizer-edge/level4/?query=a", "tag whitelist but event attributes allowed on whitelisted tags",
+  vuln: "reflected-html", delivery: ["query"], note: "the whitelist keeps b/i/u/em/strong but does not strip their attributes, so an event handler on a whitelisted tag survives")
 maze_get "/sanitizer-edge/level4/" do |env|
   query = env.params.query["query"]
   # Whitelist: only allow b, i, u, em, strong tags (case-sensitive check)
@@ -49,7 +53,8 @@ maze_get "/sanitizer-edge/level4/" do |env|
 end
 
 # Level 5: Strips tags/dangerous attrs but allows style — attribute breakout from style
-Xssmaze.push("sanitizer-edge-level5", "/sanitizer-edge/level5/?query=a", "style attribute allowed, breakout from style value")
+Xssmaze.push("sanitizer-edge-level5", "/sanitizer-edge/level5/?query=a", "style attribute allowed, breakout from style value",
+  vuln: "reflected-attr", delivery: ["query"], note: "tags are stripped, so break out of the style attribute with a quote instead")
 maze_get "/sanitizer-edge/level5/" do |env|
   query = env.params.query["query"]
   # Strip all HTML tags from query
@@ -59,7 +64,8 @@ maze_get "/sanitizer-edge/level5/" do |env|
 end
 
 # Level 6: Strips javascript:/vbscript:/data: from href — attribute breakout instead
-Xssmaze.push("sanitizer-edge-level6", "/sanitizer-edge/level6/?query=a", "protocol strip in href, attribute breakout")
+Xssmaze.push("sanitizer-edge-level6", "/sanitizer-edge/level6/?query=a", "protocol strip in href, attribute breakout",
+  vuln: "reflected-attr", delivery: ["query"], note: "javascript:/vbscript:/data: are stripped from the href, so break out of the attribute instead")
 maze_get "/sanitizer-edge/level6/" do |env|
   query = env.params.query["query"]
   # Strip dangerous protocols

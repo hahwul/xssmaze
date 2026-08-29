@@ -1,5 +1,6 @@
 # Level 1: Full page with header/nav/main/footer, query reflected in main content div
-Xssmaze.push("complexpage-level1", "/complexpage/level1/?query=a", "full page with header/nav/footer, reflection in content div")
+Xssmaze.push("complexpage-level1", "/complexpage/level1/?query=a", "full page with header/nav/footer, reflection in content div",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/complexpage/level1/" do |env|
   query = env.params.query["query"]
 
@@ -18,7 +19,8 @@ maze_get "/complexpage/level1/" do |env|
 end
 
 # Level 2: Full page with sidebar, query reflected in search input value
-Xssmaze.push("complexpage-level2", "/complexpage/level2/?query=a", "full page with sidebar, reflection in search input value")
+Xssmaze.push("complexpage-level2", "/complexpage/level2/?query=a", "full page with sidebar, reflection in search input value",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/complexpage/level2/" do |env|
   query = env.params.query["query"]
 
@@ -41,7 +43,8 @@ maze_get "/complexpage/level2/" do |env|
 end
 
 # Level 3: Full page with multiple scripts, query reflected in h2 title
-Xssmaze.push("complexpage-level3", "/complexpage/level3/?query=a", "full page with multiple scripts, reflection in h2 title")
+Xssmaze.push("complexpage-level3", "/complexpage/level3/?query=a", "full page with multiple scripts, reflection in h2 title",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/complexpage/level3/" do |env|
   query = env.params.query["query"]
 
@@ -63,7 +66,8 @@ maze_get "/complexpage/level3/" do |env|
 end
 
 # Level 4: Full page with CSS, query reflected in paragraph description
-Xssmaze.push("complexpage-level4", "/complexpage/level4/?query=a", "full page with CSS styles, reflection in description paragraph")
+Xssmaze.push("complexpage-level4", "/complexpage/level4/?query=a", "full page with CSS styles, reflection in description paragraph",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/complexpage/level4/" do |env|
   query = env.params.query["query"]
 
@@ -89,7 +93,8 @@ h1 { color: #333; border-bottom: 2px solid #0066cc; padding-bottom: 10px; }
 end
 
 # Level 5: Full page with forms and tables, query reflected in table data cell
-Xssmaze.push("complexpage-level5", "/complexpage/level5/?query=a", "full page with forms and tables, reflection in td element")
+Xssmaze.push("complexpage-level5", "/complexpage/level5/?query=a", "full page with forms and tables, reflection in td element",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/complexpage/level5/" do |env|
   query = env.params.query["query"]
 
@@ -115,7 +120,8 @@ maze_get "/complexpage/level5/" do |env|
 end
 
 # Level 6: Full page with lots of HTML (>1000 chars before reflection), query deep in page
-Xssmaze.push("complexpage-level6", "/complexpage/level6/?query=a", "large page with reflection deep in HTML (>1000 chars before reflection)")
+Xssmaze.push("complexpage-level6", "/complexpage/level6/?query=a", "large page with reflection deep in HTML (>1000 chars before reflection)",
+  vuln: "reflected-html", delivery: ["query"], note: "the reflection sits about a kilobyte into the document, after the nav and sidebar markup")
 maze_get "/complexpage/level6/" do |env|
   query = env.params.query["query"]
 

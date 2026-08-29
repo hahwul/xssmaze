@@ -104,7 +104,8 @@ end
 # sink. The normal page escapes its reflection, so the only way through is the
 # block page. Real-world class: WAF/CDN block page reflected XSS.
 # Bypass: any blocked payload, e.g. <script>alert(1)</script> or <svg onload=alert(1)>
-Xssmaze.push("waf-facade-level1", "/waf-facade/level1/?query=a", "Cloudflare-style block page reflects the blocked payload raw (block-page XSS)")
+Xssmaze.push("waf-facade-level1", "/waf-facade/level1/?query=a", "Cloudflare-style block page reflects the blocked payload raw (block-page XSS)",
+  vuln: "reflected-html", delivery: ["query"], note: "the normal page HTML-escapes its reflection; the raw reflection is on the branded 403 block page, so the payload has to trip the WAF pattern to reach the sink at all")
 maze_get "/waf-facade/level1/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -129,7 +130,8 @@ end
 # real payload past the inspection window.
 # Bypass: 100+ chars of padding, then the vector —
 #   ?query=aaaa…(100)…aaaa<svg onload=alert(1)>
-Xssmaze.push("waf-facade-level2", "/waf-facade/level2/?query=a", "AWS WAF-style inspection-size cap: only the first 100 bytes are scanned")
+Xssmaze.push("waf-facade-level2", "/waf-facade/level2/?query=a", "AWS WAF-style inspection-size cap: only the first 100 bytes are scanned",
+  vuln: "reflected-html", delivery: ["query"], note: "only the first 100 bytes are inspected, so padding the value past that window gets the full string reflected raw")
 maze_get "/waf-facade/level2/" do |env|
   query = env.params.query.fetch("query", "")
   window = query[0, 100]
@@ -151,7 +153,8 @@ end
 # built from un-scored primitives slips under.
 # Bypass: avoid the scored keywords, e.g.
 #   <input autofocus onfocus=confirm(1)>   (input/onfocus/confirm are un-scored)
-Xssmaze.push("waf-facade-level3", "/waf-facade/level3/?query=a", "ModSecurity CRS-style anomaly scoring (un-scored primitives slip under the threshold)")
+Xssmaze.push("waf-facade-level3", "/waf-facade/level3/?query=a", "ModSecurity CRS-style anomaly scoring (un-scored primitives slip under the threshold)",
+  vuln: "reflected-html", delivery: ["query"], note: "anomaly scoring blocks at 5 points, so a payload built from un-scored primitives such as <input autofocus onfocus=confirm(1)> stays under the threshold")
 maze_get "/waf-facade/level3/" do |env|
   query = env.params.query.fetch("query", "")
   score = WafFacade.crs_score(query)
@@ -173,7 +176,8 @@ end
 # it. Classic scope gap: the WAF guards query/body, a header sink is missed.
 # Bypass: keep ?query benign, put the payload in the User-Agent header —
 #   User-Agent: <img src=x onerror=alert(1)>
-Xssmaze.push("waf-facade-level4", "/waf-facade/level4/?query=a", "Akamai-style WAF guards the query but reflects the User-Agent header raw", "GET", ["query", "User-Agent"])
+Xssmaze.push("waf-facade-level4", "/waf-facade/level4/?query=a", "Akamai-style WAF guards the query but reflects the User-Agent header raw", "GET", ["query", "User-Agent"],
+  vuln: "reflected-html", delivery: ["header"], note: "the query parameter is escaped and guarded, but the User-Agent header is reflected raw and never inspected, so the payload goes in the header while query stays benign")
 maze_get "/waf-facade/level4/" do |env|
   query = env.params.query.fetch("query", "")
   ua = env.request.headers["User-Agent"]? || "unknown"
@@ -196,7 +200,8 @@ end
 # is a case-SENSITIVE literal denylist, so a case-folded vector walks straight
 # past it before being reflected raw.
 # Bypass: case-fold the tag/handler, e.g.  <SvG OnLoad=alert(1)>  or  <ScRiPt>alert(1)</ScRiPt>
-Xssmaze.push("waf-facade-level5", "/waf-facade/level5/?query=a", "F5 ASM-style case-sensitive literal denylist (case-fold bypass)")
+Xssmaze.push("waf-facade-level5", "/waf-facade/level5/?query=a", "F5 ASM-style case-sensitive literal denylist (case-fold bypass)",
+  vuln: "reflected-html", delivery: ["query"], note: "the denylist is case-sensitive, so a case-folded vector such as <SvG OnLoad=...> walks straight past it")
 maze_get "/waf-facade/level5/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -221,7 +226,8 @@ end
 # branded block page — but the reflection actually lands inside a single-quoted JS
 # string, where no angle brackets are needed at all.
 # Bypass: break the JS string instead of injecting a tag —  ';alert(1)//
-Xssmaze.push("waf-facade-level6", "/waf-facade/level6/?query=a", "Incapsula-style tag-focused WAF, but the reflection is in a JS string context")
+Xssmaze.push("waf-facade-level6", "/waf-facade/level6/?query=a", "Incapsula-style tag-focused WAF, but the reflection is in a JS string context",
+  vuln: "reflected-js", delivery: ["query"], note: "any opening tag trips the block page, but the reflection is in a single-quoted JS string where no angle brackets are needed")
 maze_get "/waf-facade/level6/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -246,7 +252,8 @@ end
 # into the DOM before any script runs. The server response is the real sink.
 # Bypass: just send the payload — it is already in the initial HTML —
 #   ?query=<img src=x onerror=alert(1)>
-Xssmaze.push("waf-facade-level7", "/waf-facade/level7/?query=a", "Cosmetic client-side WAF: the server reflects raw before the JS 'sanitizer' runs")
+Xssmaze.push("waf-facade-level7", "/waf-facade/level7/?query=a", "Cosmetic client-side WAF: the server reflects raw before the JS 'sanitizer' runs",
+  vuln: "reflected-html", delivery: ["query"], note: "the client-side sanitizer only feeds a second element; the server already reflected the raw value into #preview before any script ran")
 maze_get "/waf-facade/level7/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -271,7 +278,8 @@ end
 # fake check finishes it reads ?query from the URL and writes it via innerHTML —
 # the challenge screen is the DOM-XSS sink. Pure client-side, no server reflection.
 # Bypass: ?query=<img src=x onerror=alert(1)>
-Xssmaze.push("waf-facade-level8", "/waf-facade/level8/?query=a", "Cloudflare-style JS challenge interstitial whose 'verify' step is a DOM innerHTML sink")
+Xssmaze.push("waf-facade-level8", "/waf-facade/level8/?query=a", "Cloudflare-style JS challenge interstitial whose 'verify' step is a DOM innerHTML sink",
+  vuln: "dom", sources: ["location.search"], sinks: ["innerHTML"], delivery: ["query"], note: "the server response ignores the parameter entirely; the sink runs in a setTimeout about 600 ms after load")
 maze_get "/waf-facade/level8/" do |_env|
   "<!doctype html><html><head><meta charset='utf-8'>
   <title>Just a moment...</title></head><body>

@@ -7,7 +7,8 @@
 # CVE shape: news/blog/SaaS share-preview pages embed a tenant- or
 # query-controlled title into `<meta property="og:title" content="X">`.
 # Quote-context attribute injection — fires on `"><svg onload=...>`.
-Xssmaze.push("scanbounty-level1", "/scanbounty/level1/?title=Welcome", "Open Graph og:title meta content reflection", "GET", ["title"])
+Xssmaze.push("scanbounty-level1", "/scanbounty/level1/?title=Welcome", "Open Graph og:title meta content reflection", "GET", ["title"],
+  vuln: "reflected-html", delivery: ["query"], note: "three reflections — the og:title content attribute, <title> RCDATA and the <h1>; the <h1> is the plain HTML context")
 maze_get "/scanbounty/level1/" do |env|
   title = env.params.query.fetch("title", "Welcome")
 
@@ -21,7 +22,8 @@ end
 # Level 2: pagination param reflected in `<a href>`
 # `?page=2` lands back in `<a href="?page=2">Next</a>` and
 # `<link rel="next">`. Attribute-context — `"><script>` works.
-Xssmaze.push("scanbounty-level2", "/scanbounty/level2/?page=1", "pagination param reflected in next-page link href", "GET", ["page"])
+Xssmaze.push("scanbounty-level2", "/scanbounty/level2/?page=1", "pagination param reflected in next-page link href", "GET", ["page"],
+  vuln: "reflected-html", delivery: ["query"], note: "reflected into <link href>, an <a href> and the paragraph text; the paragraph is the plain HTML context")
 maze_get "/scanbounty/level2/" do |env|
   page = env.params.query.fetch("page", "1")
 
@@ -37,7 +39,8 @@ end
 # `/app?lang=en` apps reflect the locale code into the root `<html
 # lang>` attribute. Attribute breakout with `"><script>` — directly
 # observed in CMS / e-commerce templates.
-Xssmaze.push("scanbounty-level3", "/scanbounty/level3/?lang=en", "<html lang> attribute breakout via locale param", "GET", ["lang"])
+Xssmaze.push("scanbounty-level3", "/scanbounty/level3/?lang=en", "<html lang> attribute breakout via locale param", "GET", ["lang"],
+  vuln: "reflected-html", delivery: ["query"], note: "reflected into the <html lang> attribute and into paragraph text")
 maze_get "/scanbounty/level3/" do |env|
   lang = env.params.query.fetch("lang", "en")
 
@@ -53,7 +56,8 @@ end
 # type="application/ld+json">{...}</script>` with the product / article
 # name pulled from the request. JS-string context inside <script>;
 # `</script><script>alert(1)</script>` closes the block.
-Xssmaze.push("scanbounty-level4", "/scanbounty/level4/?name=Sample", "JSON-LD structured data name field reflection", "GET", ["name"])
+Xssmaze.push("scanbounty-level4", "/scanbounty/level4/?name=Sample", "JSON-LD structured data name field reflection", "GET", ["name"],
+  vuln: "reflected-html", delivery: ["query"], note: "the ld+json block is data, not executable JavaScript; the <h1> copy is the plain HTML context")
 maze_get "/scanbounty/level4/" do |env|
   name = env.params.query.fetch("name", "Sample Product")
 
@@ -68,7 +72,8 @@ end
 # Login / logout / signup pages echo the post-auth destination into
 # the form's `action` attribute and into a "Cancel" link. Attribute
 # breakout — fires on `" autofocus onfocus=alert(1) x="`.
-Xssmaze.push("scanbounty-level5", "/scanbounty/level5/?return_to=/dashboard", "return_to param reflected in form action + cancel link", "GET", ["return_to"])
+Xssmaze.push("scanbounty-level5", "/scanbounty/level5/?return_to=/dashboard", "return_to param reflected in form action + cancel link", "GET", ["return_to"],
+  vuln: "reflected-attr", delivery: ["query"], note: "reflected into the form action and an <a href>, both double-quoted attributes")
 maze_get "/scanbounty/level5/" do |env|
   rt = env.params.query.fetch("return_to", "/")
 
@@ -85,7 +90,8 @@ end
 # Doc / widget hosts allow embedding via `?embed=URL`. Server slots
 # the URL straight into `<iframe src>`. Detect via `javascript:`
 # scheme or `"><svg onload=...>` quote breakout.
-Xssmaze.push("scanbounty-level6", "/scanbounty/level6/?embed=https://example.com", "iframe src from embed= param (scheme + attr breakout)", "GET", ["embed"])
+Xssmaze.push("scanbounty-level6", "/scanbounty/level6/?embed=https://example.com", "iframe src from embed= param (scheme + attr breakout)", "GET", ["embed"],
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/scanbounty/level6/" do |env|
   embed = env.params.query.fetch("embed", "about:blank")
 
@@ -100,7 +106,8 @@ end
 # `<img src="https://t.example/p?tag=X">` from the visitor's tag
 # parameter. Image src is a forgiving attribute context — fires on
 # `"><svg onload=...>` and `onerror` payloads.
-Xssmaze.push("scanbounty-level7", "/scanbounty/level7/?tag=newsletter", "tracking pixel src tag reflection", "GET", ["tag"])
+Xssmaze.push("scanbounty-level7", "/scanbounty/level7/?tag=newsletter", "tracking pixel src tag reflection", "GET", ["tag"],
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/scanbounty/level7/" do |env|
   tag = env.params.query.fetch("tag", "default")
 
@@ -114,7 +121,8 @@ end
 # CMS themes accept `?color=` and emit `body { background: COLOR; }`
 # into a `<style>` tag. CSS context — closes with `;}</style>
 # <script>...`. Standard CSS-injection / CSS-context scanner payload.
-Xssmaze.push("scanbounty-level8", "/scanbounty/level8/?color=blue", "theme color reflected into inline <style>", "GET", ["color"])
+Xssmaze.push("scanbounty-level8", "/scanbounty/level8/?color=blue", "theme color reflected into inline <style>", "GET", ["color"],
+  vuln: "reflected-html", delivery: ["query"], note: "lands inside an inline <style> block; close it with </style> to reach an HTML context")
 maze_get "/scanbounty/level8/" do |env|
   color = env.params.query.fetch("color", "white")
 
