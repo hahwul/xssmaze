@@ -2,7 +2,7 @@
 Xssmaze.push("fwoutput-level1", "/fwoutput/level1/?query=a", "Django-style error message, raw reflection in alert div",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/fwoutput/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<!DOCTYPE html>
 <html lang=\"en\">
@@ -21,7 +21,7 @@ end
 Xssmaze.push("fwoutput-level2", "/fwoutput/level2/?query=a", "Rails-style search form, reflection in input value attribute",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/fwoutput/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<!DOCTYPE html>
 <html lang=\"en\">
@@ -43,7 +43,7 @@ end
 Xssmaze.push("fwoutput-level3", "/fwoutput/level3/?query=a", "Express-style JSON error in pre tag, served as text/html",
   vuln: "reflected-html", delivery: ["query"], note: "JSON-shaped text inside <pre>, which is ordinary parsed content rather than raw text")
 maze_get "/fwoutput/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<!DOCTYPE html>
 <html lang=\"en\">
@@ -59,7 +59,7 @@ end
 Xssmaze.push("fwoutput-level4", "/fwoutput/level4/?query=a", "Spring/Thymeleaf-style span, raw reflection in span element",
   vuln: "reflected-attr", delivery: ["query"], note: "no Thymeleaf runs here; th:text is an inert attribute, so break out of its double-quoted value")
 maze_get "/fwoutput/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<!DOCTYPE html>
 <html lang=\"en\">
@@ -81,7 +81,7 @@ end
 Xssmaze.push("fwoutput-level5", "/fwoutput/level5/?query=a", "Laravel-style breadcrumb, raw reflection in breadcrumb item",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/fwoutput/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<!DOCTYPE html>
 <html lang=\"en\">
@@ -106,7 +106,7 @@ end
 Xssmaze.push("fwoutput-level6", "/fwoutput/level6/?query=a", ".NET-style asp:Label, raw reflection in label element",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/fwoutput/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<!DOCTYPE html>
 <html lang=\"en\">

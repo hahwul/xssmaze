@@ -2,7 +2,7 @@
 Xssmaze.push("domctx-level1", "/domctx/level1/?query=a", "reflection in div body with no filtering",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/domctx/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head></head><body>
   <h1>DOM Context Level 1</h1>
@@ -14,7 +14,7 @@ end
 Xssmaze.push("domctx-level2", "/domctx/level2/?query=a", "reflection in document.write JS string",
   vuln: "reflected-js", delivery: ["query"])
 maze_get "/domctx/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head></head><body>
   <h1>DOM Context Level 2</h1>
@@ -28,7 +28,7 @@ end
 Xssmaze.push("domctx-level3", "/domctx/level3/?query=a", "reflection in innerHTML assignment JS string",
   vuln: "reflected-js", delivery: ["query"])
 maze_get "/domctx/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head></head><body>
   <h1>DOM Context Level 3</h1>
@@ -43,7 +43,7 @@ end
 Xssmaze.push("domctx-level4", "/domctx/level4/?query=a", "reflection in JSON object inside script tag",
   vuln: "reflected-js", delivery: ["query"])
 maze_get "/domctx/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head></head><body>
   <h1>DOM Context Level 4</h1>
@@ -55,7 +55,7 @@ end
 Xssmaze.push("domctx-level5", "/domctx/level5/?query=a", "server URL-decodes then reflects in div body",
   vuln: "reflected-html", delivery: ["query"], note: "the server URL-decodes once before reflecting")
 maze_get "/domctx/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   decoded = URI.decode(query)
 
   "<html><head></head><body>
@@ -68,7 +68,7 @@ end
 Xssmaze.push("domctx-level6", "/domctx/level6/?query=a", "reflection in eval string inside script tag",
   vuln: "reflected-js", delivery: ["query"])
 maze_get "/domctx/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head></head><body>
   <h1>DOM Context Level 6</h1>

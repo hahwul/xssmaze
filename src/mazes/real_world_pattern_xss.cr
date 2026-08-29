@@ -3,7 +3,7 @@
 Xssmaze.push("rwpattern-level1", "/rwpattern/level1/?query=a", "search page: input value + results paragraph",
   vuln: "reflected-html", delivery: ["query"], note: "reflected twice: into a double-quoted input value and raw into the results paragraph")
 maze_get "/rwpattern/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Search</h1>
@@ -16,7 +16,7 @@ end
 Xssmaze.push("rwpattern-level2", "/rwpattern/level2/?query=a", "profile page: username span injection",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/rwpattern/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <div class=\"profile\">
@@ -30,7 +30,7 @@ end
 Xssmaze.push("rwpattern-level3", "/rwpattern/level3/?query=a", "404 page: path reflected in heading",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/rwpattern/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>404 - #{query} not found</h1>
@@ -42,7 +42,7 @@ end
 Xssmaze.push("rwpattern-level4", "/rwpattern/level4/?query=a", "blog comment: paragraph injection",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/rwpattern/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h2>Comments</h2>
@@ -55,7 +55,7 @@ end
 Xssmaze.push("rwpattern-level5", "/rwpattern/level5/?query=a", "admin panel: table cell + title injection",
   vuln: "reflected-html", delivery: ["query"], note: "reflected into both <title>, a raw-text element that needs a </title> first, and a table cell that does not")
 maze_get "/rwpattern/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head>
   <title>Admin - #{query}</title>
@@ -70,7 +70,7 @@ end
 Xssmaze.push("rwpattern-level6", "/rwpattern/level6/?query=a", "API docs: code + pre block injection",
   vuln: "reflected-html", delivery: ["query"], note: "<code> and <pre> are ordinary elements, not raw text, so no closing tag is needed before injecting")
 maze_get "/rwpattern/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>API Documentation</h1>

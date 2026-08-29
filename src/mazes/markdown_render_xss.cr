@@ -44,7 +44,7 @@ end
 Xssmaze.push("markdown-level3", "/markdown/level3/?query=hello", "markdown html:true pass-through (raw HTML survives)",
   vuln: "reflected-html", delivery: ["query"], note: "raw HTML passes straight through the renderer")
 maze_get "/markdown/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   html = query.gsub(/\*\*([^*]+)\*\*/) { "<strong>#{$1}</strong>" }
     .gsub(/\*([^*]+)\*/) { "<em>#{$1}</em>" }
     .gsub(/\n/, "<br>")

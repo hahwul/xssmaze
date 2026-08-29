@@ -2,7 +2,7 @@
 Xssmaze.push("tagattrmix-level1", "/tagattrmix/level1/?query=a", "reflection in both span content and data-info attribute",
   vuln: "reflected-html", delivery: ["query"], note: "reflected twice: into a double-quoted data-info attribute and raw into the span")
 maze_get "/tagattrmix/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><div data-info=\"#{query}\"><span>#{query}</span></div></body></html>"
 end
@@ -11,7 +11,7 @@ end
 Xssmaze.push("tagattrmix-level2", "/tagattrmix/level2/?query=a", "reflection in class attribute (double quote breakout)",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/tagattrmix/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><div class=\"#{query}\">content</div></body></html>"
 end
@@ -20,7 +20,7 @@ end
 Xssmaze.push("tagattrmix-level3", "/tagattrmix/level3/?query=a", "reflection in img title attribute (double quote breakout)",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/tagattrmix/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><img title=\"#{query}\" src=\"photo.jpg\"></body></html>"
 end
@@ -29,7 +29,7 @@ end
 Xssmaze.push("tagattrmix-level4", "/tagattrmix/level4/?query=a", "reflection in anchor data-id attribute (double quote breakout)",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/tagattrmix/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><a href=\"#\" data-id=\"#{query}\">Link</a></body></html>"
 end
@@ -38,7 +38,7 @@ end
 Xssmaze.push("tagattrmix-level5", "/tagattrmix/level5/?query=a", "reflection in meta content attribute (double quote breakout)",
   vuln: "reflected-attr", delivery: ["query"], note: "the reflection is in <head>; a breakout implicitly opens <body>, so a self-firing tag still runs")
 maze_get "/tagattrmix/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head><meta name=\"description\" content=\"#{query}\"></head><body><p>Page content</p></body></html>"
 end
@@ -47,7 +47,7 @@ end
 Xssmaze.push("tagattrmix-level6", "/tagattrmix/level6/?query=a", "reflection in style url() with single quote breakout",
   vuln: "reflected-attr", delivery: ["query"], note: "the value sits in a single-quoted CSS url() inside a double-quoted style attribute; a double quote leaves style= entirely")
 maze_get "/tagattrmix/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><div style=\"background: url('#{query}')\">Styled content</div></body></html>"
 end

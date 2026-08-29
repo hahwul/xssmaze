@@ -10,7 +10,7 @@
 Xssmaze.push("regexbypass-level1", "/regexbypass/level1/?query=a", "case-sensitive <script blacklist (no /i)",
   vuln: "reflected-html", delivery: ["query"], note: "the strip is case-sensitive; <Script> passes")
 maze_get "/regexbypass/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   filtered = query.gsub("<script", "").gsub("</script", "")
 
   "<html><body>#{filtered}</body></html>"
@@ -24,7 +24,7 @@ end
 Xssmaze.push("regexbypass-level2", "/regexbypass/level2/?query=a", "on*= regex requires whitespace prefix (slash bypass)",
   vuln: "reflected-html", delivery: ["query"], note: "the handler regex needs whitespace before on*=; use a slash separator: <svg/onload=alert(1)>")
 maze_get "/regexbypass/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Filter requires literal whitespace before the event handler, so
   # `<svg/onload=...>` and `<img/src=x/onerror=...>` pass through.
   filtered = query.gsub(/\s+on\w+\s*=/i, "")
@@ -41,7 +41,7 @@ end
 Xssmaze.push("regexbypass-level3", "/regexbypass/level3/?query=https://example.com", "javascript: literal strip but href decodes entities",
   vuln: "reflected-attr", delivery: ["query"], note: "javascript: and data: are stripped from the literal text but href decodes entities first (javas&#99;ript:alert(1)); quotes are unfiltered, so breaking out of the attribute also works")
 maze_get "/regexbypass/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   filtered = query.gsub(/javascript:/i, "").gsub(/data:/i, "")
 
   "<html><body><a href=\"#{filtered}\">Continue</a></body></html>"
@@ -54,7 +54,7 @@ end
 Xssmaze.push("regexbypass-level4", "/regexbypass/level4/?query=a", "single-pass <script> strip (nested-tag bypass)",
   vuln: "reflected-html", delivery: ["query"], note: "the strip runs once, so <scr<script>ipt> collapses back into <script>")
 maze_get "/regexbypass/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   filtered = query.gsub(/<script>/i, "").gsub(/<\/script>/i, "")
 
   "<html><body>#{filtered}</body></html>"
@@ -69,7 +69,7 @@ end
 Xssmaze.push("regexbypass-level5", "/regexbypass/level5/?query=a", "server encodes < and >, client JS decodes via innerHTML",
   vuln: "reflected-js", sinks: ["innerHTML"], delivery: ["query"], note: "only angle brackets are encoded, so the single-quoted JS string can simply be closed; the intended path is a double-encoded payload that decodeURIComponent restores before innerHTML")
 maze_get "/regexbypass/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   filtered = Filters.encode_angles(query)
 
   "<html><body>
@@ -90,7 +90,7 @@ end
 Xssmaze.push("regexbypass-level6", "/regexbypass/level6/?query=a", "blacklist misses details/input/video sinks",
   vuln: "reflected-html", delivery: ["query"], note: "the blacklist misses <details ontoggle>, <input autofocus onfocus> and <video onerror>")
 maze_get "/regexbypass/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   filtered = query.gsub(/<\/?(script|img|iframe|svg|object|embed)[^>]*>/i, "")
 
   "<html><body>#{filtered}</body></html>"
@@ -103,7 +103,7 @@ end
 Xssmaze.push("regexbypass-level7", "/regexbypass/level7/?query=a", "newline strip with tab/CR untouched",
   vuln: "reflected-html", delivery: ["query"], note: "only newlines are stripped; tabs and carriage returns still work as attribute separators")
 maze_get "/regexbypass/level7/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   filtered = query.gsub("\n", "")
 
   "<html><body>#{filtered}</body></html>"
@@ -117,7 +117,7 @@ end
 Xssmaze.push("regexbypass-level8", "/regexbypass/level8/?query=ok", "alert( literal signature inside JS sink",
   vuln: "reflected-js", delivery: ["query"], note: "only the literal alert( is blocked; confirm(1) or alert`1` works, and the double-quoted JS string is otherwise unescaped")
 maze_get "/regexbypass/level8/" do |env|
-  query = env.params.query["query"].gsub("alert(", "_blocked_")
+  query = env.params.query.fetch("query", "").gsub("alert(", "_blocked_")
 
   "<html><body>
   <script>var msg = \"#{query}\"; document.title = msg;</script>

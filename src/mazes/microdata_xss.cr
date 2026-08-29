@@ -3,7 +3,7 @@
 Xssmaze.push("microdata-level1", "/microdata/level1/?query=a", "reflection in itemtype attribute (double-quoted)",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/microdata/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <div itemscope itemtype=\"#{query}\"><span>content</span></div>
@@ -15,7 +15,7 @@ end
 Xssmaze.push("microdata-level2", "/microdata/level2/?query=a", "reflection in itemprop attribute (double-quoted)",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/microdata/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <div itemscope itemtype=\"https://schema.org/Thing\">
@@ -29,7 +29,7 @@ end
 Xssmaze.push("microdata-level3", "/microdata/level3/?query=a", "reflection in meta itemprop content attribute (double-quoted)",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/microdata/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <div itemscope itemtype=\"https://schema.org/Product\">
@@ -44,7 +44,7 @@ end
 Xssmaze.push("microdata-level4", "/microdata/level4/?query=a", "reflection in link itemprop href attribute (double-quoted)",
   vuln: "reflected-attr", delivery: ["query"], note: "a <link> href does not run javascript: URLs; break out of the double-quoted attribute")
 maze_get "/microdata/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <div itemscope itemtype=\"https://schema.org/WebPage\">
@@ -59,7 +59,7 @@ end
 Xssmaze.push("microdata-level5", "/microdata/level5/?query=a", "reflection in RDFa property content attribute (double-quoted)",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/microdata/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <div vocab=\"https://schema.org/\" typeof=\"Person\">
@@ -73,7 +73,7 @@ end
 Xssmaze.push("microdata-level6", "/microdata/level6/?query=a", "reflection in RDFa typeof attribute (double-quoted)",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/microdata/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <div vocab=\"https://schema.org/\">

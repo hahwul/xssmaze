@@ -1,7 +1,7 @@
 Xssmaze.push("css-injection-level1", "/css/level1/?query=a", "CSS expression() XSS (IE)",
   vuln: "reflected-html", delivery: ["query"], note: "CSS expression() has not executed in any browser since IE11; the live path is closing the </style> block and injecting a tag")
 maze_get "/css/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head>
   <style>
@@ -18,7 +18,7 @@ end
 Xssmaze.push("css-injection-level2", "/css/level2/?query=a", "CSS import with javascript: URL",
   vuln: "reflected-html", delivery: ["query"], note: "a javascript: URL in @import does not execute; the live path is closing the </style> block and injecting a tag")
 maze_get "/css/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head>
   <style>
@@ -33,7 +33,7 @@ end
 Xssmaze.push("css-injection-level3", "/css/level3/?query=a", "CSS background-image with javascript: URL",
   vuln: "reflected-html", delivery: ["query"], note: "a javascript: URL in background-image does not execute; the live path is closing the </style> block and injecting a tag")
 maze_get "/css/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head>
   <style>
@@ -52,7 +52,7 @@ end
 Xssmaze.push("css-injection-level4", "/css/level4/?query=a", "CSS content property XSS",
   vuln: "reflected-html", delivery: ["query"], note: "the content property renders text only; the live path is closing the </style> block and injecting a tag")
 maze_get "/css/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head>
   <style>
@@ -69,7 +69,7 @@ end
 Xssmaze.push("css-injection-level5", "/css/level5/?query=a", "CSS keyframes animation XSS",
   vuln: "reflected-html", delivery: ["query"], note: "a keyframe background URL does not execute; the live path is closing the </style> block and injecting a tag")
 maze_get "/css/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head>
   <style>
@@ -89,7 +89,7 @@ end
 Xssmaze.push("css-injection-level6", "/css/level6/?query=a", "CSS attr() function with HTML injection",
   vuln: "reflected-attr", delivery: ["query"], note: "the CSS attr() display is a decoy: the value lands in a single-quoted data-content attribute, so break out of that")
 maze_get "/css/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head>
   <style>

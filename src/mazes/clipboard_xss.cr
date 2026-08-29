@@ -8,7 +8,7 @@ Xssmaze.push("clipboard-level1", "/clipboard/level1/?query=a", "paste handler in
 maze_get "/clipboard/level1/" do |env|
   # Query is reflected into a JS string that the paste handler concatenates
   # with the pasted HTML and writes via innerHTML.
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   "<div id='paste' contenteditable>paste here</div>
    <div id='out'></div>
    <script>
@@ -23,7 +23,7 @@ end
 Xssmaze.push("clipboard-level2", "/clipboard/level2/?query=a", "navigator.clipboard.readText concatenated with reflected prefix",
   vuln: "dom", sources: ["clipboardData"], sinks: ["innerHTML"], delivery: ["query"], note: "requires a user click plus clipboard-read permission")
 maze_get "/clipboard/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   "<button id='b'>read</button><div id='out'></div>
    <script>
      var prefix = #{query.to_json};
@@ -38,7 +38,7 @@ end
 Xssmaze.push("clipboard-level3", "/clipboard/level3/?query=a", "copy event sets reflected text/html on dataTransfer (sink: target page)",
   vuln: "dom", sources: ["server-reflected"], sinks: ["clipboardData.setData"], delivery: ["query"], note: "poisons the clipboard with text/html; execution happens in the page the user later pastes into, not here")
 maze_get "/clipboard/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   "<div id='src'>copy me</div>
    <p>This page poisons the clipboard with attacker-controlled HTML; the XSS fires when the user pastes into a renderer (rich text editor, mail client).</p>
    <script>
@@ -52,7 +52,7 @@ end
 Xssmaze.push("clipboard-level4", "/clipboard/level4/?query=a", "ClipboardItem blob text/html consumed by paste-listener page",
   vuln: "dom", sources: ["server-reflected"], sinks: ["clipboardData.setData"], delivery: ["query"], note: "requires a user click; the ClipboardItem executes in the page the user later pastes into, not here")
 maze_get "/clipboard/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   "<button id='b'>copy</button>
    <p>Click to push a text/html ClipboardItem; XSS fires in any page whose paste handler innerHTMLs the html mime type.</p>
    <script>

@@ -3,12 +3,12 @@
 Xssmaze.push("mixedmethod-level1", "/mixed-method/level1/?query=a", "GET param query reflected raw (also works via query string on POST)",
   vuln: "reflected-html", delivery: ["query"], note: "the route also answers POST, but the parameter is read from the query string either way")
 maze_get "/mixed-method/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>#{query}</body></html>"
 end
 maze_post "/mixed-method/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>#{query}</body></html>"
 end
@@ -18,7 +18,7 @@ end
 Xssmaze.push("mixedmethod-level2", "/mixed-method/level2/?input=a", "GET param 'input' reflected raw (non-standard param name)", "GET", ["input"],
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/mixed-method/level2/" do |env|
-  query = env.params.query["input"]
+  query = env.params.query.fetch("input", "")
 
   "<html><body>#{query}</body></html>"
 end
@@ -28,7 +28,7 @@ end
 Xssmaze.push("mixedmethod-level3", "/mixed-method/level3/?search=a", "GET param 'search' reflected in h2 heading", "GET", ["search"],
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/mixed-method/level3/" do |env|
-  query = env.params.query["search"]
+  query = env.params.query.fetch("search", "")
 
   "<html><body><h2>Results for: #{query}</h2></body></html>"
 end
@@ -38,7 +38,7 @@ end
 Xssmaze.push("mixedmethod-level4", "/mixed-method/level4/?q=a", "GET param 'q' reflected raw (short param name)", "GET", ["q"],
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/mixed-method/level4/" do |env|
-  query = env.params.query["q"]
+  query = env.params.query.fetch("q", "")
 
   "<html><body>#{query}</body></html>"
 end
@@ -48,7 +48,7 @@ end
 Xssmaze.push("mixedmethod-level5", "/mixed-method/level5/?callback=a", "GET param 'callback' reflected raw in HTML body", "GET", ["callback"],
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/mixed-method/level5/" do |env|
-  query = env.params.query["callback"]
+  query = env.params.query.fetch("callback", "")
 
   "<html><body>#{query}</body></html>"
 end
@@ -58,7 +58,7 @@ end
 Xssmaze.push("mixedmethod-level6", "/mixed-method/level6/?redirect_url=a", "GET param 'redirect_url' reflected in href (javascript: protocol)", "GET", ["redirect_url"],
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/mixed-method/level6/" do |env|
-  query = env.params.query["redirect_url"]
+  query = env.params.query.fetch("redirect_url", "")
 
   "<html><body><a href=\"#{query}\">Click here to continue</a></body></html>"
 end

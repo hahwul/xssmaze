@@ -2,7 +2,7 @@
 Xssmaze.push("complexpage-level1", "/complexpage/level1/?query=a", "full page with header/nav/footer, reflection in content div",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/complexpage/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<!DOCTYPE html>
 <html lang=\"en\">
@@ -22,7 +22,7 @@ end
 Xssmaze.push("complexpage-level2", "/complexpage/level2/?query=a", "full page with sidebar, reflection in search input value",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/complexpage/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<!DOCTYPE html>
 <html lang=\"en\">
@@ -46,7 +46,7 @@ end
 Xssmaze.push("complexpage-level3", "/complexpage/level3/?query=a", "full page with multiple scripts, reflection in h2 title",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/complexpage/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<!DOCTYPE html>
 <html lang=\"en\">
@@ -69,7 +69,7 @@ end
 Xssmaze.push("complexpage-level4", "/complexpage/level4/?query=a", "full page with CSS styles, reflection in description paragraph",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/complexpage/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<!DOCTYPE html>
 <html lang=\"en\">
@@ -96,7 +96,7 @@ end
 Xssmaze.push("complexpage-level5", "/complexpage/level5/?query=a", "full page with forms and tables, reflection in td element",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/complexpage/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<!DOCTYPE html>
 <html lang=\"en\">
@@ -123,7 +123,7 @@ end
 Xssmaze.push("complexpage-level6", "/complexpage/level6/?query=a", "large page with reflection deep in HTML (>1000 chars before reflection)",
   vuln: "reflected-html", delivery: ["query"], note: "the reflection sits about a kilobyte into the document, after the nav and sidebar markup")
 maze_get "/complexpage/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<!DOCTYPE html>
 <html lang=\"en\">

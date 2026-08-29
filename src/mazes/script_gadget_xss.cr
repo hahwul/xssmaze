@@ -2,7 +2,7 @@
 Xssmaze.push("scriptgadget-level1", "/scriptgadget/level1/?query=a", "query in JS object property value (close script to inject)",
   vuln: "reflected-js", delivery: ["query"])
 maze_get "/scriptgadget/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
 <script>var config = {name: \"#{query}\", id: 1};</script>
@@ -14,7 +14,7 @@ end
 Xssmaze.push("scriptgadget-level2", "/scriptgadget/level2/?query=a", "query in JS ternary expression (close script to inject)",
   vuln: "reflected-js", delivery: ["query"])
 maze_get "/scriptgadget/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
 <script>var x = true ? \"#{query}\" : \"default\";</script>
@@ -26,7 +26,7 @@ end
 Xssmaze.push("scriptgadget-level3", "/scriptgadget/level3/?query=a", "query in JS string concatenation (close script to inject)",
   vuln: "reflected-js", delivery: ["query"])
 maze_get "/scriptgadget/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
 <script>var msg = \"Hello \" + \"#{query}\" + \"!\";</script>
@@ -38,7 +38,7 @@ end
 Xssmaze.push("scriptgadget-level4", "/scriptgadget/level4/?query=a", "query in JS function call arg (close script to inject)",
   vuln: "reflected-js", delivery: ["query"])
 maze_get "/scriptgadget/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
 <script>function init(a, b) { return a; } init(\"#{query}\", {debug: false});</script>
@@ -52,7 +52,7 @@ end
 Xssmaze.push("scriptgadget-level5", "/scriptgadget/level5/?query=a", "query in onclick handler attr (break out, add event attr)",
   vuln: "reflected-attr", delivery: ["query"], note: "angle brackets are stripped; break out of the onclick attribute instead of injecting a tag")
 maze_get "/scriptgadget/level5/" do |env|
-  query = Filters.strip_angles(env.params.query["query"])
+  query = Filters.strip_angles(env.params.query.fetch("query", ""))
 
   "<html><body>
 <div onclick=\"handle('#{query}')\" style=\"padding:20px;background:#eee;cursor:pointer;\">Click here</div>
@@ -63,7 +63,7 @@ end
 Xssmaze.push("scriptgadget-level6", "/scriptgadget/level6/?query=a", "query in JS template literal inside script (close script to inject)",
   vuln: "reflected-js", delivery: ["query"], note: "lands inside a template literal; ${...} also evaluates")
 maze_get "/scriptgadget/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
 <script>var name = \"World\"; var t = `Hello ${name}, #{query}`;</script>

@@ -3,7 +3,7 @@
 Xssmaze.push("whitespace-level1", "/whitespace/level1/?query=a", "spaces replaced with &amp;nbsp; in body",
   vuln: "reflected-html", delivery: ["query"], note: "spaces become &nbsp; entities, which do not separate attributes; use a slash instead: <img/src=x/onerror=alert(1)>")
 maze_get "/whitespace/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   filtered = query.gsub(" ", "&nbsp;")
 
   "<html><body>
@@ -16,7 +16,7 @@ end
 Xssmaze.push("whitespace-level2", "/whitespace/level2/?query=a", "tabs stripped, body reflection",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/whitespace/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   filtered = query.gsub("\t", "")
 
   "<html><body>
@@ -29,7 +29,7 @@ end
 Xssmaze.push("whitespace-level3", "/whitespace/level3/?query=a", "newlines stripped, body reflection",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/whitespace/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   filtered = query.gsub("\n", "").gsub("\r", "")
 
   "<html><body>
@@ -42,7 +42,7 @@ end
 Xssmaze.push("whitespace-level4", "/whitespace/level4/?query=a", "multiple spaces collapsed to one in div",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/whitespace/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   filtered = query.gsub(/  +/, " ")
 
   "<html><body>
@@ -55,7 +55,7 @@ end
 Xssmaze.push("whitespace-level5", "/whitespace/level5/?query=a", "raw reflection inside pre tag",
   vuln: "reflected-html", delivery: ["query"], note: "<pre> is an ordinary element, not raw text, so no </pre> is needed before injecting")
 maze_get "/whitespace/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Whitespace XSS Level 5</h1>
@@ -68,7 +68,7 @@ end
 Xssmaze.push("whitespace-level6", "/whitespace/level6/?query=a", "all whitespace stripped, body reflection",
   vuln: "reflected-html", delivery: ["query"], note: "every whitespace character is stripped; use a slash separator: <svg/onload=alert(1)>")
 maze_get "/whitespace/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   filtered = query.gsub(/[\s]/, "")
 
   "<html><body>
