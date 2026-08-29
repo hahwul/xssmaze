@@ -2,7 +2,7 @@
 Xssmaze.push("wrappercontext-level1", "/wrappercontext/level1/?query=a", "reflection wrapped in bold+italic tags",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/wrappercontext/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><b><i>#{query}</i></b></body></html>"
 end
@@ -11,7 +11,7 @@ end
 Xssmaze.push("wrappercontext-level2", "/wrappercontext/level2/?query=a", "reflection wrapped in styled span",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/wrappercontext/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><span style=\"color:red\">#{query}</span></body></html>"
 end
@@ -20,7 +20,7 @@ end
 Xssmaze.push("wrappercontext-level3", "/wrappercontext/level3/?query=a", "reflection wrapped in anchor tag text",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/wrappercontext/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><a href=\"#\">#{query}</a></body></html>"
 end
@@ -29,7 +29,7 @@ end
 Xssmaze.push("wrappercontext-level4", "/wrappercontext/level4/?query=a", "reflection wrapped in small+em tags",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/wrappercontext/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><small><em>#{query}</em></small></body></html>"
 end
@@ -38,7 +38,7 @@ end
 Xssmaze.push("wrappercontext-level5", "/wrappercontext/level5/?query=a", "reflection wrapped in mark tag",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/wrappercontext/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><mark>#{query}</mark></body></html>"
 end
@@ -47,7 +47,7 @@ end
 Xssmaze.push("wrappercontext-level6", "/wrappercontext/level6/?query=a", "reflection wrapped in abbr tag",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/wrappercontext/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><abbr title=\"abbreviation\">#{query}</abbr></body></html>"
 end

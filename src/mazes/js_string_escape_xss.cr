@@ -4,7 +4,7 @@
 Xssmaze.push("jsescape-level1", "/jsescape/level1/?query=a", "JS string double-quote escaped but script tag not blocked",
   vuln: "reflected-js", delivery: ["query"], note: "double quotes are backslash-escaped; close the <script> block instead of the string")
 maze_get "/jsescape/level1/" do |env|
-  query = env.params.query["query"].gsub("\"", "\\\"")
+  query = env.params.query.fetch("query", "").gsub("\"", "\\\"")
 
   "<html><body><script>var msg = \"#{query}\";</script></body></html>"
 end
@@ -15,7 +15,7 @@ end
 Xssmaze.push("jsescape-level2", "/jsescape/level2/?query=a", "JS string single-quote escaped but script tag not blocked",
   vuln: "reflected-js", delivery: ["query"], note: "the backslash itself is not escaped, so a leading backslash neutralises the quote escape and closes the string; closing the <script> block also works")
 maze_get "/jsescape/level2/" do |env|
-  query = env.params.query["query"].gsub("'", "\\'")
+  query = env.params.query.fetch("query", "").gsub("'", "\\'")
 
   "<html><body><script>var msg = '#{query}';</script></body></html>"
 end
@@ -26,7 +26,7 @@ end
 Xssmaze.push("jsescape-level3", "/jsescape/level3/?query=a", "JS template literal quotes escaped but backtick and script tag not blocked",
   vuln: "reflected-js", delivery: ["query"], note: "template literal: the backtick is not escaped, and a ${...} substitution evaluates without any breakout")
 maze_get "/jsescape/level3/" do |env|
-  query = env.params.query["query"].gsub("\"", "\\\"").gsub("'", "\\'")
+  query = env.params.query.fetch("query", "").gsub("\"", "\\\"").gsub("'", "\\'")
 
   "<html><body><script>var msg = `#{query}`;</script></body></html>"
 end
@@ -41,7 +41,7 @@ end
 Xssmaze.push("jsescape-level4", "/jsescape/level4/?query=a", "JS string with backslash and quote both escaped but script tag not blocked",
   vuln: "reflected-js", delivery: ["query"], note: "backslashes are escaped before quotes, so the string itself holds; close the <script> block")
 maze_get "/jsescape/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   query = query.gsub("\\", "\\\\") # \ -> \\
   query = query.gsub("\"", "\\\"") # " -> \"
 
@@ -55,7 +55,7 @@ end
 Xssmaze.push("jsescape-level5", "/jsescape/level5/?query=a", "JS string with < encoded but raw reflection in body",
   vuln: "reflected-html", delivery: ["query"], note: "the script-string copy encodes < and the quote, but the same value is reflected raw into the div just after it")
 maze_get "/jsescape/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   js_query = query.gsub("<", "\\x3c").gsub("\"", "\\\"")
 
   "<html><body><script>var msg = \"#{js_query}\";</script><div>Search: #{query}</div></body></html>"
@@ -68,7 +68,7 @@ end
 Xssmaze.push("jsescape-level6", "/jsescape/level6/?query=a", "JS string single-quote HTML-entity escaped (ineffective in JS)",
   vuln: "reflected-js", delivery: ["query"], note: "quotes are replaced with an HTML entity, which is literal text inside a script element and never decodes; close the <script> block")
 maze_get "/jsescape/level6/" do |env|
-  query = env.params.query["query"].gsub("'", "&#39;")
+  query = env.params.query.fetch("query", "").gsub("'", "&#39;")
 
   "<html><body><script>var msg = '#{query}';</script></body></html>"
 end

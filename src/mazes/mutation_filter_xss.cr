@@ -3,7 +3,7 @@
 Xssmaze.push("mutfilter-level1", "/mutfilter/level1/?query=a", "< replaced with %3C in body",
   vuln: "non-xss-control", delivery: ["query"], exploitable: false, note: "< and > are replaced with the literal text %3C/%3E and nothing decodes them client-side, so no tag can form")
 maze_get "/mutfilter/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   query = query.gsub("<", "%3C").gsub(">", "%3E")
 
   "<html><body>#{query}</body></html>"
@@ -13,7 +13,7 @@ end
 Xssmaze.push("mutfilter-level2", "/mutfilter/level2/?query=a", "HTML comment strip only",
   vuln: "reflected-html", delivery: ["query"], note: "only HTML comments are stripped; other tags survive")
 maze_get "/mutfilter/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   query = query.gsub(/<!--.*?-->/m, "")
 
   "<html><body>#{query}</body></html>"
@@ -23,7 +23,7 @@ end
 Xssmaze.push("mutfilter-level3", "/mutfilter/level3/?query=a", "on* prefix replaced with off*",
   vuln: "reflected-html", delivery: ["query"], note: "on* handlers are rewritten to off*; use a <script> tag or other non-event vector")
 maze_get "/mutfilter/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   query = query.gsub(/\bon(\w)/i) { "off#{$1}" }
 
   "<html><body>#{query}</body></html>"
@@ -33,7 +33,7 @@ end
 Xssmaze.push("mutfilter-level4", "/mutfilter/level4/?query=a", "dangerous attribute strip (src/href/action)",
   vuln: "reflected-html", delivery: ["query"], note: "src/href/action attributes are neutralized; use a <script> tag or an event handler")
 maze_get "/mutfilter/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   query = query.gsub(/\b(src|href|action|formaction)\s*=/i, "data-removed=")
 
   "<html><body>#{query}</body></html>"
@@ -43,7 +43,7 @@ end
 Xssmaze.push("mutfilter-level5", "/mutfilter/level5/?query=a", "no filter (basic reflection)",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/mutfilter/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><p>#{query}</p></body></html>"
 end
@@ -52,7 +52,7 @@ end
 Xssmaze.push("mutfilter-level6", "/mutfilter/level6/?query=a", "all whitespace removed in body reflection",
   vuln: "reflected-html", delivery: ["query"], note: "whitespace is stripped; use / as an attribute separator or a <script> tag")
 maze_get "/mutfilter/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   query = query.gsub(/\s/, "")
 
   "<html><body>#{query}</body></html>"

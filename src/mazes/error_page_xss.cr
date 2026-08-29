@@ -2,7 +2,7 @@
 Xssmaze.push("errpage-level1", "/errpage/level1/?query=a", "404 error page with raw reflection in h1",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/errpage/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><h1>Page not found: #{query}</h1></body></html>"
 end
@@ -11,7 +11,7 @@ end
 Xssmaze.push("errpage-level2", "/errpage/level2/?query=a", "error message div with raw reflection",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/errpage/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><div class=\"error\">Invalid input: #{query}</div></body></html>"
 end
@@ -21,7 +21,7 @@ end
 Xssmaze.push("errpage-level3", "/errpage/level3/?query=a", "debug page with reflection in pre tag",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/errpage/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><h2>Debug Info</h2><pre>Request param: #{query}</pre></body></html>"
 end
@@ -31,7 +31,7 @@ end
 Xssmaze.push("errpage-level4", "/errpage/level4/?query=a", "search results page with reflection in paragraph",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/errpage/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><p>No results for \"#{query}\"</p></body></html>"
 end
@@ -41,7 +41,7 @@ end
 Xssmaze.push("errpage-level5", "/errpage/level5/?query=a", "error page with reflection in title and h1",
   vuln: "reflected-html", delivery: ["query"], note: "reflected into both <title> RCDATA and the <h1> body")
 maze_get "/errpage/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><head><title>Error - #{query}</title></head><body><h1>Error: #{query}</h1></body></html>"
 end
@@ -51,7 +51,7 @@ end
 Xssmaze.push("errpage-level6", "/errpage/level6/?query=a", "stack trace page with reflection in code tag",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/errpage/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><h2>Application Error</h2><code>NameError: undefined variable '#{query}'</code></body></html>"
 end

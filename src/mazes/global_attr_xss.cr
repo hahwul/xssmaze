@@ -3,7 +3,7 @@
 Xssmaze.push("globalattr-level1", "/globalattr/level1/?query=a", "reflection in div id attribute",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/globalattr/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Global Attribute XSS Level 1</h1>
@@ -16,7 +16,7 @@ end
 Xssmaze.push("globalattr-level2", "/globalattr/level2/?query=a", "reflection in p class attribute",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/globalattr/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Global Attribute XSS Level 2</h1>
@@ -29,7 +29,7 @@ end
 Xssmaze.push("globalattr-level3", "/globalattr/level3/?query=a", "reflection in span accesskey attribute",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/globalattr/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Global Attribute XSS Level 3</h1>
@@ -42,7 +42,7 @@ end
 Xssmaze.push("globalattr-level4", "/globalattr/level4/?query=a", "reflection in div spellcheck attribute",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/globalattr/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Global Attribute XSS Level 4</h1>
@@ -55,7 +55,7 @@ end
 Xssmaze.push("globalattr-level5", "/globalattr/level5/?query=a", "reflection in p draggable attribute",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/globalattr/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Global Attribute XSS Level 5</h1>
@@ -68,7 +68,7 @@ end
 Xssmaze.push("globalattr-level6", "/globalattr/level6/?query=a", "reflection in div lang attribute",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/globalattr/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Global Attribute XSS Level 6</h1>

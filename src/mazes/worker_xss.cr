@@ -5,7 +5,7 @@
 Xssmaze.push("worker-level1", "/worker/level1/?query=a", "page innerHTMLs whatever the worker postMessages back",
   vuln: "dom", sources: ["worker-message"], sinks: ["innerHTML"], delivery: ["query"])
 maze_get "/worker/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   "<div id='out'></div>
    <script>
      var b = new Blob(['onmessage = function (e) { self.postMessage(e.data) }'], { type: 'application/javascript' });
@@ -18,7 +18,7 @@ end
 Xssmaze.push("worker-level2", "/worker/level2/?query=a", "Worker source built by string concat (untrusted code in worker)",
   vuln: "dom", sources: ["worker-message"], sinks: ["worker-source", "innerHTML"], delivery: ["query"], note: "the value is concatenated into the Worker source, so it also runs as JS inside the worker")
 maze_get "/worker/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   "<div id='out'></div>
    <script>
      // The query is concatenated into the worker source; any code there runs in
@@ -33,7 +33,7 @@ end
 Xssmaze.push("worker-level3", "/worker/level3/?query=a", "importScripts() with attacker-controlled URL",
   vuln: "dom", sources: ["worker-message"], sinks: ["importScripts", "innerHTML"], delivery: ["query"], note: "the worker importScripts() an attacker URL; its postMessage output lands in page innerHTML")
 maze_get "/worker/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   "<div id='out'></div>
    <script>
      // Worker pulls remote script via importScripts(query); any side-effect the
@@ -48,7 +48,7 @@ end
 Xssmaze.push("worker-level4", "/worker/level4/?query=a", "worker eval gadget: page posts query, worker eval()s, returns to innerHTML",
   vuln: "dom", sources: ["worker-message"], sinks: ["eval", "innerHTML"], delivery: ["query"])
 maze_get "/worker/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   "<div id='out'></div>
    <script>
      var src = 'onmessage = function (e) { try { self.postMessage(eval(e.data)) } catch (err) { self.postMessage(String(err)) } }';

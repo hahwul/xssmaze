@@ -4,7 +4,7 @@
 Xssmaze.push("unicode-level1", "/unicode/level1/?query=a", "fullwidth normalization (regular ASCII angles still work)",
   vuln: "reflected-html", delivery: ["query"], note: "nothing is filtered here; the fullwidth normalization only adds a second way in beside plain ASCII angles")
 maze_get "/unicode/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Normalize fullwidth to ASCII
   query = query.gsub("\uFF1C", "<").gsub("\uFF1E", ">")
 
@@ -19,7 +19,7 @@ end
 Xssmaze.push("unicode-level2", "/unicode/level2/?query=a", "strip ASCII angles then normalize fullwidth (order-of-ops bypass)",
   vuln: "reflected-html", delivery: ["query"], note: "ASCII angle brackets are stripped before the fullwidth normalization runs, so send U+FF1C and U+FF1E instead")
 maze_get "/unicode/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Step 1: Strip ASCII angle brackets
   query = query.gsub("<", "").gsub(">", "")
   # Step 2: Normalize fullwidth to ASCII (vulnerable: fullwidth survives step 1)
@@ -36,7 +36,7 @@ end
 Xssmaze.push("unicode-level3", "/unicode/level3/?query=a", "null byte stripping only (all other chars reflected)",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/unicode/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   query = query.gsub("\0", "")
 
   "<html><body>
@@ -50,7 +50,7 @@ end
 Xssmaze.push("unicode-level4", "/unicode/level4/?query=a", "UTF-7 charset with raw reflection",
   vuln: "reflected-html", delivery: ["query"], note: "no modern browser decodes UTF-7, but the reflection is raw, so a plain payload works regardless of the declared charset")
 maze_get "/unicode/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   env.response.content_type = "text/html; charset=utf-7"
 
   "<html><body>
@@ -64,7 +64,7 @@ end
 Xssmaze.push("unicode-level5", "/unicode/level5/?query=a", "reflection in attribute (RLO/bidi chars allowed)",
   vuln: "reflected-attr", delivery: ["query"], note: "the bidi angle is a red herring: nothing is filtered, so this is a plain double-quoted attribute breakout")
 maze_get "/unicode/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Unicode XSS Level 5</h1>
@@ -77,7 +77,7 @@ end
 Xssmaze.push("unicode-level6", "/unicode/level6/?query=a", "backslash stripping only (angles and quotes allowed)",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/unicode/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   query = query.gsub("\\", "")
 
   "<html><body>

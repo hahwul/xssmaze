@@ -3,7 +3,7 @@
 Xssmaze.push("condreflect-level1", "/condreflect/level1/?query=a", "reflects only if input length > 5",
   vuln: "reflected-html", delivery: ["query"], note: "nothing is reflected unless the value is longer than 5 characters, so a short scanner marker sees no reflection")
 maze_get "/condreflect/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   if query.size > 5
     "<html><body><div>#{query}</div></body></html>"
@@ -17,7 +17,7 @@ end
 Xssmaze.push("condreflect-level2", "/condreflect/level2/?query=a", "reflects only if input contains a digit",
   vuln: "reflected-html", delivery: ["query"], note: "nothing is reflected unless the value contains a digit, so a purely alphabetic marker sees no reflection")
 maze_get "/condreflect/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   if query.matches?(/[0-9]/)
     "<html><body><div>#{query}</div></body></html>"
@@ -31,7 +31,7 @@ end
 Xssmaze.push("condreflect-level3", "/condreflect/level3/?query=a", "reflects only if input does not start with <",
   vuln: "reflected-html", delivery: ["query"], note: "a value starting with < is not reflected at all; prefix the payload with any other character")
 maze_get "/condreflect/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   if !query.starts_with?("<")
     "<html><body><div>#{query}</div></body></html>"
@@ -45,7 +45,7 @@ end
 Xssmaze.push("condreflect-level4", "/condreflect/level4/?query=a", "double reflection when input contains <",
   vuln: "reflected-html", delivery: ["query"], note: "a value containing < is reflected twice, once in a div and once in a p")
 maze_get "/condreflect/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   if query.includes?("<")
     "<html><body><div>#{query}</div><p>Also: #{query}</p></body></html>"
@@ -58,7 +58,7 @@ end
 Xssmaze.push("condreflect-level5", "/condreflect/level5/?query=a", "wraps in code tag if lang param present, div otherwise",
   vuln: "reflected-html", delivery: ["query"], note: "an extra lang parameter of any value switches the wrapper from <div> to <code>; the payload always lands in query")
 maze_get "/condreflect/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   has_lang = env.params.query.has_key?("lang")
 
   if has_lang
@@ -73,7 +73,7 @@ end
 Xssmaze.push("condreflect-level6", "/condreflect/level6/?query=a", "raw reflection if input < 100 chars, encoded otherwise",
   vuln: "reflected-html", delivery: ["query"], note: "values of 100 characters or more are entity-encoded, so keep the payload short")
 maze_get "/condreflect/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   if query.size < 100
     "<html><body><div>#{query}</div></body></html>"

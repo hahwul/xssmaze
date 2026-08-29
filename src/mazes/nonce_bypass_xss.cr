@@ -4,7 +4,7 @@
 Xssmaze.push("nonce-level1", "/nonce/level1/?query=a", "CSP nonce with reflection inside nonced script string",
   vuln: "reflected-js", delivery: ["query"], note: "the nonce is random per request, so no injected <script> can carry it; the only route is breaking the double-quoted string inside the already-nonced block")
 maze_get "/nonce/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   nonce = Random::Secure.hex(16)
   env.response.headers["Content-Security-Policy"] = "script-src 'nonce-#{nonce}'"
 
@@ -20,7 +20,7 @@ end
 Xssmaze.push("nonce-level2", "/nonce/level2/?query=a", "CSP nonce with reflection in onclick (unsafe-hashes)",
   vuln: "non-xss-control", delivery: ["query"], exploitable: false, note: "script-src 'nonce-X' 'unsafe-hashes' lists no hash source, so 'unsafe-hashes' enables nothing and the onclick handler holding the reflection never runs; an injected handler or script is blocked too and the nonce is random, so nothing reaches a JS sink")
 maze_get "/nonce/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   nonce = Random::Secure.hex(16)
   env.response.headers["Content-Security-Policy"] = "script-src 'nonce-#{nonce}' 'unsafe-hashes'"
 
@@ -39,7 +39,7 @@ end
 Xssmaze.push("nonce-level3", "/nonce/level3/?query=/", "CSP script-src self with base tag href injection",
   vuln: "reflected-attr", delivery: ["query"], note: "script-src 'self' blocks inline scripts and event handlers, and also blocks the intended <base href> redirect of /js/app.js to another origin; what does work is the \" attribute breakout plus a same-origin <script src=...> include")
 maze_get "/nonce/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   env.response.headers["Content-Security-Policy"] = "script-src 'self'"
 
   "<html><head>
@@ -56,7 +56,7 @@ end
 Xssmaze.push("nonce-level4", "/nonce/level4/?query=a", "script single-quote string with backslash escape bypass",
   vuln: "reflected-js", delivery: ["query"], note: "single quotes are backslash-escaped but backslashes are not, so a leading backslash escapes the added one and frees the quote: \\';alert(1)//")
 maze_get "/nonce/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   # Only escape single quotes by prepending backslash (but not backslashes themselves)
   escaped = query.gsub("'", "\\'")

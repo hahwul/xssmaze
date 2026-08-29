@@ -4,7 +4,7 @@
 Xssmaze.push("customtag-level1", "/customtag/level1/?query=a", "raw reflection in custom element",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/customtag/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><custom-element>#{query}</custom-element></body></html>"
 end
@@ -15,7 +15,7 @@ end
 Xssmaze.push("customtag-level2", "/customtag/level2/?query=a", "reflection in custom element data-value attribute",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/customtag/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><x-widget data-value=\"#{query}\">content</x-widget></body></html>"
 end
@@ -26,7 +26,7 @@ end
 Xssmaze.push("customtag-level3", "/customtag/level3/?query=a", "raw reflection in customized built-in element (is= attribute)",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/customtag/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><div is=\"custom-div\">#{query}</div></body></html>"
 end
@@ -37,7 +37,7 @@ end
 Xssmaze.push("customtag-level4", "/customtag/level4/?query=a", "reflection in slot name attribute",
   vuln: "reflected-attr", delivery: ["query"])
 maze_get "/customtag/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><slot name=\"#{query}\">default</slot></body></html>"
 end
@@ -49,7 +49,7 @@ end
 Xssmaze.push("customtag-level5", "/customtag/level5/?query=a", "raw reflection inside template element",
   vuln: "reflected-html", delivery: ["query"], note: "content parsed inside <template> is inert and never executes; close the template tag first, then inject")
 maze_get "/customtag/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><template id=\"tmpl\"><div>#{query}</div></template></body></html>"
 end
@@ -60,7 +60,7 @@ end
 Xssmaze.push("customtag-level6", "/customtag/level6/?query=a", "raw reflection in output element",
   vuln: "reflected-html", delivery: ["query"])
 maze_get "/customtag/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body><output name=\"result\">#{query}</output></body></html>"
 end
