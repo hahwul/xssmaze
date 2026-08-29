@@ -48,8 +48,10 @@ Xssmaze.push("respheader-level4", "/respheader/level4/?query=a", "query in Set-C
 maze_get "/respheader/level4/" do |env|
   query = env.params.query["query"]
   env.response.content_type = "text/html"
-  env.response.cookies << HTTP::Cookie.new("session_data", query, path: "/respheader/level4/")
-  env.response.cookies << HTTP::Cookie.new("user_pref", query, path: "/respheader/level4/")
+  # The cookie copies drop the bytes RFC 6265 forbids because Crystal
+  # refuses to emit them; the body reflection below stays raw.
+  env.response.cookies << HTTP::Cookie.new("session_data", Xssmaze.cookie_value(query), path: "/respheader/level4/")
+  env.response.cookies << HTTP::Cookie.new("user_pref", Xssmaze.cookie_value(query), path: "/respheader/level4/")
 
   "<html><body>
   <h1>Response Header XSS Level 4</h1>

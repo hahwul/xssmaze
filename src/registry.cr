@@ -65,6 +65,19 @@ module Xssmaze
     s.delete("\r\n\u0000")
   end
 
+  # Same bargain as `header_value`, one layer down, for `Set-Cookie`.
+  #
+  # `HTTP::Cookie` enforces RFC 6265 4.1.1 and raises `IO::Error` on any
+  # byte outside 0x20..0x7e plus `"` `,` `;` `\`, so the cookie mazes
+  # answered 500 on precisely the payloads they exist to reflect — a
+  # `?pref="x"` never reached `Set-Cookie` at all, and `rsplit-level4` died
+  # on the very characters a response-splitting test is made of. Dropping
+  # those bytes keeps the value in the header where the lesson is; the body
+  # reflection alongside it stays raw.
+  def self.cookie_value(s : String) : String
+    s.delete { |char| !char.in?(' '..'~') || char.in?('"', ',', ';', '\\') }
+  end
+
   def self.gzip(body : String) : Bytes
     io = IO::Memory.new
     Compress::Gzip::Writer.open(io, level: Compress::Gzip::BEST_COMPRESSION) do |writer|

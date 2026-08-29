@@ -30,7 +30,9 @@ end
 Xssmaze.push("rsplit-level4", "/rsplit/level4/?pref=a", "set-cookie + body reflection")
 maze_get "/rsplit/level4/" do |env|
   pref = env.params.query.fetch("pref", "default")
-  env.response.cookies << HTTP::Cookie.new("pref", pref, path: "/rsplit/level4/")
+  # Splitting characters are exactly what this level is about, so the cookie
+  # copy keeps everything RFC 6265 lets through and the body keeps the rest.
+  env.response.cookies << HTTP::Cookie.new("pref", Xssmaze.cookie_value(pref), path: "/rsplit/level4/")
 
   "<html><body><div>Preference: #{pref}</div></body></html>"
 end
