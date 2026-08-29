@@ -1,6 +1,7 @@
 # Level 1: Server HTML-encodes only the literal pair "<>" when they appear adjacent
 # Individual < or > pass through untouched — standard injection works
-Xssmaze.push("encodingedge-level1", "/encodingedge/level1/?query=a", "only adjacent <> pair encoded, individual < > pass through")
+Xssmaze.push("encodingedge-level1", "/encodingedge/level1/?query=a", "only adjacent <> pair encoded, individual < > pass through",
+  vuln: "reflected-html", delivery: ["query"], note: "only the adjacent pair <> is entity-encoded; a lone < or > passes through")
 maze_get "/encodingedge/level1/" do |env|
   query = env.params.query["query"]
   # Only encode the exact string "<>" — individual angle brackets survive
@@ -11,7 +12,8 @@ end
 
 # Level 2: Server strips "<script" (case-sensitive) but not "<Script" or "<SCRIPT"
 # Mixed case like <Script>alert(1)</Script> bypasses the filter
-Xssmaze.push("encodingedge-level2", "/encodingedge/level2/?query=a", "case-sensitive <script strip (mixed case bypass)")
+Xssmaze.push("encodingedge-level2", "/encodingedge/level2/?query=a", "case-sensitive <script strip (mixed case bypass)",
+  vuln: "reflected-html", delivery: ["query"], note: "only the lowercase <script prefix is stripped; <Script> or any other tag passes")
 maze_get "/encodingedge/level2/" do |env|
   query = env.params.query["query"]
   # Case-sensitive strip — only lowercase "<script" is removed
@@ -22,7 +24,8 @@ end
 
 # Level 3: Server replaces only the FIRST double quote with &quot; (using .sub not .gsub)
 # Reflected in attribute context — send a sacrificial " first, then the real breakout "
-Xssmaze.push("encodingedge-level3", "/encodingedge/level3/?query=a", "only first double-quote encoded (sub not gsub)")
+Xssmaze.push("encodingedge-level3", "/encodingedge/level3/?query=a", "only first double-quote encoded (sub not gsub)",
+  vuln: "reflected-attr", delivery: ["query"], note: "only the first double quote is encoded (sub, not gsub); send a sacrificial quote before the real breakout")
 maze_get "/encodingedge/level3/" do |env|
   query = env.params.query["query"]
   # Only first " is escaped — second " can break out of attribute
@@ -33,7 +36,8 @@ end
 
 # Level 4: Server hex-encodes all alphabetic characters in the first 10 characters of input
 # Characters after position 10 are left raw — pad with 10 digits then inject
-Xssmaze.push("encodingedge-level4", "/encodingedge/level4/?query=a", "first 10 chars alpha hex-encoded, rest raw")
+Xssmaze.push("encodingedge-level4", "/encodingedge/level4/?query=a", "first 10 chars alpha hex-encoded, rest raw",
+  vuln: "reflected-html", delivery: ["query"], note: "alphabetic characters in the first 10 are entity-encoded so they cannot form a tag name; pad with 10 digits before the payload")
 maze_get "/encodingedge/level4/" do |env|
   query = env.params.query["query"]
   # Hex-encode alpha chars in first 10 characters only
@@ -47,7 +51,8 @@ end
 
 # Level 5: Server converts < to fullwidth ＜ and > to fullwidth ＞
 # Reflected in attribute value — no angle brackets needed, break out with " and add event handler
-Xssmaze.push("encodingedge-level5", "/encodingedge/level5/?query=a", "angle brackets to fullwidth, reflected in attribute (quote breakout)")
+Xssmaze.push("encodingedge-level5", "/encodingedge/level5/?query=a", "angle brackets to fullwidth, reflected in attribute (quote breakout)",
+  vuln: "reflected-attr", delivery: ["query"], note: "angle brackets become fullwidth look-alikes, so no tag can be opened; break out of the double-quoted input value and add an event handler")
 maze_get "/encodingedge/level5/" do |env|
   query = env.params.query["query"]
   # Convert angle brackets to fullwidth Unicode equivalents
@@ -59,7 +64,8 @@ end
 # Level 6: Server strips everything matching /<[^>]*>/ (angle-bracket-enclosed content) from QUERY
 # Reflected in attribute value — since angles are stripped, use " to break out of attribute
 # No angle brackets needed for attribute-context XSS: " onfocus=alert(1) autofocus "
-Xssmaze.push("encodingedge-level6", "/encodingedge/level6/?query=a", "regex strips <...> tags from input, reflected in attribute (no angles needed)")
+Xssmaze.push("encodingedge-level6", "/encodingedge/level6/?query=a", "regex strips <...> tags from input, reflected in attribute (no angles needed)",
+  vuln: "reflected-attr", delivery: ["query"], note: "anything shaped like a tag is regex-stripped; break out of the double-quoted input value and add an event handler, which needs no angle brackets")
 maze_get "/encodingedge/level6/" do |env|
   query = env.params.query["query"]
   # Strip anything that looks like an HTML tag

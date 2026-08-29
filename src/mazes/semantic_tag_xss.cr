@@ -1,5 +1,6 @@
 # Level 1: Reflected in <article><p>QUERY</p></article>
-Xssmaze.push("semantictag-level1", "/semantictag/level1/?query=a", "reflection in article > p element")
+Xssmaze.push("semantictag-level1", "/semantictag/level1/?query=a", "reflection in article > p element",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/semantictag/level1/" do |env|
   query = env.params.query["query"]
 
@@ -10,7 +11,8 @@ maze_get "/semantictag/level1/" do |env|
 end
 
 # Level 2: Reflected in <section><h2>QUERY</h2></section>
-Xssmaze.push("semantictag-level2", "/semantictag/level2/?query=a", "reflection in section > h2 element")
+Xssmaze.push("semantictag-level2", "/semantictag/level2/?query=a", "reflection in section > h2 element",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/semantictag/level2/" do |env|
   query = env.params.query["query"]
 
@@ -21,7 +23,8 @@ maze_get "/semantictag/level2/" do |env|
 end
 
 # Level 3: Reflected in <aside>QUERY</aside>
-Xssmaze.push("semantictag-level3", "/semantictag/level3/?query=a", "reflection in aside element")
+Xssmaze.push("semantictag-level3", "/semantictag/level3/?query=a", "reflection in aside element",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/semantictag/level3/" do |env|
   query = env.params.query["query"]
 
@@ -32,7 +35,8 @@ maze_get "/semantictag/level3/" do |env|
 end
 
 # Level 4: Reflected in <nav><a href="#">QUERY</a></nav>
-Xssmaze.push("semantictag-level4", "/semantictag/level4/?query=a", "reflection in nav > a link text")
+Xssmaze.push("semantictag-level4", "/semantictag/level4/?query=a", "reflection in nav > a link text",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/semantictag/level4/" do |env|
   query = env.params.query["query"]
 
@@ -43,7 +47,8 @@ maze_get "/semantictag/level4/" do |env|
 end
 
 # Level 5: Reflected in <footer>QUERY</footer>
-Xssmaze.push("semantictag-level5", "/semantictag/level5/?query=a", "reflection in footer element")
+Xssmaze.push("semantictag-level5", "/semantictag/level5/?query=a", "reflection in footer element",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/semantictag/level5/" do |env|
   query = env.params.query["query"]
 
@@ -54,7 +59,8 @@ maze_get "/semantictag/level5/" do |env|
 end
 
 # Level 6: Reflected in <main><blockquote>QUERY</blockquote></main>
-Xssmaze.push("semantictag-level6", "/semantictag/level6/?query=a", "reflection in main > blockquote element")
+Xssmaze.push("semantictag-level6", "/semantictag/level6/?query=a", "reflection in main > blockquote element",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/semantictag/level6/" do |env|
   query = env.params.query["query"]
 

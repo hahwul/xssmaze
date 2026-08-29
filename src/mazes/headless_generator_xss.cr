@@ -16,7 +16,8 @@ headless_callback_log = Xssmaze::Store.group("headless-generator/level5")
 # Level 1: Basic HTML to PDF - No Filtering
 # Accepts HTML input and simulates PDF generation with no sanitization
 # Vulnerable to direct XSS execution in headless browser context
-Xssmaze.push("headless-generator-level1", "/headless-generator/level1/", "HTML to PDF - no filtering", "POST", ["html"])
+Xssmaze.push("headless-generator-level1", "/headless-generator/level1/", "HTML to PDF - no filtering", "POST", ["html"],
+  vuln: "reflected-html", delivery: ["body"], note: "the headless browser is only simulated; the html field is reflected raw into this response and executes in the requesting browser")
 maze_get "/headless-generator/level1/" do |_|
   %(<form action='/headless-generator/level1/' method='post'>
       <textarea name='html' rows='10' cols='50'>&lt;h1&gt;Test Document&lt;/h1&gt;</textarea><br>
@@ -42,7 +43,8 @@ end
 # Level 2: SVG to PNG - No Filtering
 # Accepts SVG input for image generation
 # SVG can contain script elements that execute during rendering
-Xssmaze.push("headless-generator-level2", "/headless-generator/level2/", "SVG to PNG - no filtering", "POST", ["svg"])
+Xssmaze.push("headless-generator-level2", "/headless-generator/level2/", "SVG to PNG - no filtering", "POST", ["svg"],
+  vuln: "reflected-html", delivery: ["body"], note: "the renderer is only simulated; the svg field is inlined raw into an HTML response, so inline SVG rules apply")
 maze_get "/headless-generator/level2/" do |_|
   %(<form action='/headless-generator/level2/' method='post'>
       <textarea name='svg' rows='10' cols='50'>&lt;svg xmlns="http://www.w3.org/2000/svg"&gt;&lt;circle cx="50" cy="50" r="40"/&gt;&lt;/svg&gt;</textarea><br>
@@ -68,7 +70,8 @@ end
 # Level 3: HTML Sanitization with Bypass
 # Implements basic tag filtering but bypassable
 # Strips <script> tags but misses other execution vectors
-Xssmaze.push("headless-generator-level3", "/headless-generator/level3/", "HTML sanitization bypass", "POST", ["html"])
+Xssmaze.push("headless-generator-level3", "/headless-generator/level3/", "HTML sanitization bypass", "POST", ["html"],
+  vuln: "reflected-html", delivery: ["body"], note: "only a paired <script>...</script> on one line is stripped; <svg onload=...> or a script split across newlines passes")
 maze_get "/headless-generator/level3/" do |_|
   %(<form action='/headless-generator/level3/' method='post'>
       <textarea name='html' rows='10' cols='50'>&lt;h1&gt;Test Document&lt;/h1&gt;</textarea><br>
@@ -97,7 +100,8 @@ end
 # Level 4: SSRF via Internal URL Fetching
 # Accepts HTML with external resources (img src, link href)
 # Simulates headless browser fetching resources during rendering
-Xssmaze.push("headless-generator-level4", "/headless-generator/level4/", "SSRF via resource loading", "POST", ["html"])
+Xssmaze.push("headless-generator-level4", "/headless-generator/level4/", "SSRF via resource loading", "POST", ["html"],
+  vuln: "reflected-html", delivery: ["body"], note: "no SSRF actually happens, the URLs are only listed and escaped; the bug is the raw reflection of the html field below them")
 maze_get "/headless-generator/level4/" do |_|
   %(<form action='/headless-generator/level4/' method='post'>
       <textarea name='html' rows='10' cols='50'>&lt;img src="https://example.com/image.png"&gt;</textarea><br>
@@ -133,7 +137,8 @@ end
 # Level 5: JavaScript Callback Simulation with Webhook
 # Simulates JavaScript execution that triggers external callbacks
 # Useful for testing out-of-band XSS detection
-Xssmaze.push("headless-generator-level5", "/headless-generator/level5/", "JavaScript callback simulation", "POST", ["html", "callback_id"])
+Xssmaze.push("headless-generator-level5", "/headless-generator/level5/", "JavaScript callback simulation", "POST", ["html", "callback_id"],
+  vuln: "reflected-html", delivery: ["body"], note: "only the html field is injectable; callback_id is HTML-escaped everywhere it is echoed")
 maze_get "/headless-generator/level5/" do |_|
   callback_id = Random::Secure.hex(8)
   %(<form action='/headless-generator/level5/' method='post'>
@@ -197,7 +202,8 @@ end
 # Level 6: Content-Type Validation Bypass
 # Checks Content-Type but can be bypassed with polyglot files
 # Accepts JSON input claiming to be HTML
-Xssmaze.push("headless-generator-level6", "/headless-generator/level6/", "Content-Type validation bypass", "POST", ["content"])
+Xssmaze.push("headless-generator-level6", "/headless-generator/level6/", "Content-Type validation bypass", "POST", ["content"],
+  vuln: "reflected-html", delivery: ["body"], note: "the content field is reflected raw whether or not it parses as JSON; if it does, the html member is what gets reflected")
 maze_get "/headless-generator/level6/" do |_|
   %(<form action='/headless-generator/level6/' method='post'>
       <textarea name='content' rows='10' cols='50'>{"html": "&lt;h1&gt;Title&lt;/h1&gt;"}</textarea><br>

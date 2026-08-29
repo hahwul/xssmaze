@@ -1,16 +1,19 @@
-Xssmaze.push("dialog-level1", "/dialog/level1/?query=a", "raw query inside <dialog open> element")
+Xssmaze.push("dialog-level1", "/dialog/level1/?query=a", "raw query inside <dialog open> element",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/dialog/level1/" do |env|
   query = env.params.query["query"]
   "<dialog open>#{query}</dialog>"
 end
 
-Xssmaze.push("dialog-level2", "/dialog/level2/?query=a", "query reflected as <dialog> id")
+Xssmaze.push("dialog-level2", "/dialog/level2/?query=a", "query reflected as <dialog> id",
+  vuln: "reflected-attr", delivery: ["query"], note: "the id attribute is single-quoted")
 maze_get "/dialog/level2/" do |env|
   query = env.params.query["query"]
   "<dialog open id='#{query}'>hello</dialog>"
 end
 
-Xssmaze.push("dialog-level3", "/dialog/level3/?query=a", "query as form returnValue inside dialog")
+Xssmaze.push("dialog-level3", "/dialog/level3/?query=a", "query as form returnValue inside dialog",
+  vuln: "reflected-attr", delivery: ["query"], note: "reflected into two single-quoted value attributes, on the input and on the button")
 maze_get "/dialog/level3/" do |env|
   query = env.params.query["query"]
   "<dialog open>
@@ -21,7 +24,8 @@ maze_get "/dialog/level3/" do |env|
   </dialog>"
 end
 
-Xssmaze.push("dialog-level4", "/dialog/level4/?query=a", "showModal trigger with query as innerHTML")
+Xssmaze.push("dialog-level4", "/dialog/level4/?query=a", "showModal trigger with query as innerHTML",
+  vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "the value is JSON-escaped into the script, so there is no string breakout; innerHTML does not run a bare <script>, so use <img src=x onerror=...>")
 maze_get "/dialog/level4/" do |env|
   query = env.params.query["query"]
   "<dialog id='d'></dialog>
@@ -32,7 +36,8 @@ maze_get "/dialog/level4/" do |env|
    </script>"
 end
 
-Xssmaze.push("dialog-level5", "/dialog/level5/?query=a", "<dialog> with filtered <script> tag (case bypass)")
+Xssmaze.push("dialog-level5", "/dialog/level5/?query=a", "<dialog> with filtered <script> tag (case bypass)",
+  vuln: "reflected-html", delivery: ["query"], note: "only the exact lowercase <script> and </script> strings are removed; <ScRiPt>, <script src=x> or <img src=x onerror=...> all pass")
 maze_get "/dialog/level5/" do |env|
   query = env.params.query["query"].gsub("<script>", "").gsub("</script>", "")
   "<dialog open>#{query}</dialog>"

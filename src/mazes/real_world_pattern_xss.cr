@@ -1,6 +1,7 @@
 # Level 1: Search page with query in <input value="QUERY"> and in <p>Results for: QUERY</p>
 # Both reflection points are exploitable (attribute breakout + body injection)
-Xssmaze.push("rwpattern-level1", "/rwpattern/level1/?query=a", "search page: input value + results paragraph")
+Xssmaze.push("rwpattern-level1", "/rwpattern/level1/?query=a", "search page: input value + results paragraph",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected twice: into a double-quoted input value and raw into the results paragraph")
 maze_get "/rwpattern/level1/" do |env|
   query = env.params.query["query"]
 
@@ -12,7 +13,8 @@ maze_get "/rwpattern/level1/" do |env|
 end
 
 # Level 2: Profile page with query in <span class="username">QUERY</span>
-Xssmaze.push("rwpattern-level2", "/rwpattern/level2/?query=a", "profile page: username span injection")
+Xssmaze.push("rwpattern-level2", "/rwpattern/level2/?query=a", "profile page: username span injection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/rwpattern/level2/" do |env|
   query = env.params.query["query"]
 
@@ -25,7 +27,8 @@ maze_get "/rwpattern/level2/" do |env|
 end
 
 # Level 3: 404 page with query in <h1>404 - QUERY not found</h1>
-Xssmaze.push("rwpattern-level3", "/rwpattern/level3/?query=a", "404 page: path reflected in heading")
+Xssmaze.push("rwpattern-level3", "/rwpattern/level3/?query=a", "404 page: path reflected in heading",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/rwpattern/level3/" do |env|
   query = env.params.query["query"]
 
@@ -36,7 +39,8 @@ maze_get "/rwpattern/level3/" do |env|
 end
 
 # Level 4: Blog comment with query in <div class="comment"><p>QUERY</p></div>
-Xssmaze.push("rwpattern-level4", "/rwpattern/level4/?query=a", "blog comment: paragraph injection")
+Xssmaze.push("rwpattern-level4", "/rwpattern/level4/?query=a", "blog comment: paragraph injection",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/rwpattern/level4/" do |env|
   query = env.params.query["query"]
 
@@ -48,7 +52,8 @@ end
 
 # Level 5: Admin panel with query in <td>QUERY</td> and <title>Admin - QUERY</title>
 # Both reflection points are exploitable
-Xssmaze.push("rwpattern-level5", "/rwpattern/level5/?query=a", "admin panel: table cell + title injection")
+Xssmaze.push("rwpattern-level5", "/rwpattern/level5/?query=a", "admin panel: table cell + title injection",
+  vuln: "reflected-html", delivery: ["query"], note: "reflected into both <title>, a raw-text element that needs a </title> first, and a table cell that does not")
 maze_get "/rwpattern/level5/" do |env|
   query = env.params.query["query"]
 
@@ -62,7 +67,8 @@ end
 
 # Level 6: API documentation page with query in <code> and <pre> blocks
 # Break out of code/pre tags with standard injection
-Xssmaze.push("rwpattern-level6", "/rwpattern/level6/?query=a", "API docs: code + pre block injection")
+Xssmaze.push("rwpattern-level6", "/rwpattern/level6/?query=a", "API docs: code + pre block injection",
+  vuln: "reflected-html", delivery: ["query"], note: "<code> and <pre> are ordinary elements, not raw text, so no closing tag is needed before injecting")
 maze_get "/rwpattern/level6/" do |env|
   query = env.params.query["query"]
 

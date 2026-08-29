@@ -1,5 +1,6 @@
 # Level 1: First strips <script>, then strips <img> -- use <svg onload=alert(1)> which survives both
-Xssmaze.push("nestedfilter-level1", "/nestedfilter/level1/?query=a", "strips script then img tags (svg survives)")
+Xssmaze.push("nestedfilter-level1", "/nestedfilter/level1/?query=a", "strips script then img tags (svg survives)",
+  vuln: "reflected-html", delivery: ["query"], note: "<script> and <img> tags are both stripped; <svg onload=alert(1)> survives")
 maze_get "/nestedfilter/level1/" do |env|
   query = env.params.query["query"]
   query = Filters.strip_tags(query, ["script"])
@@ -9,7 +10,8 @@ maze_get "/nestedfilter/level1/" do |env|
 end
 
 # Level 2: First lowercases input, then strips <script> -- use <img src=x onerror=alert(1)>
-Xssmaze.push("nestedfilter-level2", "/nestedfilter/level2/?query=a", "lowercase then strip script (img survives)")
+Xssmaze.push("nestedfilter-level2", "/nestedfilter/level2/?query=a", "lowercase then strip script (img survives)",
+  vuln: "reflected-html", delivery: ["query"], note: "the value is lowercased before <script> is stripped, so mixed case does not help; use <img src=x onerror=alert(1)>")
 maze_get "/nestedfilter/level2/" do |env|
   query = env.params.query["query"].downcase
   query = Filters.strip_tags(query, ["script"])
@@ -19,7 +21,8 @@ end
 
 # Level 3: First strips on[a-z]+=, then strips <script> tag
 # Use <scr<script>ipt>alert(1)</scr</script>ipt> -- after <script> strip becomes <script>alert(1)</script>
-Xssmaze.push("nestedfilter-level3", "/nestedfilter/level3/?query=a", "strips event handlers then script (nested tag reconstruction)")
+Xssmaze.push("nestedfilter-level3", "/nestedfilter/level3/?query=a", "strips event handlers then script (nested tag reconstruction)",
+  vuln: "reflected-html", delivery: ["query"], note: "on*= handlers and <script> tags are each stripped in one pass, so nest the tag: <scr<script>ipt>alert(1)</scr</script>ipt>")
 maze_get "/nestedfilter/level3/" do |env|
   query = env.params.query["query"]
   query = query.gsub(/on[a-z]+=/, "")
@@ -30,7 +33,8 @@ end
 
 # Level 4: Strips < then strips > -- both angle brackets gone
 # Reflection in attribute context: <input value="QUERY"> -- break out with " onmouseover=alert(1) x="
-Xssmaze.push("nestedfilter-level4", "/nestedfilter/level4/?query=a", "strips < and > (attribute breakout)")
+Xssmaze.push("nestedfilter-level4", "/nestedfilter/level4/?query=a", "strips < and > (attribute breakout)",
+  vuln: "reflected-attr", delivery: ["query"], note: "both angle brackets are stripped; break out of the double-quoted input value and add an event handler")
 maze_get "/nestedfilter/level4/" do |env|
   query = env.params.query["query"]
   query = query.gsub("<", "")
@@ -40,7 +44,8 @@ maze_get "/nestedfilter/level4/" do |env|
 end
 
 # Level 5: URL-decodes once then strips <script> -- use <img src=x onerror=alert(1)> (not affected by script strip)
-Xssmaze.push("nestedfilter-level5", "/nestedfilter/level5/?query=a", "URL decode then strip script (img survives)")
+Xssmaze.push("nestedfilter-level5", "/nestedfilter/level5/?query=a", "URL decode then strip script (img survives)",
+  vuln: "reflected-html", delivery: ["query"], note: "the value is URL-decoded once before <script> is stripped, so encoding does not smuggle a script tag; <img src=x onerror=alert(1)> survives")
 maze_get "/nestedfilter/level5/" do |env|
   query = env.params.query["query"]
   begin
@@ -53,7 +58,8 @@ maze_get "/nestedfilter/level5/" do |env|
 end
 
 # Level 6: Strips "alert", then strips <script> -- use <img src=x onerror=confirm(1)>
-Xssmaze.push("nestedfilter-level6", "/nestedfilter/level6/?query=a", "strips alert keyword then script tag (confirm survives)")
+Xssmaze.push("nestedfilter-level6", "/nestedfilter/level6/?query=a", "strips alert keyword then script tag (confirm survives)",
+  vuln: "reflected-html", delivery: ["query"], note: "the literal lowercase alert and <script> tags are each stripped once; use confirm(1), or nest as alalertert")
 maze_get "/nestedfilter/level6/" do |env|
   query = env.params.query["query"]
   query = query.gsub("alert", "")

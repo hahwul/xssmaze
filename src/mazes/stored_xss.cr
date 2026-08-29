@@ -7,7 +7,8 @@ stored_data = {
   "level4" => Xssmaze::Store.list("stored/level4"),
 }
 
-Xssmaze.push("stored-level1", "/stored/level1/", "stored XSS via guestbook (no filter)", "POST")
+Xssmaze.push("stored-level1", "/stored/level1/", "stored XSS via guestbook (no filter)", "POST",
+  vuln: "stored", delivery: ["body"], note: "the POST response re-renders the whole list, so the reflection is visible without a follow-up GET")
 maze_get "/stored/level1/" do |_|
   entries = stored_data["level1"].entries.map { |e| "<li>#{e}</li>" }.join
   "<html><body>
@@ -27,7 +28,8 @@ maze_post "/stored/level1/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("stored-level2", "/stored/level2/", "stored XSS with angle bracket filter", "POST")
+Xssmaze.push("stored-level2", "/stored/level2/", "stored XSS with angle bracket filter", "POST",
+  vuln: "non-xss-control", delivery: ["body"], exploitable: false, note: "angle brackets are stripped before storage and the value is rendered as <li> text content, so no markup can be introduced; reporting no XSS here is the correct result")
 maze_get "/stored/level2/" do |_|
   entries = stored_data["level2"].entries.map { |e| "<li>#{e}</li>" }.join
   "<html><body>
@@ -47,7 +49,8 @@ maze_post "/stored/level2/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("stored-level3", "/stored/level3/", "stored XSS in attribute context", "POST")
+Xssmaze.push("stored-level3", "/stored/level3/", "stored XSS in attribute context", "POST",
+  vuln: "stored", delivery: ["body"], note: "the visible copy is angle-encoded; the injectable context is the raw double-quoted title attribute on the same div")
 maze_get "/stored/level3/" do |_|
   entries = stored_data["level3"].entries.map { |e| "<div title=\"#{e}\">#{Filters.encode_angles(e)}</div>" }.join
   "<html><body>
@@ -67,7 +70,8 @@ maze_post "/stored/level3/" do |env|
   </body></html>"
 end
 
-Xssmaze.push("stored-level4", "/stored/level4/", "stored XSS in JSON API response rendered via innerHTML", "POST")
+Xssmaze.push("stored-level4", "/stored/level4/", "stored XSS in JSON API response rendered via innerHTML", "POST",
+  vuln: "stored", sources: ["fetch-response"], sinks: ["innerHTML"], delivery: ["body"], note: "the stored value is served by /stored/level4/api and pasted into innerHTML, so a bare <script> will not run; use <img src=x onerror=...>")
 maze_get "/stored/level4/" do |_|
   "<html><body>
   <h1>Stored XSS Level 4</h1>

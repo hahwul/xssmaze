@@ -1,5 +1,6 @@
 # Level 1: 500 chars of HTML before reflection in div
-Xssmaze.push("latereflect-level1", "/latereflect/level1/?query=a", "500 chars of HTML before reflection in div")
+Xssmaze.push("latereflect-level1", "/latereflect/level1/?query=a", "500 chars of HTML before reflection in div",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/latereflect/level1/" do |env|
   query = env.params.query["query"]
   padding = "<div class=\"wrapper\"><header><h1>Welcome to Our Application</h1><p>This is a comprehensive platform designed to help users manage their data efficiently.</p></header><nav><ul><li><a href=\"/home\">Home</a></li><li><a href=\"/about\">About</a></li><li><a href=\"/services\">Services</a></li><li><a href=\"/contact\">Contact</a></li></ul></nav><section class=\"intro\"><p>We provide excellent services for all your needs. Our team is dedicated to delivering quality results.</p></section></div>"
@@ -13,7 +14,8 @@ maze_get "/latereflect/level1/" do |env|
 end
 
 # Level 2: 1000 chars of HTML before reflection in p
-Xssmaze.push("latereflect-level2", "/latereflect/level2/?query=a", "1000 chars of HTML before reflection in p tag")
+Xssmaze.push("latereflect-level2", "/latereflect/level2/?query=a", "1000 chars of HTML before reflection in p tag",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/latereflect/level2/" do |env|
   query = env.params.query["query"]
   padding = "<div class=\"wrapper\"><header><h1>Welcome to Our Application Portal</h1><p>This is a comprehensive platform designed to help users manage their data efficiently and securely.</p></header><nav><ul><li><a href=\"/home\">Home</a></li><li><a href=\"/about\">About Us</a></li><li><a href=\"/services\">Services</a></li><li><a href=\"/products\">Products</a></li><li><a href=\"/contact\">Contact</a></li><li><a href=\"/support\">Support</a></li></ul></nav><section class=\"intro\"><p>We provide excellent services for all your needs. Our team of professionals is dedicated to delivering quality results on time and within budget.</p><p>Founded in 2020, we have grown to serve thousands of customers worldwide with innovative solutions and cutting-edge technology.</p></section><aside class=\"sidebar\"><h3>Latest News</h3><ul><li>New feature released this week</li><li>Quarterly report now available</li><li>Maintenance scheduled for next weekend</li></ul></aside><section class=\"features\"><h2>Key Features</h2><p>Our platform includes real-time analytics, automated reporting, team collaboration tools, and enterprise-grade security.</p></section></div>"
@@ -27,7 +29,8 @@ maze_get "/latereflect/level2/" do |env|
 end
 
 # Level 3: 2000 chars of HTML before reflection in input value
-Xssmaze.push("latereflect-level3", "/latereflect/level3/?query=a", "2000 chars of HTML before reflection in input value")
+Xssmaze.push("latereflect-level3", "/latereflect/level3/?query=a", "2000 chars of HTML before reflection in input value",
+  vuln: "reflected-attr", delivery: ["query"])
 maze_get "/latereflect/level3/" do |env|
   query = env.params.query["query"]
   block_a = "<div class=\"section-alpha\"><header><h1>Enterprise Dashboard Portal</h1><p>Manage your organization resources, teams, and analytics from one centralized location.</p></header><nav class=\"main-nav\"><ul><li><a href=\"/home\">Home</a></li><li><a href=\"/dashboard\">Dashboard</a></li><li><a href=\"/reports\">Reports</a></li><li><a href=\"/analytics\">Analytics</a></li><li><a href=\"/settings\">Settings</a></li><li><a href=\"/profile\">Profile</a></li><li><a href=\"/logout\">Logout</a></li></ul></nav></div>"
@@ -45,7 +48,8 @@ maze_get "/latereflect/level3/" do |env|
 end
 
 # Level 4: Reflection sandwiched between two 500-char blocks
-Xssmaze.push("latereflect-level4", "/latereflect/level4/?query=a", "reflection between two 500-char HTML blocks")
+Xssmaze.push("latereflect-level4", "/latereflect/level4/?query=a", "reflection between two 500-char HTML blocks",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/latereflect/level4/" do |env|
   query = env.params.query["query"]
   before_block = "<div class=\"before-content\"><header><h1>Application Framework Portal</h1><p>This platform provides tools for managing enterprise resources, analytics dashboards, and team collaboration features.</p></header><nav><ul><li><a href=\"/home\">Home</a></li><li><a href=\"/about\">About</a></li><li><a href=\"/services\">Services</a></li><li><a href=\"/contact\">Contact</a></li></ul></nav><section class=\"intro\"><p>We deliver excellence in every project. Our professionals ensure quality results with timely delivery.</p></section></div>"
@@ -61,7 +65,8 @@ maze_get "/latereflect/level4/" do |env|
 end
 
 # Level 5: 3000 chars of HTML before reflection in span
-Xssmaze.push("latereflect-level5", "/latereflect/level5/?query=a", "3000 chars of HTML before reflection in span")
+Xssmaze.push("latereflect-level5", "/latereflect/level5/?query=a", "3000 chars of HTML before reflection in span",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/latereflect/level5/" do |env|
   query = env.params.query["query"]
   block_a = "<div class=\"mega-header\"><header><h1>Global Enterprise Management System</h1><p>A comprehensive solution for managing worldwide operations, resources, and strategic business initiatives across all departments.</p></header><nav class=\"primary-nav\"><ul><li><a href=\"/home\">Home</a></li><li><a href=\"/dashboard\">Dashboard</a></li><li><a href=\"/projects\">Projects</a></li><li><a href=\"/teams\">Teams</a></li><li><a href=\"/reports\">Reports</a></li><li><a href=\"/settings\">Settings</a></li></ul></nav></div>"
@@ -81,7 +86,8 @@ maze_get "/latereflect/level5/" do |env|
 end
 
 # Level 6: 5000 chars of HTML before reflection in deep div
-Xssmaze.push("latereflect-level6", "/latereflect/level6/?query=a", "5000 chars of HTML before reflection in deep div")
+Xssmaze.push("latereflect-level6", "/latereflect/level6/?query=a", "5000 chars of HTML before reflection in deep div",
+  vuln: "reflected-html", delivery: ["query"])
 maze_get "/latereflect/level6/" do |env|
   query = env.params.query["query"]
   block_a = "<div class=\"ultra-header\"><header class=\"site-header\"><h1>International Enterprise Resource Planning System</h1><p>Providing world-class solutions for organizations of all sizes across every industry sector and geographic region.</p><p>Our platform has been trusted by Fortune 500 companies for over a decade, delivering consistent results and exceptional reliability.</p></header><nav class=\"main-navigation\"><ul class=\"nav-list\"><li><a href=\"/home\">Home</a></li><li><a href=\"/dashboard\">Dashboard</a></li><li><a href=\"/projects\">Projects</a></li><li><a href=\"/resources\">Resources</a></li><li><a href=\"/analytics\">Analytics</a></li><li><a href=\"/reports\">Reports</a></li><li><a href=\"/admin\">Administration</a></li><li><a href=\"/settings\">Settings</a></li><li><a href=\"/help\">Help Center</a></li></ul></nav></div>"

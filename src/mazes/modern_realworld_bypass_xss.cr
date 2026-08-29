@@ -5,7 +5,8 @@ level1_store = Hash(String, String).new
 
 # Level 1: Multi-Step / Multi-State Session-Locked Stored XSS
 # DAST scanners scan endpoints in isolation and do not track states across distinct HTTP methods/pages.
-Xssmaze.push("modern-bypass-level1", "/modern-bypass/level1/preview?view=draft", "Session-locked multi-step draft preview", "GET", ["view"])
+Xssmaze.push("modern-bypass-level1", "/modern-bypass/level1/preview?view=draft", "Session-locked multi-step draft preview", "GET", ["view"],
+  vuln: "stored", delivery: ["body"], note: "the payload enters as the content field of POST /modern-bypass/level1/save; this preview only renders it when the session_id cookie set by that POST is replayed together with view=draft")
 
 # Step 1: Endpoint to save draft (POST)
 maze_post "/modern-bypass/level1/save" do |env|
@@ -46,7 +47,8 @@ end
 # Level 2: DOM Clobbering to XSS via Global Config Override
 # Scanners lack the static/dynamic tracing engines to detect when a reflected attribute
 # overrides global namespaces, which are subsequently loaded into dynamic script tags.
-Xssmaze.push("modern-bypass-level2", "/modern-bypass/level2/?query=a", "DOM Clobbering XSS via global config override", "GET", ["query"])
+Xssmaze.push("modern-bypass-level2", "/modern-bypass/level2/?query=a", "DOM Clobbering XSS via global config override", "GET", ["query"],
+  vuln: "dom", sources: ["server-reflected"], sinks: ["script.src"], delivery: ["query"], note: "script/iframe/object/embed tags and on*= handlers are all stripped, so nothing executes directly; the surviving path is DOM clobbering with <a id=config href=data:text/javascript,alert(1)>, which window.config resolves to and the page loads as a script 500ms later")
 maze_get "/modern-bypass/level2/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -80,7 +82,8 @@ end
 # Level 3: Vue.js Client-Side Template Injection (CSTI) Bypassing Tag Filters
 # Scanners check for HTML injection by looking for tags like <script> or <img onerror>.
 # Stripping `<` and `>` bypasses these scanners completely while Vue parses curly braces.
-Xssmaze.push("modern-bypass-level3", "/modern-bypass/level3/?query=a", "Vue.js Client-Side Template Injection (CSTI) bypassing tag filters", "GET", ["query"])
+Xssmaze.push("modern-bypass-level3", "/modern-bypass/level3/?query=a", "Vue.js Client-Side Template Injection (CSTI) bypassing tag filters", "GET", ["query"],
+  vuln: "csti", delivery: ["query"], note: "Vue 2 compiles #app as a template and angle brackets are stripped, so the payload is a {{ }} expression; needs the jsdelivr CDN to be reachable")
 maze_get "/modern-bypass/level3/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -107,7 +110,8 @@ end
 
 # Level 4: Client-Side JavaScript Prototype Pollution to DOM XSS
 # Scanners do not test dynamic client-side hash parsing (#) or prototype poisoning.
-Xssmaze.push("modern-bypass-level4", %q(/modern-bypass/level4/#{"__proto__":{"scriptUrl":"data:text/javascript,alert(1)"}}), "Client-side Prototype Pollution to DOM XSS via hash parsing", "GET", [] of String)
+Xssmaze.push("modern-bypass-level4", %q(/modern-bypass/level4/#{"__proto__":{"scriptUrl":"data:text/javascript,alert(1)"}}), "Client-side Prototype Pollution to DOM XSS via hash parsing", "GET", [] of String,
+  vuln: "prototype-pollution", sources: ["location.hash"], sinks: ["script.src"], delivery: ["fragment"], note: "fragment only, so no request-only scanner can deliver it; the hash is JSON.parsed and merged, and the polluted scriptUrl key becomes the src of a dynamically created <script>")
 maze_get "/modern-bypass/level4/" do |_env|
   "<!doctype html><html><head><title>Dashboard</title></head><body>
   <h1>Modern Dashboard</h1>
@@ -159,7 +163,8 @@ end
 
 # Level 5: SVG Content-Type Reflection with Script Tag Stripping
 # Scanners assume SVG is safe when `<script>` is deleted, ignoring element-level event triggers like `<svg onload="...">`.
-Xssmaze.push("modern-bypass-level5", "/modern-bypass/level5/?svg=a", "SVG reflection with script tag stripping (requires direct navigation)", "GET", ["svg"])
+Xssmaze.push("modern-bypass-level5", "/modern-bypass/level5/?svg=a", "SVG reflection with script tag stripping (requires direct navigation)", "GET", ["svg"],
+  vuln: "reflected-html", delivery: ["query"], note: "the parameter is svg, not query; the response is served as image/svg+xml, so it only executes on direct navigation, and only <script> is stripped, leaving <svg onload=alert(1)>")
 maze_get "/modern-bypass/level5/" do |env|
   svg = env.params.query.fetch("svg", "")
 
@@ -174,7 +179,8 @@ end
 # Level 6: Entity Decoding inside Iframe `srcdoc` Attribute Context
 # Scanners check if `<script>` is escaped to `&lt;script&gt;` and report safe.
 # They miss that the browser decodes attribute entities inside `srcdoc` before parsing the frame HTML.
-Xssmaze.push("modern-bypass-level6", "/modern-bypass/level6/?query=a", "Iframe srcdoc attribute entity decoding bypass", "GET", ["query"])
+Xssmaze.push("modern-bypass-level6", "/modern-bypass/level6/?query=a", "Iframe srcdoc attribute entity decoding bypass", "GET", ["query"],
+  vuln: "reflected-attr", sinks: ["srcdoc"], delivery: ["query"], note: "entity-encoded in the outer document but decoded again when srcdoc is parsed")
 maze_get "/modern-bypass/level6/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -193,7 +199,8 @@ end
 
 # Level 7: Unicode Normalization (NFKC) Filter Bypass
 # DAST scanners rarely send Unicode homoglyphs to check normalization side-effects.
-Xssmaze.push("modern-bypass-level7", "/modern-bypass/level7/?query=a", "Unicode normalization (NFKC) filter bypass", "GET", ["query"])
+Xssmaze.push("modern-bypass-level7", "/modern-bypass/level7/?query=a", "Unicode normalization (NFKC) filter bypass", "GET", ["query"],
+  vuln: "reflected-js", sinks: ["innerHTML"], delivery: ["query"], note: "the keyword WAF (403) never looks at quotes, so the single-quoted JS string can simply be closed; the intended path is a fullwidth homoglyph payload that NFKC-normalises into real markup before innerHTML")
 maze_get "/modern-bypass/level7/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -220,7 +227,8 @@ end
 
 # Level 8: Flawed Regex Host Whitelist for Dynamic Scripts
 # Scanners do not test subdomain/credential validation bypasses of whitelist patterns.
-Xssmaze.push("modern-bypass-level8", "/modern-bypass/level8/?callback_url=https://xssmaze.com/js/callback.js", "Flawed regex domain whitelist bypass for dynamic scripts", "GET", ["callback_url"])
+Xssmaze.push("modern-bypass-level8", "/modern-bypass/level8/?callback_url=https://xssmaze.com/js/callback.js", "Flawed regex domain whitelist bypass for dynamic scripts", "GET", ["callback_url"],
+  vuln: "reflected-js", sinks: ["script.src"], delivery: ["query"], note: "the parameter is callback_url; it lands raw in a single-quoted JS string, so it runs whatever the whitelist decides. The intended bug is the unanchored host regex, which https://xssmaze.com.attacker.com/x.js satisfies")
 maze_get "/modern-bypass/level8/" do |env|
   url = env.params.query.fetch("callback_url", "https://xssmaze.com/js/callback.js")
 
@@ -251,7 +259,8 @@ end
 
 # Level 9: Event Handler in an Unquoted Attribute Context with Space Stripping (Requires Slash Delimiter)
 # Scanners check if they can inject attribute event handlers using alternative separators like `/` when spaces are stripped.
-Xssmaze.push("modern-bypass-level9", "/modern-bypass/level9/?query=a", "Event handler unquoted attribute with space stripping (requires slash separator)", "GET", ["query"])
+Xssmaze.push("modern-bypass-level9", "/modern-bypass/level9/?query=a", "Event handler unquoted attribute with space stripping (requires slash separator)", "GET", ["query"],
+  vuln: "reflected-attr", delivery: ["query"], note: "all whitespace is stripped, so a multi-attribute payload needs slash separators; the template already supplies the leading space, so onerror=alert(1) alone fires on the broken img")
 maze_get "/modern-bypass/level9/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -266,7 +275,8 @@ end
 
 # Level 10: Tag Injection in Nested <select> and <option> Elements
 # Tests if the scanner can properly identify single-quoted option attributes inside select contexts.
-Xssmaze.push("modern-bypass-level10", "/modern-bypass/level10/?query=a", "Nested select option attribute tag breakout", "GET", ["query"])
+Xssmaze.push("modern-bypass-level10", "/modern-bypass/level10/?query=a", "Nested select option attribute tag breakout", "GET", ["query"],
+  vuln: "reflected-attr", delivery: ["query"], note: "double quotes are encoded and the option value is single-quoted; the parser is in in-select mode, so close </select> before injecting anything other than <script>")
 maze_get "/modern-bypass/level10/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -286,7 +296,8 @@ end
 # Level 11: Style Context with Dynamic CSS Variable to JS Execution
 # The user parameter is reflected inside a style block. Scanners trying to close style tags are blocked by WAF.
 # Scanners must understand the style evaluates inside a CSS variable as plain JS by the page scripts.
-Xssmaze.push("modern-bypass-level11", "/modern-bypass/level11/?query=a", "Style context CSS variable to dynamic JS execution", "GET", ["query"])
+Xssmaze.push("modern-bypass-level11", "/modern-bypass/level11/?query=a", "Style context CSS variable to dynamic JS execution", "GET", ["query"],
+  vuln: "dom", sources: ["css-custom-property"], sinks: ["Function"], delivery: ["query"], note: "closing </style> is answered with 403, so no markup is involved at all: the CSS custom property value is read back and passed to new Function 500ms after load, making the payload plain JS such as alert(1)")
 maze_get "/modern-bypass/level11/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -325,7 +336,8 @@ end
 
 # Level 12: Content Security Policy (CSP) Bypass using JSONP Whitelisted Origin
 # Restricts script-src to self and googleapis. Users can bypass CSP using JSONP callback dynamically.
-Xssmaze.push("modern-bypass-level12", "/modern-bypass/level12/?query=a", "CSP bypass via Whitelisted JSONP API Endpoint", "GET", ["query"])
+Xssmaze.push("modern-bypass-level12", "/modern-bypass/level12/?query=a", "CSP bypass via Whitelisted JSONP API Endpoint", "GET", ["query"],
+  vuln: "reflected-attr", delivery: ["query"], note: "the value lands in a single-quoted <script src> in <head>, but the CSP blocks inline script, so an inline breakout does not run; the bypass is to load a template-engine gadget from the whitelisted ajax.googleapis.com. The jquery.min.js callback parameter is not a real JSONP endpoint")
 maze_get "/modern-bypass/level12/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -343,7 +355,8 @@ end
 
 # Level 13: SVG Path Attribute Custom Trigger Injection
 # Measures if the scanner can detect XSS in custom data attributes or SVG sub-properties.
-Xssmaze.push("modern-bypass-level13", "/modern-bypass/level13/?query=a", "SVG Path custom action trigger XSS", "GET", ["query"])
+Xssmaze.push("modern-bypass-level13", "/modern-bypass/level13/?query=a", "SVG Path custom action trigger XSS", "GET", ["query"],
+  vuln: "reflected-attr", sinks: ["eval"], delivery: ["query"], note: "the single-quoted SVG path d attribute can be broken out of, but no breakout is needed: any d value containing xss: has the rest eval-ed 500ms after load, so xss:alert(1) is enough")
 maze_get "/modern-bypass/level13/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -370,7 +383,8 @@ end
 
 # Level 14: Strict Event Denylist (Requires Obscure Event Handlers)
 # Blocks the 10 most common event handlers. Scanner must utilize obscure events like pointerover or pointerdown.
-Xssmaze.push("modern-bypass-level14", "/modern-bypass/level14/?query=a", "Strict event denylist (requires obscure HTML5 events)", "GET", ["query"])
+Xssmaze.push("modern-bypass-level14", "/modern-bypass/level14/?query=a", "Strict event denylist (requires obscure HTML5 events)", "GET", ["query"],
+  vuln: "reflected-attr", delivery: ["query"], note: "ten common handlers are answered with 403; obscure ones are not, so break out of the double-quoted title with <details open ontoggle=alert(1)>")
 maze_get "/modern-bypass/level14/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -387,7 +401,8 @@ end
 
 # Level 15: Nested JSON String in Single-Quoted Attribute Context
 # Replaces double quotes but leaves single quotes intact. Breakout via single-quote attribute boundary.
-Xssmaze.push("modern-bypass-level15", "/modern-bypass/level15/?query=a", "Nested JSON inside single-quoted attribute breakout", "GET", ["query"])
+Xssmaze.push("modern-bypass-level15", "/modern-bypass/level15/?query=a", "Nested JSON inside single-quoted attribute breakout", "GET", ["query"],
+  vuln: "reflected-attr", sinks: ["innerHTML"], delivery: ["query"], note: "only double quotes are escaped, so a single quote leaves the data-info attribute; alternatively the JSON name member reaches document.body.innerHTML, so a quote-free payload works with no breakout at all")
 maze_get "/modern-bypass/level15/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -409,7 +424,8 @@ end
 
 # Level 16: Multi-Context Variable Splitting XSS
 # First reflection is fully HTML-escaped. Second reflection is unquoted raw JS.
-Xssmaze.push("modern-bypass-level16", "/modern-bypass/level16/?query=a", "Multi-context unquoted JS variable splitting", "GET", ["query"])
+Xssmaze.push("modern-bypass-level16", "/modern-bypass/level16/?query=a", "Multi-context unquoted JS variable splitting", "GET", ["query"],
+  vuln: "reflected-js", delivery: ["query"], note: "the first reflection is HTML-escaped; the second is an unquoted JS value, so the payload is a bare expression such as alert(1)")
 maze_get "/modern-bypass/level16/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -429,7 +445,8 @@ end
 # Level 17: Shadow DOM (Closed Root) Reflection via Client-Side Query Parsing
 # Static HTML response contains no user input; the sink is reached only after JS execution.
 # Many crawlers and simple DAST tools won't execute JS or inspect closed shadow roots.
-Xssmaze.push("modern-bypass-level17", "/modern-bypass/level17/?query=a", "Closed ShadowRoot innerHTML reflection via URLSearchParams (client-side only)", "GET", ["query"])
+Xssmaze.push("modern-bypass-level17", "/modern-bypass/level17/?query=a", "Closed ShadowRoot innerHTML reflection via URLSearchParams (client-side only)", "GET", ["query"],
+  vuln: "dom", sources: ["location.search"], sinks: ["attachShadow.innerHTML"], delivery: ["query"], note: "the server response carries no reflection at all, and the shadow root is closed, so the injected node is invisible to document queries")
 maze_get "/modern-bypass/level17/" do |_env|
   "<!doctype html><html><head><meta charset='utf-8'><title>Shadow DOM (closed) Reflection</title></head><body>
   <h1>Modern Bypass Level 17</h1>
@@ -449,7 +466,8 @@ end
 
 # Level 18: Closed ShadowRoot + Slot-Based Injection
 # The shadow DOM uses a slot, while the light DOM is populated via client-side innerHTML.
-Xssmaze.push("modern-bypass-level18", "/modern-bypass/level18/?query=a", "Closed ShadowRoot slot renders light DOM populated via client-side innerHTML", "GET", ["query"])
+Xssmaze.push("modern-bypass-level18", "/modern-bypass/level18/?query=a", "Closed ShadowRoot slot renders light DOM populated via client-side innerHTML", "GET", ["query"],
+  vuln: "dom", sources: ["location.search"], sinks: ["innerHTML"], delivery: ["query"], note: "the server response carries no reflection at all; innerHTML does not run a bare <script>, so use <img src=x onerror=...>")
 maze_get "/modern-bypass/level18/" do |_env|
   "<!doctype html><html><head><meta charset='utf-8'><title>Shadow DOM Slot (closed)</title></head><body>
   <h1>Modern Bypass Level 18</h1>
@@ -472,7 +490,8 @@ end
 
 # Level 19: Web Messaging (postMessage) Origin RegExp Bypass
 # Evaluates event data from postMessage listeners where origin validation has weak unanchored RegExp.
-Xssmaze.push("modern-bypass-level19", "/modern-bypass/level19/", "Web Messaging (postMessage) origin RegExp bypass", "GET", [] of String)
+Xssmaze.push("modern-bypass-level19", "/modern-bypass/level19/", "Web Messaging (postMessage) origin RegExp bypass", "GET", [] of String,
+  vuln: "non-xss-control", sources: ["postMessage"], sinks: ["eval"], delivery: ["postmessage"], exploitable: false, note: "the inline script does not parse: `/https://xssmaze.com/.test(...)` tokenises as a regex followed by a line comment, so the if is never closed and the message listener is never registered. Nothing reaches eval, so reporting no XSS here is the correct result")
 maze_get "/modern-bypass/level19/" do |_env|
   "<!doctype html><html><head><meta charset='utf-8'><title>PostMessage Portal</title></head><body>
   <h1>Modern Bypass Level 19</h1>
@@ -503,7 +522,8 @@ end
 
 # Level 20: Double URL Decoding / Double Escape Bypass
 # The application uses explicit second URL decoding after passing input through a WAF rule checking first-level tags.
-Xssmaze.push("modern-bypass-level20", "/modern-bypass/level20/?query=a", "Double URL decoding / double escape bypass", "GET", ["query"])
+Xssmaze.push("modern-bypass-level20", "/modern-bypass/level20/?query=a", "Double URL decoding / double escape bypass", "GET", ["query"],
+  vuln: "reflected-html", delivery: ["query"], note: "the value is URL-decoded a second time after the WAF check, so double-encode the handler name as well as the angle brackets: %253Cimg%2520src%253Dx%2520%256Fnerror%253Dalert(1)%253E")
 maze_get "/modern-bypass/level20/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -525,7 +545,8 @@ end
 # Level 21: Context-Breaking JSON Script Tag Injection (Auto-Escaping Failure)
 # The application serializes a Crystal Hash to JSON and reflects it raw in a script block.
 # An attacker closes the script block with </script> and opens a new one, breaking JS parser rules.
-Xssmaze.push("modern-bypass-level21", "/modern-bypass/level21/?query=a", "Context-breaking JSON script tag injection", "GET", ["query"])
+Xssmaze.push("modern-bypass-level21", "/modern-bypass/level21/?query=a", "Context-breaking JSON script tag injection", "GET", ["query"],
+  vuln: "reflected-js", delivery: ["query"], note: "the value is JSON-serialised, so quotes are escaped, but </script> is not: close the script block and open a new one")
 maze_get "/modern-bypass/level21/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -551,7 +572,8 @@ end
 # Level 22: Alpine.js Directive Injection (Attribute Context)
 # Input is placed directly inside a div element's tag body as a custom attribute. Quotes are HTML-escaped to prevent attribute breakout.
 # Evaluated via Alpine.js directives (like x-init) which do not require quotes to run code in HTML.
-Xssmaze.push("modern-bypass-level22", "/modern-bypass/level22/?query=a", "Alpine.js directive attribute injection", "GET", ["query"])
+Xssmaze.push("modern-bypass-level22", "/modern-bypass/level22/?query=a", "Alpine.js directive attribute injection", "GET", ["query"],
+  vuln: "reflected-attr", delivery: ["query"], note: "quotes and angle brackets are HTML-escaped, so the payload has to be an unquoted Alpine directive in attribute-name position, e.g. x-init=alert(1); needs the jsdelivr CDN to be reachable")
 maze_get "/modern-bypass/level22/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -575,7 +597,8 @@ end
 # Level 23: Meta CSP Pre-Execution Race (Reflection before <meta> tag)
 # The application defines strict CSP via a <meta> tag in the head, but user reflection lands
 # before the meta tag. The browser runs injected scripts before parsing the CSP policy.
-Xssmaze.push("modern-bypass-level23", "/modern-bypass/level23/?query=a", "Meta CSP pre-execution race condition (reflection before meta tag)", "GET", ["query"])
+Xssmaze.push("modern-bypass-level23", "/modern-bypass/level23/?query=a", "Meta CSP pre-execution race condition (reflection before meta tag)", "GET", ["query"],
+  vuln: "reflected-html", delivery: ["query"], note: "the reflection lands in <head> before the CSP <meta>, which only covers what follows it, so a script injected here runs under script-src none")
 maze_get "/modern-bypass/level23/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -592,7 +615,8 @@ end
 
 # Level 24: AngularJS Client-Side Template Injection (CSTI) under Strict Tag Filters
 # Angle brackets are entirely stripped. Evaluated inside AngularJS framework container.
-Xssmaze.push("modern-bypass-level24", "/modern-bypass/level24/?query=a", "AngularJS Client-Side Template Injection (CSTI) bypassing HTML tags", "GET", ["query"])
+Xssmaze.push("modern-bypass-level24", "/modern-bypass/level24/?query=a", "AngularJS Client-Side Template Injection (CSTI) bypassing HTML tags", "GET", ["query"],
+  vuln: "csti", delivery: ["query"], note: "AngularJS 1.6.9 ng-app scope and angle brackets are stripped, so the payload is a {{ }} expression; needs the googleapis CDN to be reachable")
 maze_get "/modern-bypass/level24/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -613,7 +637,8 @@ end
 # Level 25: ES6 Template Literal Backtick Breakout with Placeholders
 # Reflections landing inside template literals can be exploited using ES6 placeholders `${...}`
 # or by escaping/using backticks if not filtered.
-Xssmaze.push("modern-bypass-level25", "/modern-bypass/level25/?query=a", "ES6 JS Template Literal Placeholder Injection", "GET", ["query"])
+Xssmaze.push("modern-bypass-level25", "/modern-bypass/level25/?query=a", "ES6 JS Template Literal Placeholder Injection", "GET", ["query"],
+  vuln: "reflected-js", delivery: ["query"], note: "both quote characters are backslash-escaped, but the value lands inside a backtick template literal; ${alert(1)} evaluates")
 maze_get "/modern-bypass/level25/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -634,7 +659,8 @@ end
 
 # Level 26: Nested Query Parameter Prototype Pollution XSS
 # Simulates deep query string key parsing where __proto__ allows poisoning object prototypes.
-Xssmaze.push("modern-bypass-level26", "/modern-bypass/level26/?query=a", "Query parameter recursive parsing prototype pollution to DOM XSS", "GET", ["query"])
+Xssmaze.push("modern-bypass-level26", "/modern-bypass/level26/?query=a", "Query parameter recursive parsing prototype pollution to DOM XSS", "GET", ["query"],
+  vuln: "prototype-pollution", sources: ["location.search"], sinks: ["script.src"], delivery: ["query"], note: "the parser splits keys on a pipe, not on brackets, so the bracket shape its own comment advertises does nothing; use ?__proto__|scriptUrl=data:text/javascript,alert(1)")
 maze_get "/modern-bypass/level26/" do |_env|
   "<!doctype html><html><head><meta charset='utf-8'><title>Admin Config Console</title></head><body>
   <h1>Configuration Loader</h1>

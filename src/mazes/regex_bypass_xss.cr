@@ -7,7 +7,8 @@
 # Real shape: hand-rolled WAF rule, in-house template filter, or a
 # CMS plugin that forgot the case-insensitive flag. Bypass: `<Script>`
 # or any mixed case.
-Xssmaze.push("regexbypass-level1", "/regexbypass/level1/?query=a", "case-sensitive <script blacklist (no /i)")
+Xssmaze.push("regexbypass-level1", "/regexbypass/level1/?query=a", "case-sensitive <script blacklist (no /i)",
+  vuln: "reflected-html", delivery: ["query"], note: "the strip is case-sensitive; <Script> passes")
 maze_get "/regexbypass/level1/" do |env|
   query = env.params.query["query"]
   filtered = query.gsub("<script", "").gsub("</script", "")
@@ -20,7 +21,8 @@ end
 # HTML permits `/` between attributes. Bypass: `<svg/onload=alert(1)>`
 # or `<img/src=x/onerror=alert(1)>`. Documented in many WAF bypass
 # write-ups.
-Xssmaze.push("regexbypass-level2", "/regexbypass/level2/?query=a", "on*= regex requires whitespace prefix (slash bypass)")
+Xssmaze.push("regexbypass-level2", "/regexbypass/level2/?query=a", "on*= regex requires whitespace prefix (slash bypass)",
+  vuln: "reflected-html", delivery: ["query"], note: "the handler regex needs whitespace before on*=; use a slash separator: <svg/onload=alert(1)>")
 maze_get "/regexbypass/level2/" do |env|
   query = env.params.query["query"]
   # Filter requires literal whitespace before the event handler, so
@@ -36,7 +38,8 @@ end
 # `href=` attribute where browsers decode HTML entities before URL
 # parsing. Bypass: `javas&#99;ript:alert(1)` or `&#106;avascript:`.
 # The lab also strips `data:` to keep the channel narrow.
-Xssmaze.push("regexbypass-level3", "/regexbypass/level3/?query=https://example.com", "javascript: literal strip but href decodes entities")
+Xssmaze.push("regexbypass-level3", "/regexbypass/level3/?query=https://example.com", "javascript: literal strip but href decodes entities",
+  vuln: "reflected-attr", delivery: ["query"], note: "javascript: and data: are stripped from the literal text but href decodes entities first (javas&#99;ript:alert(1)); quotes are unfiltered, so breaking out of the attribute also works")
 maze_get "/regexbypass/level3/" do |env|
   query = env.params.query["query"]
   filtered = query.gsub(/javascript:/i, "").gsub(/data:/i, "")
@@ -48,7 +51,8 @@ end
 # Real shape: `gsub("<script>", "")` is run once. `<scr<script>ipt>`
 # collapses to `<script>` after the strip. Classic CVE pattern
 # (countless CMS plugin advisories).
-Xssmaze.push("regexbypass-level4", "/regexbypass/level4/?query=a", "single-pass <script> strip (nested-tag bypass)")
+Xssmaze.push("regexbypass-level4", "/regexbypass/level4/?query=a", "single-pass <script> strip (nested-tag bypass)",
+  vuln: "reflected-html", delivery: ["query"], note: "the strip runs once, so <scr<script>ipt> collapses back into <script>")
 maze_get "/regexbypass/level4/" do |env|
   query = env.params.query["query"]
   filtered = query.gsub(/<script>/i, "").gsub(/<\/script>/i, "")
@@ -62,7 +66,8 @@ end
 # render. Bypass: send `%3Cscript%3E...%3C/script%3E` URL-encoded
 # past the server filter; the JS sink decodes and parses it.
 # Pattern observed in many SPA error pages.
-Xssmaze.push("regexbypass-level5", "/regexbypass/level5/?query=a", "server encodes < and >, client JS decodes via innerHTML")
+Xssmaze.push("regexbypass-level5", "/regexbypass/level5/?query=a", "server encodes < and >, client JS decodes via innerHTML",
+  vuln: "reflected-js", sinks: ["innerHTML"], delivery: ["query"], note: "only angle brackets are encoded, so the single-quoted JS string can simply be closed; the intended path is a double-encoded payload that decodeURIComponent restores before innerHTML")
 maze_get "/regexbypass/level5/" do |env|
   query = env.params.query["query"]
   filtered = Filters.encode_angles(query)
@@ -82,7 +87,8 @@ end
 # `<details ontoggle>`, `<input autofocus onfocus>`, or
 # `<video src=x onerror>` still execute. Standard scanner payload
 # rotation finds it.
-Xssmaze.push("regexbypass-level6", "/regexbypass/level6/?query=a", "blacklist misses details/input/video sinks")
+Xssmaze.push("regexbypass-level6", "/regexbypass/level6/?query=a", "blacklist misses details/input/video sinks",
+  vuln: "reflected-html", delivery: ["query"], note: "the blacklist misses <details ontoggle>, <input autofocus onfocus> and <video onerror>")
 maze_get "/regexbypass/level6/" do |env|
   query = env.params.query["query"]
   filtered = query.gsub(/<\/?(script|img|iframe|svg|object|embed)[^>]*>/i, "")
@@ -94,7 +100,8 @@ end
 # Real shape: filter strips `\n` to defeat header-injection-style
 # attacks, but `\t` and `\r` still pass and HTML treats them as
 # whitespace. Bypass: `<img\tsrc=x\tonerror=alert(1)>`.
-Xssmaze.push("regexbypass-level7", "/regexbypass/level7/?query=a", "newline strip with tab/CR untouched")
+Xssmaze.push("regexbypass-level7", "/regexbypass/level7/?query=a", "newline strip with tab/CR untouched",
+  vuln: "reflected-html", delivery: ["query"], note: "only newlines are stripped; tabs and carriage returns still work as attribute separators")
 maze_get "/regexbypass/level7/" do |env|
   query = env.params.query["query"]
   filtered = query.gsub("\n", "")
@@ -107,7 +114,8 @@ end
 # all PoCs use it. Bypass: `(alert)(1)`, ``alert`1` ``, `top['ale'+'rt'](1)`,
 # `confirm(1)`, `prompt(1)` — any equivalent sink. Reflective into
 # a JS string context inside `<script>`.
-Xssmaze.push("regexbypass-level8", "/regexbypass/level8/?query=ok", "alert( literal signature inside JS sink")
+Xssmaze.push("regexbypass-level8", "/regexbypass/level8/?query=ok", "alert( literal signature inside JS sink",
+  vuln: "reflected-js", delivery: ["query"], note: "only the literal alert( is blocked; confirm(1) or alert`1` works, and the double-quoted JS string is otherwise unescaped")
 maze_get "/regexbypass/level8/" do |env|
   query = env.params.query["query"].gsub("alert(", "_blocked_")
 
