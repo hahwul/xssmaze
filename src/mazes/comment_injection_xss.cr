@@ -2,7 +2,7 @@
 Xssmaze.push("commentinj-level1", "/commentinj/level1/?query=a", "reflected inside HTML comment",
   vuln: "reflected-html", delivery: ["query"], note: "reflected inside an HTML comment; close it with --> to inject markup")
 maze_get "/commentinj/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   "<html><body><!-- #{query} --><p>Safe content</p></body></html>"
 end
 
@@ -10,7 +10,7 @@ end
 Xssmaze.push("commentinj-level2", "/commentinj/level2/?query=a", "reflected inside JS block comment in script tag",
   vuln: "reflected-js", delivery: ["query"], note: "reflected inside a /* */ block comment in a <script>; close the comment or the </script>")
 maze_get "/commentinj/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   "<html><body><script>/* #{query} */var x=1;</script><p>Safe content</p></body></html>"
 end
 
@@ -18,7 +18,7 @@ end
 Xssmaze.push("commentinj-level3", "/commentinj/level3/?query=a", "reflected inside JS single-line comment in script tag",
   vuln: "reflected-js", delivery: ["query"], note: "reflected inside a // line comment in a <script>; a newline or </script> ends it")
 maze_get "/commentinj/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   "<html><body><script>// #{query}\nvar x=1;</script><p>Safe content</p></body></html>"
 end
 
@@ -26,7 +26,7 @@ end
 Xssmaze.push("commentinj-level4", "/commentinj/level4/?query=a", "reflected inside conditional comment",
   vuln: "reflected-html", delivery: ["query"], note: "reflected inside a downlevel conditional comment; close it with <![endif]--> to inject markup")
 maze_get "/commentinj/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   "<html><body><!--[if IE]>#{query}<![endif]--><p>Safe content</p></body></html>"
 end
 
@@ -34,7 +34,7 @@ end
 Xssmaze.push("commentinj-level5", "/commentinj/level5/?query=a", "reflected inside HTML comment with --> stripped (use --!> to close)",
   vuln: "reflected-html", delivery: ["query"], note: "--> is stripped once; --!> also closes the HTML comment")
 maze_get "/commentinj/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   filtered = query.gsub("-->", "")
   "<html><body><!-- #{filtered} --><p>Safe content</p></body></html>"
 end
@@ -43,6 +43,6 @@ end
 Xssmaze.push("commentinj-level6", "/commentinj/level6/?query=a", "reflected inside JS block comment - close comment and script tag",
   vuln: "reflected-js", delivery: ["query"], note: "reflected inside a /* */ block comment in a <script>; close the comment then the </script>")
 maze_get "/commentinj/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   "<html><body><script>/* #{query} */</script><p>Safe content</p></body></html>"
 end

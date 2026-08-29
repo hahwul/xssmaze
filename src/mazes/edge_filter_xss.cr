@@ -2,7 +2,7 @@
 Xssmaze.push("edgefilter-level1", "/edgefilter/level1/?query=a", "strips script keyword but allows other tags and event handlers",
   vuln: "reflected-html", delivery: ["query"], note: "script is stripped case-insensitively; other tags and their event handlers pass through untouched")
 maze_get "/edgefilter/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   filtered = query.gsub(/script/i, "")
 
   "<html><head></head><body>
@@ -16,7 +16,7 @@ end
 Xssmaze.push("edgefilter-level2", "/edgefilter/level2/?query=a", "single-pass tag regex strip (double-wrap bypass)",
   vuln: "reflected-html", delivery: ["query"], note: "one pass of a <...> regex; nest a throwaway tag inside the payload so the surviving halves rejoin")
 maze_get "/edgefilter/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Single-pass strip: matches <...> greedily
   filtered = query.gsub(/<[^>]+>/, "")
 
@@ -31,7 +31,7 @@ end
 Xssmaze.push("edgefilter-level3", "/edgefilter/level3/?query=a", "angle bracket filter only before alpha chars, reflection in attribute",
   vuln: "reflected-attr", delivery: ["query"], note: "< is only encoded when a letter follows it; break out of the double-quoted value attribute rather than injecting a tag")
 maze_get "/edgefilter/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Encode < only when followed by a letter (tries to block tags but misses attribute escape)
   filtered = query.gsub(/<([a-zA-Z])/) { |_match| "&lt;#{$1}" }
 
@@ -45,7 +45,7 @@ end
 Xssmaze.push("edgefilter-level4", "/edgefilter/level4/?query=a", "strips event handlers but allows script tags",
   vuln: "reflected-html", delivery: ["query"], note: "event-handler attributes are stripped, but tags are not")
 maze_get "/edgefilter/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Remove event handler attributes like onclick=, onerror=, onload=, etc.
   filtered = query.gsub(/on[a-zA-Z]+\s*=/i, "")
 
@@ -60,7 +60,7 @@ end
 Xssmaze.push("edgefilter-level5", "/edgefilter/level5/?query=a", "strips angle brackets and quotes but reflects in raw JS context",
   vuln: "reflected-js", delivery: ["query"], note: "angle brackets and both quote characters are stripped, but the value lands unquoted in a JS statement, so plain code such as 1;alert(1) runs")
 maze_get "/edgefilter/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   filtered = query.gsub("<", "").gsub(">", "").gsub("\"", "").gsub("'", "")
 
   "<html><head></head><body>
@@ -73,7 +73,7 @@ end
 Xssmaze.push("edgefilter-level6", "/edgefilter/level6/?query=a", "HTML encode first 20 chars only, rest is raw reflection",
   vuln: "reflected-html", delivery: ["query"], note: "only the first 20 characters are entity-encoded; pad the payload past that offset")
 maze_get "/edgefilter/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   if query.size > 20
     head = query[0, 20]
     tail = query[20..]

@@ -2,7 +2,7 @@
 Xssmaze.push("nestedfilter-level1", "/nestedfilter/level1/?query=a", "strips script then img tags (svg survives)",
   vuln: "reflected-html", delivery: ["query"], note: "<script> and <img> tags are both stripped; <svg onload=alert(1)> survives")
 maze_get "/nestedfilter/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   query = Filters.strip_tags(query, ["script"])
   query = Filters.strip_tags(query, ["img"])
 
@@ -13,7 +13,7 @@ end
 Xssmaze.push("nestedfilter-level2", "/nestedfilter/level2/?query=a", "lowercase then strip script (img survives)",
   vuln: "reflected-html", delivery: ["query"], note: "the value is lowercased before <script> is stripped, so mixed case does not help; use <img src=x onerror=alert(1)>")
 maze_get "/nestedfilter/level2/" do |env|
-  query = env.params.query["query"].downcase
+  query = env.params.query.fetch("query", "").downcase
   query = Filters.strip_tags(query, ["script"])
 
   "<html><body>#{query}</body></html>"
@@ -24,7 +24,7 @@ end
 Xssmaze.push("nestedfilter-level3", "/nestedfilter/level3/?query=a", "strips event handlers then script (nested tag reconstruction)",
   vuln: "reflected-html", delivery: ["query"], note: "on*= handlers and <script> tags are each stripped in one pass, so nest the tag: <scr<script>ipt>alert(1)</scr</script>ipt>")
 maze_get "/nestedfilter/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   query = query.gsub(/on[a-z]+=/, "")
   query = Filters.strip_tags(query, ["script"])
 
@@ -36,7 +36,7 @@ end
 Xssmaze.push("nestedfilter-level4", "/nestedfilter/level4/?query=a", "strips < and > (attribute breakout)",
   vuln: "reflected-attr", delivery: ["query"], note: "both angle brackets are stripped; break out of the double-quoted input value and add an event handler")
 maze_get "/nestedfilter/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   query = query.gsub("<", "")
   query = query.gsub(">", "")
 
@@ -47,7 +47,7 @@ end
 Xssmaze.push("nestedfilter-level5", "/nestedfilter/level5/?query=a", "URL decode then strip script (img survives)",
   vuln: "reflected-html", delivery: ["query"], note: "the value is URL-decoded once before <script> is stripped, so encoding does not smuggle a script tag; <img src=x onerror=alert(1)> survives")
 maze_get "/nestedfilter/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   begin
     query = URI.decode(query)
   rescue
@@ -61,7 +61,7 @@ end
 Xssmaze.push("nestedfilter-level6", "/nestedfilter/level6/?query=a", "strips alert keyword then script tag (confirm survives)",
   vuln: "reflected-html", delivery: ["query"], note: "the literal lowercase alert and <script> tags are each stripped once; use confirm(1), or nest as alalertert")
 maze_get "/nestedfilter/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   query = query.gsub("alert", "")
   query = Filters.strip_tags(query, ["script"])
 

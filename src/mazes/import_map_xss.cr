@@ -1,7 +1,7 @@
 Xssmaze.push("import-map-level1", "/import-map/level1/?query=a", "import map injection via script type=importmap with dynamic import().then()",
   vuln: "dom", sources: ["server-reflected"], sinks: ["dynamic-import"], delivery: ["query"], note: "the value becomes the import-map address for the specifier the page then import()s, so a data:text/javascript,... address executes with no breakout; a </script> breakout out of the importmap block also reaches plain HTML")
 maze_get "/import-map/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Import Map Level 1</h1>
@@ -27,7 +27,7 @@ end
 Xssmaze.push("import-map-level2", "/import-map/level2/?query=a", "import map injection in single-quoted context with module hijacking",
   vuln: "reflected-js", delivery: ["query"], note: "the value lands in a single-quoted JS string before it ever reaches the import map, so the breakout happens first")
 maze_get "/import-map/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Import Map Level 2</h1>
@@ -63,7 +63,7 @@ end
 Xssmaze.push("import-map-level3", "/import-map/level3/?query=a", "import map with double-quoted JSON property and data: URL hijacking",
   vuln: "dom", sources: ["server-reflected"], sinks: ["dynamic-import"], delivery: ["query"], note: "the value becomes the import-map address for the specifier the page then import()s, so a data:text/javascript,... address executes with no breakout; a </script> breakout out of the importmap block also reaches plain HTML")
 maze_get "/import-map/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Import Map Level 3</h1>
@@ -89,7 +89,7 @@ end
 Xssmaze.push("import-map-level4", "/import-map/level4/?query=a", "import map module overwrite with attacker-controlled domain",
   vuln: "dom", sources: ["server-reflected"], sinks: ["dynamic-import"], delivery: ["query"], note: "the value becomes the import-map address for the specifier the page then import()s, so a data:text/javascript,... address executes with no breakout; a </script> breakout out of the importmap block also reaches plain HTML")
 maze_get "/import-map/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Import Map Level 4</h1>
@@ -117,7 +117,7 @@ end
 Xssmaze.push("import-map-level5", "/import-map/level5/?query=a", "scoped import map with bare module specifier hijacking",
   vuln: "dom", sources: ["server-reflected"], sinks: ["dynamic-import"], delivery: ["query"], note: "the value becomes the import-map address for the specifier the page then import()s, so a data:text/javascript,... address executes with no breakout; a </script> breakout out of the importmap block also reaches plain HTML")
 maze_get "/import-map/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Import Map Level 5</h1>
@@ -147,7 +147,7 @@ end
 Xssmaze.push("import-map-level6", "/import-map/level6/?query=a", "import map with trailing slash scope and path manipulation",
   vuln: "reflected-html", delivery: ["query"], note: "the injected address sits under the import-map scope /app/, which never matches this page's own URL, so import() never resolves to it; the only working route is a </script> breakout out of the importmap block")
 maze_get "/import-map/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   "<html><body>
   <h1>Import Map Level 6</h1>

@@ -4,7 +4,7 @@
 Xssmaze.push("wafv2-level1", "/wafv2/level1/?query=a", "single-pass case-insensitive 'script' strip (rejoin bypass)",
   vuln: "reflected-html", delivery: ["query"], note: "\"script\" is removed case-insensitively in a single pass, so <scr<script>ipt> rejoins")
 maze_get "/wafv2/level1/" do |env|
-  query = Filters.strip_keyword_ci(env.params.query["query"], "script")
+  query = Filters.strip_keyword_ci(env.params.query.fetch("query", ""), "script")
 
   "<html><body>#{query}</body></html>"
 end
@@ -15,7 +15,7 @@ end
 Xssmaze.push("wafv2-level2", "/wafv2/level2/?query=a", "event handler on\\w+= pattern strip (script tag bypass)",
   vuln: "reflected-html", delivery: ["query"], note: "on...= handlers are stripped, and a plain <script> tag has none")
 maze_get "/wafv2/level2/" do |env|
-  query = Filters.strip_event_handlers(env.params.query["query"])
+  query = Filters.strip_event_handlers(env.params.query.fetch("query", ""))
 
   "<html><body>#{query}</body></html>"
 end
@@ -29,7 +29,7 @@ end
 Xssmaze.push("wafv2-level3", "/wafv2/level3/?query=a", "alert/confirm/prompt function name strip",
   vuln: "reflected-html", delivery: ["query"], note: "alert/confirm/prompt are stripped by name, so build the call another way")
 maze_get "/wafv2/level3/" do |env|
-  query = Filters.strip_keyword_ci(env.params.query["query"], "alert")
+  query = Filters.strip_keyword_ci(env.params.query.fetch("query", ""), "alert")
   query = Filters.strip_keyword_ci(query, "confirm")
   query = Filters.strip_keyword_ci(query, "prompt")
 
@@ -42,7 +42,7 @@ end
 Xssmaze.push("wafv2-level4", "/wafv2/level4/?query=a", "length limit: blocked if > 50 chars",
   vuln: "reflected-html", delivery: ["query"], note: "values over 50 characters are blocked outright")
 maze_get "/wafv2/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   if query.size > 50
     "<html><body><p>Input too long — blocked by WAF.</p></body></html>"
@@ -57,7 +57,7 @@ end
 Xssmaze.push("wafv2-level5", "/wafv2/level5/?query=a", "strip <[a-zA-Z] pattern, reflected in value attribute",
   vuln: "reflected-attr", delivery: ["query"], note: "< followed by a letter is stripped, so no tag can be opened; the reflection is in an input value, so break out of the attribute")
 maze_get "/wafv2/level5/" do |env|
-  query = env.params.query["query"].gsub(/<[a-zA-Z]/, "")
+  query = env.params.query.fetch("query", "").gsub(/<[a-zA-Z]/, "")
 
   "<html><body><input type=\"text\" value=\"#{query}\" class=\"search\"></body></html>"
 end
@@ -68,7 +68,7 @@ end
 Xssmaze.push("wafv2-level6", "/wafv2/level6/?query=a", "multi-filter: script tag strip + quote encode, but < > and ' allowed",
   vuln: "reflected-html", delivery: ["query"], note: "script tags are stripped and double quotes entity-encoded, but other tags and single quotes survive")
 maze_get "/wafv2/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Strip <script> and </script> tags (case-insensitive)
   query = query.gsub(/<\/?script[^>]*>/i, "")
   # Encode double quotes

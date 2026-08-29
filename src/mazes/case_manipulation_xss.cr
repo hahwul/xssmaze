@@ -3,7 +3,7 @@
 Xssmaze.push("casemanip-level1", "/casemanip/level1/?query=a", "lowercase tag names only, attributes untouched",
   vuln: "reflected-html", delivery: ["query"], note: "only tag names are lowercased; lowercase payloads reflect unchanged into the body")
 maze_get "/casemanip/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Lowercase only the tag name portion: <TAG -> <tag
   result = query.gsub(/<([A-Za-z]+)/) do |_|
     tag = $1
@@ -18,7 +18,7 @@ end
 Xssmaze.push("casemanip-level2", "/casemanip/level2/?query=a", "capitalize first letter only, HTML still valid",
   vuln: "reflected-html", delivery: ["query"], note: "only the first letter is uppercased; <Img ...> is still valid HTML")
 maze_get "/casemanip/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   result = if query.size > 0
              query[0].upcase + query[1..]
            else
@@ -33,7 +33,7 @@ end
 Xssmaze.push("casemanip-level3", "/casemanip/level3/?query=a", "swap case of all alpha chars, HTML case-insensitive",
   vuln: "reflected-html", delivery: ["query"], note: "case is swapped, but HTML tags are case-insensitive")
 maze_get "/casemanip/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   result = query.chars.map do |ch|
     if ch.uppercase?
       ch.downcase
@@ -52,7 +52,7 @@ end
 Xssmaze.push("casemanip-level4", "/casemanip/level4/?query=a", "ROT13 display but raw reflection in hidden input",
   vuln: "reflected-attr", delivery: ["query"], note: "the ROT13 body copy is a decoy; the raw value is reflected into a hidden input value attribute")
 maze_get "/casemanip/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   rot13 = query.chars.map do |ch|
     if ch >= 'a' && ch <= 'z'
       ((((ch.ord - 'a'.ord) + 13) % 26) + 'a'.ord).chr
@@ -71,7 +71,7 @@ end
 Xssmaze.push("casemanip-level5", "/casemanip/level5/?query=a", "strip uppercase letters only, lowercase payloads work",
   vuln: "reflected-html", delivery: ["query"], note: "only uppercase letters are stripped; an all-lowercase payload survives")
 maze_get "/casemanip/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   result = query.gsub(/[A-Z]/, "")
 
   "<html><body>#{result}</body></html>"
@@ -82,7 +82,7 @@ end
 Xssmaze.push("casemanip-level6", "/casemanip/level6/?query=a", "titlecase words, HTML case-insensitive",
   vuln: "reflected-html", delivery: ["query"], note: "words are title-cased, but HTML tags are case-insensitive")
 maze_get "/casemanip/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   result = query.split(" ").map do |word|
     if word.size > 0
       word[0].upcase + word[1..]

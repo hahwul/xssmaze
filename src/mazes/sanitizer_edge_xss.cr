@@ -4,7 +4,7 @@ require "html"
 Xssmaze.push("sanitizer-edge-level1", "/sanitizer-edge/level1/?query=a", "strip tags, reflect in input value (attribute breakout)",
   vuln: "reflected-attr", delivery: ["query"], note: "tags are stripped but quotes are not escaped, so break out of the input value attribute")
 maze_get "/sanitizer-edge/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Strip all HTML tags but don't escape quotes
   sanitized = query.gsub(/<[^>]*>/, "")
 
@@ -15,7 +15,7 @@ end
 Xssmaze.push("sanitizer-edge-level2", "/sanitizer-edge/level2/?query=a", "HTML-encode special chars, reflect in unquoted script var",
   vuln: "reflected-js", delivery: ["query"], note: "<>\"' are all entity-encoded, but the value lands as a bare JS expression with no quotes to break out of, so plain JavaScript such as alert(1) runs as-is")
 maze_get "/sanitizer-edge/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Encode HTML special chars: < > " '
   sanitized = query.gsub("<", "&lt;").gsub(">", "&gt;").gsub("\"", "&quot;").gsub("'", "&#39;")
 
@@ -26,7 +26,7 @@ end
 Xssmaze.push("sanitizer-edge-level3", "/sanitizer-edge/level3/?query=a", "recursive script strip, other tags allowed",
   vuln: "reflected-html", delivery: ["query"], note: "script tags are stripped recursively, so nesting does not help; use another tag")
 maze_get "/sanitizer-edge/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Recursively strip <script> and </script> tags
   result = query
   loop do
@@ -42,7 +42,7 @@ end
 Xssmaze.push("sanitizer-edge-level4", "/sanitizer-edge/level4/?query=a", "tag whitelist but event attributes allowed on whitelisted tags",
   vuln: "reflected-html", delivery: ["query"], note: "the whitelist keeps b/i/u/em/strong but does not strip their attributes, so an event handler on a whitelisted tag survives")
 maze_get "/sanitizer-edge/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Whitelist: only allow b, i, u, em, strong tags (case-sensitive check)
   # Bug: checks tag name but does NOT strip attributes on whitelisted tags
   allowed = ["b", "i", "u", "em", "strong"]
@@ -56,7 +56,7 @@ end
 Xssmaze.push("sanitizer-edge-level5", "/sanitizer-edge/level5/?query=a", "style attribute allowed, breakout from style value",
   vuln: "reflected-attr", delivery: ["query"], note: "tags are stripped, so break out of the style attribute with a quote instead")
 maze_get "/sanitizer-edge/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Strip all HTML tags from query
   sanitized = query.gsub(/<[^>]*>/, "")
 
@@ -67,7 +67,7 @@ end
 Xssmaze.push("sanitizer-edge-level6", "/sanitizer-edge/level6/?query=a", "protocol strip in href, attribute breakout",
   vuln: "reflected-attr", delivery: ["query"], note: "javascript:/vbscript:/data: are stripped from the href, so break out of the attribute instead")
 maze_get "/sanitizer-edge/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Strip dangerous protocols
   sanitized = query.gsub(/javascript\s*:/i, "").gsub(/vbscript\s*:/i, "").gsub(/data\s*:/i, "")
 

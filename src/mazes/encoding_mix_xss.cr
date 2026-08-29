@@ -4,7 +4,7 @@
 Xssmaze.push("encmix-level1", "/encmix/level1/?query=a", "UTF-7 charset in Content-Type with raw reflection",
   vuln: "reflected-html", delivery: ["query"], note: "no modern browser decodes UTF-7, but the reflection is raw, so a plain payload works regardless of the declared charset")
 maze_get "/encmix/level1/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   env.response.content_type = "text/html; charset=utf-7"
 
   "<html><body>
@@ -20,7 +20,7 @@ end
 Xssmaze.push("encmix-level2", "/encmix/level2/?query=a", "HTML entity encode < > but not & (double-entity bypass)",
   vuln: "non-xss-control", delivery: ["query"], exploitable: false, note: "both angle brackets are entity-encoded before reflection, and an entity in a text node decodes to a character rather than markup, so the numeric-entity payload only renders as visible text")
 maze_get "/encmix/level2/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Only encode literal < and > but leave & untouched
   filtered = query.gsub("<", "&lt;").gsub(">", "&gt;")
 
@@ -37,7 +37,7 @@ end
 Xssmaze.push("encmix-level3", "/encmix/level3/?query=a", "JS string with backslash escape but no unicode filtering",
   vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "backslashes and single quotes are escaped, so neither a string breakout nor a unicode escape survives; the value still reaches innerHTML as raw HTML")
 maze_get "/encmix/level3/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   # Escape single quotes and backslashes for the JS string
   escaped = query.gsub("\\", "\\\\").gsub("'", "\\'")
 
@@ -58,7 +58,7 @@ end
 Xssmaze.push("encmix-level4", "/encmix/level4/?query=a", "JSON context served as text/html",
   vuln: "dom", sources: ["server-reflected"], sinks: ["innerHTML"], delivery: ["query"], note: "the value is server-inlined raw into a double-quoted JS string and then written to innerHTML; closing the <script> block works too")
 maze_get "/encmix/level4/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   env.response.content_type = "text/html"
 
   "<html><body>
@@ -81,7 +81,7 @@ end
 Xssmaze.push("encmix-level5", "/encmix/level5/?query=a", "HTML encode only first < and > (second reflection raw)",
   vuln: "reflected-html", delivery: ["query"], note: "the server URL-decodes once, then entity-encodes only the first < and the first >")
 maze_get "/encmix/level5/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
 
   begin
     decoded = URI.decode(query)
@@ -105,7 +105,7 @@ end
 Xssmaze.push("encmix-level6", "/encmix/level6/?query=a", "ISO-8859-1 charset with raw reflection",
   vuln: "reflected-html", delivery: ["query"], note: "the iso-8859-1 charset is incidental; the reflection itself is raw")
 maze_get "/encmix/level6/" do |env|
-  query = env.params.query["query"]
+  query = env.params.query.fetch("query", "")
   env.response.content_type = "text/html; charset=iso-8859-1"
 
   "<html>
