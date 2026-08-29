@@ -74,7 +74,8 @@ end
 
 # Level 8: JSON response with Content-Type text/html (JSONP-like)
 Xssmaze.push("sink-level8", "/sink/level8/?callback=render", "JSONP-like with text/html content-type",
-  vuln: "reflected-html", delivery: ["query"], note: "despite the category name this is a server-side reflection, not a client-side DOM sink; JSONP-shaped body served as text/html. The injectable parameter is `callback`, not `query`")
+  params: ["callback"],
+  vuln: "reflected-html", delivery: ["query"], note: "despite the category name this is a server-side reflection, not a client-side DOM sink; JSONP-shaped body served as text/html")
 maze_get "/sink/level8/" do |env|
   callback = env.params.query.fetch("callback", "callback")
   env.response.content_type = "text/html"

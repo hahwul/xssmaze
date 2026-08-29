@@ -64,11 +64,17 @@ Colour is dropped automatically when the output is not a terminal, and
 | `/health` | liveness probe (`/healthz` alias) |
 | `/version` | version + counts |
 | `/random` | 302 to a random maze |
+| `/solutions.json` | the answer key: expected payload + injection context per maze |
+| `/solutions/<category>` | that category's exploit guide as markdown |
+| `/beacon/<token>` | execution oracle — a 1x1 GIF that records that a payload *ran* |
+| `/beacon/log` | what fired, how often, and from which maze page |
+| `/reset` | stored-maze state: `GET` reports sizes, `POST` clears |
 
 ```bash
 curl "http://localhost:3000/map/json?vuln=dom"           # only DOM flows
 curl "http://localhost:3000/map/json?reach=server"       # payload fits in an HTTP request
 curl "http://localhost:3000/map/json?exploitable=false"  # deliberate true negatives
+curl "http://localhost:3000/map/json?with=solutions"     # fold the answer key in
 ```
 
 The index page (`/`) has a client-side filter and links to every map above. Map responses
@@ -117,8 +123,63 @@ Two things this exists to stop a benchmark getting wrong:
 - **`exploitable: false`** endpoints are not bugs. The whole `xsleak` category is
   cross-site *leaks*, not XSS — a scanner that reports nothing there is correct.
 
-Untriaged endpoints are `"unclassified"` with `reach: "unknown"`, deliberately distinct
-from "reviewed and found safe".
+Every endpoint in the catalog is classified — `unclassified` / `reach: "unknown"` remain in
+the schema for anything added later, deliberately distinct from "reviewed and found safe",
+but nothing currently carries them.
+
+Where the question was whether a payload actually *executes* — CSP levels whose policy turns
+out to block the page's own inline script, an entity inside an attribute name, a `Location`
+header — the call was settled in a real browser against the `/beacon` oracle, not argued from
+the served HTML.
+
+## Answer key
+
+Every maze ships its expected payload and injection context, so a harness can score what a
+scanner *should* have found instead of guessing from the served HTML. The key is embedded in
+the binary at compile time — the Docker image carries it too — and a spec asserts both
+directions of parity with the catalog, so it cannot silently drift.
+
+```bash
+curl "http://localhost:3000/solutions.json"                    # every maze, keyed by name
+curl "http://localhost:3000/solutions/basic"                   # one category, as markdown
+curl "http://localhost:3000/map/json?with=solutions&type=dom"  # composes with every filter
+```
+
+```json
+"basic-level1": {
+  "payload": "<script>alert(1)</script>",
+  "context": "raw reflection, no filter",
+  "url": "/basic/level1/?query=%3Cscript%3Ealert(1)%3C/script%3E"
+}
+```
+
+## Proving execution
+
+Reflection is not execution. String-matching the response scores a harmlessly-escaped echo as
+a hit, and it is blind to the DOM flows where the payload never reaches the server response at
+all. The beacon closes that gap: a payload has to actually run to reach it.
+
+```bash
+curl "http://localhost:3000/basic/level1/?query=<img src=/beacon/run1 onerror=fetch('/beacon/run1')>"
+curl "http://localhost:3000/beacon/log?token=run1"
+```
+
+The recorded `Referer` names the maze page that executed, so one token can cover a whole sweep
+and every hit still attributes to the endpoint that produced it. `DELETE /beacon/log` clears it
+between runs. The beacon is instrumentation, not a maze — it never appears in `/map/json`,
+`/stats` or a benchmark denominator.
+
+## Isolating runs
+
+The stored mazes remember what a scanner posted. Left alone that means a second run reads the
+first run's payloads back out and reports them as its own finding. Each collection keeps only
+its most recent entries, and `/reset` clears them between runs:
+
+```bash
+curl "http://localhost:3000/reset"                        # sizes, read-only
+curl -X POST "http://localhost:3000/reset"                # clear everything
+curl -X POST "http://localhost:3000/reset?scope=stored/level1"
+```
 
 ## Security header overrides
 
@@ -163,17 +224,29 @@ handlers, timing, and `iframe.contentWindow.length`.
 
 ## Benchmarking scanners
 
-`scripts/benchmark.py` pulls every endpoint from `/map/json`, runs a scanner against
-them, and prints a detection scorecard.
+`scripts/benchmark.py` pulls every endpoint from `/map/json`, runs a scanner against them,
+and scores it against the lab's own metadata — TP / FN / FP with precision, recall and F1.
 
 ```bash
 ./bin/xssmaze -b 0.0.0.0          # terminal 1
 cd scripts && ./benchmark.sh http://localhost:3000   # terminal 2
 ```
 
-Nuclei is supported out of the box; any other tool can be wired in with
-`--custom-scanner "mytool {URL}"`. See [scripts/README.md](scripts/README.md) for
-options, report formats, and how to add a scanner permanently.
+The denominator is deliberate. `exploitable: false` endpoints leave it entirely and a
+detection on one is a **false positive**, never a miss. `--reach` picks the scored
+population — `server` (default: what a request-only scanner can actually reach), `client`,
+or `all` — and the populations are never merged into one unlabelled number.
+
+Nuclei is supported out of the box. Any other tool needs an explicit detection contract,
+because exit code alone never marks a detection:
+
+```bash
+./benchmark.sh http://localhost:3000 \
+  --custom-scanner "mytool {URL}" --detect-regex 'VULNERABLE'
+```
+
+See [scripts/README.md](scripts/README.md) for the scoring model, both invocation modes,
+report formats, and a CI regression gate.
 
 ## License
 

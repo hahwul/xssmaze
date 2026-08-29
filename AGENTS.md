@@ -262,6 +262,25 @@ When adding new vulnerability scenarios, follow these patterns:
    curl "http://localhost:3000/your/endpoint?query=<script>alert(1)</script>"
    ```
 
+### Lab infrastructure (not mazes)
+
+Three route groups are instrumentation and deliberately never call `Xssmaze.push` — adding
+them to the catalog would pollute `/map/json`, `/stats` and every benchmark denominator:
+
+- `src/store.cr`: `Xssmaze::Store` holds the stored mazes' state in bounded named collections
+  and serves `/reset`. A new stateful maze should register its collection here rather than
+  keeping a file-local Hash, or it will grow without limit and leak payloads between runs.
+- `src/mazes/beacon.cr`: `/beacon/<token>` + `/beacon/log`, the execution oracle. Use it when
+  a change turns on whether something actually runs; drive it from headless Chrome and always
+  run a known-exploitable endpoint through the same harness first, so a "did not fire" result
+  is evidence rather than a broken test.
+- `src/solutions.cr`: the answer key, embedded from `solutions/` at compile time. Adding a
+  maze without a matching `### <name>` entry in `solutions/<category>.md` fails
+  `spec/solutions_spec.cr`.
+
+`spec/smoke_spec.cr` walks the whole catalog and fails on any 5xx, so a maze that crashes on
+its own payload cannot ship.
+
 ### Crystal Language Patterns
 - Use `env.params.query["parameter"]` to access GET parameters
 - Use `env.params.body["parameter"]` for POST parameters  
