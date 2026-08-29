@@ -34,8 +34,11 @@ Hand-rolled sanitizers that pass the most-obvious payload but break on context o
 
 `/sanitizer/level5/?query=test`
 
-- payload: `test`
-- context: double HTML-escape applied to both body and title attr; no working sink (level is protected)
+- payload: `no payload — control`
+- context: the value is double HTML-entity-encoded into both the body and the
+  title attribute; the browser decodes only once, leaving inert entities as
+  visible text — served output is `&amp;lt;script&amp;gt;…`, which renders as the
+  literal text `&lt;script&gt;…`. No breakout, no sink.
 
 ### sanitizer-level6
 

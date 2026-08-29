@@ -13,8 +13,12 @@
 
 `/metarefresh/level2/?url=data:text/html,%3Cscript%3Ealert(1)%3C/script%3E`
 
-- payload: `data:text/html,<script>alert(1)</script>`
-- context: quotes stripped — use unquoted data: URL
+- payload: `no payload — control`
+- context: the value lands in a `<meta http-equiv='refresh'>` content attribute
+  (the value to try is `data:text/html,<script>alert(1)</script>`). Browsers
+  refuse a top-level `data:` navigation from a meta refresh, so it never loads
+  (verified: the beacon stayed silent and no navigation occurred). Only an open
+  redirect remains — not XSS.
 
 ### metarefresh-level3
 

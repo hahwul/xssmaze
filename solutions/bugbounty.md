@@ -69,5 +69,9 @@ Patterns from real bug-bounty reports / CVEs: OAuth flows, JWT/reset tokens, upl
 
 `/bugbounty/level10/?msg=%3Cscript%3Ealert(1)%3C/script%3E`
 
-- payload: `<script>alert(1)</script>`
-- context: application/json without nosniff; HTML body sniffed as text/html
+- payload: `no payload — control`
+- context: the `<h1>` body is HTML, but the response is served `Content-Type:
+  application/json`, and no modern browser sniffs a declared JSON response into
+  a document. Chrome renders it as escaped text inside a `<pre>` (verified with
+  `--dump-dom`: the markup arrives as a text node, and an `onerror` beacon
+  payload never fired). The markup never parses, so reporting no XSS is correct.

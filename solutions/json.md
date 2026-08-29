@@ -13,15 +13,24 @@ JSON-context reflections: JSONP callbacks, embedded JSON in script blocks, and D
 
 `/json/level2/?query=%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `<img src=x onerror=alert(1)>`
-- context: rendered to a JSON value but Content-Type sniffed if loaded as HTML; raw `<div>...</div>` wrapper
+- payload: `no payload — control`
+- context: the value is reflected raw (the value to try is
+  `<img src=x onerror=alert(1)>`), but the response is served
+  `Content-Type: application/json`, which no modern browser parses as HTML, so
+  the markup never executes (verified: `<img … onerror=fetch('/beacon/...')>`
+  stayed silent while a control endpoint fired through the same harness).
+  Reporting no XSS is correct.
 
 ### json-xss-level3
 
 `/json/level3/?query=%3C/script%3E%3Cscript%3Ealert(1)%3C/script%3E`
 
-- payload: `</script><script>alert(1)</script>`
-- context: JSON string, only `\` and `"` escaped; angles pass through
+- payload: `no payload — control`
+- context: served `Content-Type: application/json`, and quotes and backslashes are
+  escaped, so the value cannot break out of its JSON string and no browser parses
+  the response as HTML (verified: a `</script><script>fetch('/beacon/...')`
+  payload stayed silent while a control endpoint fired). Reporting no XSS is
+  correct.
 
 ### json-xss-level4
 

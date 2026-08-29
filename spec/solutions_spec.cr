@@ -46,4 +46,41 @@ describe "solutions answer key" do
     sample["context"].as_s.should_not be_empty
     sample["url"].as_s.should_not be_empty
   end
+
+  # A maze marked `exploitable: false` in the catalog is a deliberate true
+  # negative — a scanner that reports nothing there is *correct*. Its answer-key
+  # entry must read as a control, not a live exploit, or `/solutions.json` and
+  # `/map/json` contradict each other and a scanner author is told a control is
+  # exploitable. That is precisely the drift the earlier parity checks cannot
+  # catch: they assert an entry *exists*, never that it is *true*.
+  #
+  # The cheap, unfakeable marker is the payload field. A control has no working
+  # payload, so its `- payload:` states as much and carries the word "control";
+  # the parser keeps only the code-span text, so the marker has to live inside
+  # the span (`\`no payload — control\``), not trail it. We match the substring
+  # rather than an exact string to leave the wording free, and no real exploit
+  # payload (`<script>…`, `javascript:…`, `" onerror=…`) carries it by accident.
+  control_marker = "control"
+
+  it "documents every `exploitable: false` maze as a control, not an exploit" do
+    offenders = Xssmaze.get.reject(&.exploitable?).compact_map do |maze|
+      sol = entries[maze.name]?
+      next if sol.nil? # a missing entry is the parity check's job, not this one
+      "#{maze.name}  (payload: #{sol.payload.inspect})" \
+        unless sol.payload.downcase.includes?(control_marker)
+    end.sort!
+
+    unless offenders.empty?
+      fail <<-MSG
+        #{offenders.size} control(s) have a solution payload that reads as a live exploit:
+          #{offenders.join("\n  ")}
+
+        A maze with `exploitable: false` is a true negative — there is no working
+        payload. Its `- payload:` line must say so: the standard marker is
+        `no payload — control` (inside the code span), with the reasoning — and any
+        different-bug-class detail, e.g. the open redirect or the XS-Leak oracle —
+        moved into `- context:`.
+        MSG
+    end
+  end
 end

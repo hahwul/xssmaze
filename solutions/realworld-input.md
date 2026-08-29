@@ -30,8 +30,11 @@ Real-world input vectors: headers, JSON/multipart bodies, redirect sinks, cookie
 
 `/realworld-input/level4/?url=javascript%3Aalert(1)`
 
-- payload: `javascript:alert(1)`
-- context: Location header redirect; javascript: triggers when clicked from same-origin context (legacy/curl link)
+- payload: `no payload — control`
+- context: the value lands in a `Location:` redirect header (the value to try is
+  `javascript:alert(1)`). Browsers do not execute `javascript:`/`data:` from a
+  Location redirect and CR/LF is stripped, so nothing runs (verified: the beacon
+  stayed silent). The real bug is an open redirect, not XSS.
 
 ### realworld_input-level5
 

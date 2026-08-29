@@ -20,8 +20,13 @@ Reflections under various CSP configurations that fail to actually prevent execu
 
 `/cspbypass/level3/?query=%22;alert(1);//`
 
-- payload: `";alert(1);//`
-- context: inside `var data = "..."` then eval'd; break double-quoted string
+- payload: `no payload — control`
+- context: the value lands raw in `var data = "..."` that is then `eval`'d, but
+  the CSP is `script-src 'self' 'unsafe-eval'` with no `'unsafe-inline'`, so the
+  inline `<script>` holding the reflection never executes and an injected script
+  or handler is blocked too (verified: a `";fetch('/beacon/...');//` payload
+  stayed silent while a control endpoint fired through the same harness).
+  Reporting no XSS is correct.
 
 ### cspbypass-level4
 
