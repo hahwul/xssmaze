@@ -58,7 +58,9 @@ maze_get "/realworld-input/level6/" do |env|
   lang_param = env.params.query.fetch("lang", "")
 
   unless lang_param.empty?
-    env.response.cookies << HTTP::Cookie.new("lang", lang_param, path: "/realworld-input/level6/")
+    # Stored in the cookie minus the bytes RFC 6265 forbids; `display`
+    # below still reflects the untouched parameter.
+    env.response.cookies << HTTP::Cookie.new("lang", Xssmaze.cookie_value(lang_param), path: "/realworld-input/level6/")
   end
 
   lang_cookie = ""
