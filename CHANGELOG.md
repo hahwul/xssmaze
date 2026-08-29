@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- **The lab stopped 500ing on a bare request.** 768 of 1031 GET mazes answered HTTP 500 to a
+  path with no query string, because `env.params.query["x"]` raises `KeyError` when the
+  parameter is absent. That is what a crawler saw first: `/sitemap.xml` publishes paths with
+  the query string stripped, so 158 of its first 200 URLs were 500s, and any scanner fuzzing
+  one parameter at a time crashed the levels that read a sibling. All 796 non-optional reads
+  now default, behaviour with the parameter present is byte-identical, and the smoke spec
+  gained the two shapes that missed this — a bare path, and each parameter sent with no
+  siblings (#53, #54, #55, #56)
 - **Every endpoint is classified.** `unclassified` went 838 -> 0 and `reach: "unknown"` with
   it, so `/map/json?reach=server` now returns the 1040 endpoints a request-only scanner can
   actually reach instead of the 206 it used to admit to. 28 endpoints are marked

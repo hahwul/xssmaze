@@ -103,6 +103,39 @@ describe "catalog smoke test" do
     SmokeSpec.report(failures)
   end
 
+  # `/sitemap.xml` publishes paths with the query string stripped, and a scanner
+  # that fuzzes one parameter at a time never sends the others. Both shapes used
+  # to reach a non-optional `env.params.query["x"]` and come back 500 — 768 of
+  # 1031 GET mazes did, which is what a crawler saw before it fuzzed anything.
+  # The sweep below layers its payload on top of `maze.url`, so `?query=a` is
+  # always along for the ride and neither shape is covered there.
+  it "answers a bare path, with no query string at all, without a 5xx" do
+    failures = [] of String
+    SmokeSpec.mazes.each do |maze|
+      SmokeSpec.check(failures, maze, maze.url.partition('?').first)
+    end
+    SmokeSpec.report(failures)
+  end
+
+  it "answers each parameter sent on its own, with no siblings, without a 5xx" do
+    failures = [] of String
+
+    SmokeSpec.mazes.each do |maze|
+      params = SmokeSpec.params_for(maze)
+      # One parameter alone is what the sweep above already covers once the
+      # sibling defaults exist; the point here is levels that declare several.
+      next if params.size < 2
+
+      path = maze.url.partition('?').first
+      params.each do |param|
+        next if SmokeSpec.header_param?(param)
+        SmokeSpec.check(failures, maze, SmokeSpec.with_query(path, param, SmokeSpec::PAYLOADS.first))
+      end
+    end
+
+    SmokeSpec.report(failures)
+  end
+
   it "survives the canonical payloads on every GET parameter" do
     failures = [] of String
 
