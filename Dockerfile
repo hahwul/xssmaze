@@ -1,5 +1,5 @@
 ##= BUILDER =##
-FROM crystallang/crystal:1.20.1 AS builder
+FROM crystallang/crystal:1.22.0 AS builder
 WORKDIR /xssmaze
 
 RUN apt-get update && \
@@ -14,7 +14,7 @@ RUN shards build --release --no-debug --production && \
     strip /xssmaze/bin/xssmaze
 
 ##= RUNNER =##
-FROM debian:13-slim
+FROM ubuntu:26.04
 
 LABEL org.opencontainers.image.title="XSSMaze"
 LABEL org.opencontainers.image.description="Intentionally vulnerable XSS lab used to benchmark security testing tools."
@@ -27,7 +27,7 @@ ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends libgc1 libpcre2-8-0 libssl3 zlib1g ca-certificates && \
+    apt-get install -y --no-install-recommends libgc1 libpcre2-8-0 libssl3t64 zlib1g ca-certificates && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /xssmaze/bin/xssmaze /usr/local/bin/xssmaze
