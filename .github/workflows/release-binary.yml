@@ -48,7 +48,7 @@ jobs:
         run: |
           mkdir -p build
           docker run --rm -v "$(pwd)":/xssmaze -w /xssmaze --entrypoint="" \
-            crystallang/crystal:1.20.0-alpine sh -c "
+            crystallang/crystal:1.22.0-alpine sh -c "
               apk add --no-cache yaml-dev yaml-static zlib-dev zlib-static git curl &&
               shards install --release --no-debug --production &&
               mkdir -p build &&
