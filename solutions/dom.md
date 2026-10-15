@@ -187,7 +187,7 @@ Client-side DOM sinks driven by URL, hash, query, name, referrer, postMessage.
 `/dom/level26/#%3Cimg%20src=x%20onerror=alert(1)%3E`
 
 - payload: `<img src=x onerror=alert(1)>`
-- context: document.write(document.URL); document.URL includes the hash unencoded for the parser
+- context: document.write(decodeURI(document.URL)); the decoded hash reaches the HTML parser
 
 ### dom-level27
 
@@ -201,7 +201,7 @@ Client-side DOM sinks driven by URL, hash, query, name, referrer, postMessage.
 `/dom/level28/%3Cimg%20src=x%20onerror=alert(1)%3E`
 
 - payload: `<img src=x onerror=alert(1)>`
-- context: document.write(location.pathname); browser may URL-decode path but `<` in path is preserved on document.write
+- context: document.write(decodeURI(location.pathname)); the decoded path segment reaches the HTML parser
 
 ### dom-level29
 

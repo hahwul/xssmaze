@@ -153,7 +153,7 @@ Xssmaze.push("dom-level16", "/dom/level16/", "outerHTML (location.hash)", "GET",
 maze_get "/dom/level16/" do |_|
   "<div id='output'>Original content</div>
   <script>
-      document.getElementById('output').outerHTML = location.hash.substring(1)
+      document.getElementById('output').outerHTML = decodeURI(location.hash.substring(1))
   </script>"
 end
 
@@ -275,7 +275,7 @@ Xssmaze.push("dom-level26", "/dom/level26/", "document.write (document.URL)", "G
   vuln: "dom", sources: ["document.URL"], sinks: ["document.write"], delivery: ["fragment", "query"])
 maze_get "/dom/level26/" do |_|
   "<script>
-      document.write(document.URL)
+      document.write(decodeURI(document.URL))
   </script>"
 end
 
@@ -285,7 +285,7 @@ Xssmaze.push("dom-level27", "/dom/level27/", "innerHTML (location.search)",
 maze_get "/dom/level27/" do |_|
   "<div id='output'></div>
   <script>
-      document.getElementById('output').innerHTML = location.search.substring(1)
+      document.getElementById('output').innerHTML = decodeURI(location.search.substring(1))
   </script>"
 end
 
@@ -294,7 +294,7 @@ Xssmaze.push("dom-level28", "/dom/level28/", "document.write (location.pathname)
   vuln: "dom", sources: ["location.pathname"], sinks: ["document.write"], delivery: ["path"])
 maze_get "/dom/level28/" do |_|
   "<script>
-      document.write(location.pathname)
+      document.write(decodeURI(location.pathname))
   </script>"
 end
 
@@ -330,7 +330,7 @@ maze_get "/dom/level31/" do |_|
   "<div id='output'></div>
   <script>
       const range = document.createRange();
-      const fragment = range.createContextualFragment(location.hash.substring(1));
+      const fragment = range.createContextualFragment(decodeURI(location.hash.substring(1)));
       document.getElementById('output').appendChild(fragment)
   </script>"
 end
@@ -381,7 +381,7 @@ Xssmaze.push("dom-level35", "/dom/level35/", "array join innerHTML (location.has
 maze_get "/dom/level35/" do |_|
   "<div id='output'></div>
   <script>
-      const parts = location.hash.substring(1).split(',');
+      const parts = decodeURI(location.hash.substring(1)).split(',');
       document.getElementById('output').innerHTML = parts.join('')
   </script>"
 end

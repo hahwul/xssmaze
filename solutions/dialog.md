@@ -18,10 +18,10 @@ Reflections inside `<dialog>` element bodies, attributes, and JS sinks.
 
 ### dialog-level3
 
-`/dialog/level3/?query=%22%3E%3Cscript%3Ealert(1)%3C/script%3E`
+`/dialog/level3/?query=%27%3E%3Cscript%3Ealert(1)%3C/script%3E`
 
-- payload: `"><script>alert(1)</script>`
-- context: inside `<input value="...">` and `<button value="...">` — break attribute
+- payload: `'><script>alert(1)</script>`
+- context: inside single-quoted `<input value='...'>` and `<button value='...'>` — break with `'`
 
 ### dialog-level4
 
