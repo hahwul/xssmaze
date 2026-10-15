@@ -39,7 +39,7 @@ Reflections in numeric-only positions (JS numbers, CSS/HTML numeric attributes).
 
 ### numericcontext-level6
 
-`/numericcontext/level6/?query=1000)%3Balert(1)%3B(`
+`/numericcontext/level6/?query=1000);alert(1);//`
 
-- payload: `1000);alert(1);(`
-- context: setTimeout(function(){}, QUERY); unquoted JS numeric
+- payload: `1000);alert(1);//`
+- context: setTimeout(function(){}, QUERY); close the call and comment out the rest

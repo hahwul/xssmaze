@@ -25,10 +25,10 @@ Same input lands in multiple contexts; at least one is exploitable.
 
 ### multicontext-level4
 
-`/multicontext/level4/?query=%27);alert(1);//`
+`/multicontext/level4/?query=%22%20onmouseover=%22alert(1)`
 
-- payload: `');alert(1);//`
-- context: angles stripped; break out of JS string in onclick handler
+- payload: `" onmouseover="alert(1)`
+- context: onclick="handle('...')" calls an undefined function; only angles are stripped, so add a new handler
 
 ### multicontext-level5
 

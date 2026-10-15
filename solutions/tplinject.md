@@ -4,10 +4,10 @@ Template-injection-style XSS through JS template literals, `<template>` cloning,
 
 ### tplinject-level1
 
-`/tplinject/level1/?query=%22;alert(1);//`
+`/tplinject/level1/?query=%22%2Balert(1)%2B%22`
 
-- payload: `";alert(1);//`
-- context: inside `\`Hello ${"..."}\`` — close JS double-quoted string, run
+- payload: `"+alert(1)+"`
+- context: inside `${"..."}`; only an expression fits, so concatenate
 
 ### tplinject-level2
 

@@ -49,7 +49,7 @@ end
 # Level 4: SVG <a> with query in xlink:href attribute
 # Bypass: javascript:alert(1)
 Xssmaze.push("svgctx-level4", "/svgctx/level4/?query=a", "SVG xlink:href attribute injection (javascript: protocol)",
-  vuln: "reflected-attr", delivery: ["query"], note: "an SVG anchor takes a javascript: URL, but that needs a click; a quote breakout does not")
+  vuln: "reflected-attr", delivery: ["query"], note: "modern browsers do not follow a javascript: URL on an SVG anchor; break out of the double-quoted attribute and the svg instead")
 maze_get "/svgctx/level4/" do |env|
   query = env.params.query.fetch("query", "")
 

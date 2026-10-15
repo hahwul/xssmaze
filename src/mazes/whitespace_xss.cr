@@ -1,7 +1,7 @@
 # Level 1: All spaces replaced by &nbsp; but in HTML body — tags still work
 # Use / as attribute delimiter instead of space: <img/src=x/onerror=alert(1)>
 Xssmaze.push("whitespace-level1", "/whitespace/level1/?query=a", "spaces replaced with &amp;nbsp; in body",
-  vuln: "reflected-html", delivery: ["query"], note: "spaces become &nbsp; entities, which do not separate attributes; use a slash instead: <img/src=x/onerror=alert(1)>")
+  vuln: "reflected-html", delivery: ["query"], note: "spaces become &nbsp; entities, which do not separate attributes; use a slash instead: <svg/onload=alert(1)>")
 maze_get "/whitespace/level1/" do |env|
   query = env.params.query.fetch("query", "")
   filtered = query.gsub(" ", "&nbsp;")

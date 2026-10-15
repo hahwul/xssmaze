@@ -292,10 +292,13 @@ end
 # location.pathname reflection
 Xssmaze.push("dom-level28", "/dom/level28/", "document.write (location.pathname)",
   vuln: "dom", sources: ["location.pathname"], sinks: ["document.write"], delivery: ["path"])
-maze_get "/dom/level28/" do |_|
-  "<script>
+# The payload rides in the path, so match anything below the level too.
+["/dom/level28/", "/dom/level28", "/dom/level28/*rest"].each do |path|
+  get path do |_|
+    "<script>
       document.write(decodeURI(location.pathname))
   </script>"
+  end
 end
 
 # Anchor element with javascript: protocol

