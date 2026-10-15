@@ -58,7 +58,7 @@ Xssmaze.push("dom-level7", "/dom/level7/", "innerHTML (location.hash)", "GET", [
 maze_get "/dom/level7/" do |_|
   "<div id='output'></div>
   <script>
-      document.getElementById('output').innerHTML = location.hash.substring(1)
+      document.getElementById('output').innerHTML = decodeURI(location.hash.substring(1))
   </script>"
 end
 

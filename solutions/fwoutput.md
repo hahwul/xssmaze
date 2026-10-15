@@ -25,10 +25,10 @@ Framework-style templates (Django/Rails/Express/Spring/Laravel/.NET) all reflect
 
 ### fwoutput-level4
 
-`/fwoutput/level4/?query=%3Cscript%3Ealert(1)%3C/script%3E`
+`/fwoutput/level4/?query=%22%3E%3Cscript%3Ealert(1)%3C/script%3E`
 
-- payload: `<script>alert(1)</script>`
-- context: inside `<span th:text="...">` — `th:` is just a namespace, raw injection
+- payload: `"><script>alert(1)</script>`
+- context: inside `<span th:text="...">` — break out of the attribute
 
 ### fwoutput-level5
 
