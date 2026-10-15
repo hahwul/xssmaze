@@ -1,5 +1,5 @@
 Xssmaze.push("dataurl-level1", "/dataurl/level1/?query=a", "anchor href with data:text/html under user control (executes on click)",
-  vuln: "reflected-attr", delivery: ["query"], note: "single-quoted anchor href holding a data:text/html URL; on click the browser renders the reflected bytes as their own HTML document")
+  vuln: "reflected-attr", delivery: ["query"], note: "single-quoted anchor href holding a data:text/html URL; browsers block top-level data: navigation, so the live path is breaking out of the unescaped attribute")
 maze_get "/dataurl/level1/" do |env|
   query = env.params.query.fetch("query", "")
   "<a href='data:text/html,#{query}'>open</a>"

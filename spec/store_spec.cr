@@ -95,6 +95,7 @@ describe Xssmaze::Store do
       names.should contain "stored/level4"
       names.should contain "storedpat/level6"
       names.should contain "headless-generator/level5"
+      names.should contain "modern-bypass/level1"
     end
   end
 

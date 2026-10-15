@@ -32,10 +32,10 @@ Server-side and client-side template-style substitution sinks under `/template/`
 
 ### template-injection-level5
 
-`/template/level5/?query=%27;alert(1);//`
+`/template/level5/?query='%5D%3Balert(1)%3B//`
 
-- payload: `';alert(1);//`
-- context: inside single-quoted items[0] then innerHTML `<li>`
+- payload: `'];alert(1);//`
+- context: inside single-quoted items[0] array literal; close string and array
 
 ### template-injection-level6
 

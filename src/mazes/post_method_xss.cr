@@ -33,7 +33,7 @@ maze_get "/postmethod/level3/" do |_|
   <script>function send(){var x=new XMLHttpRequest();x.open('POST','/postmethod/level3/');x.setRequestHeader('Content-Type','application/json;charset=UTF-8');x.send(JSON.stringify({query:document.querySelector('input[name=query]').value}));}</script></body></html>"
 end
 maze_post "/postmethod/level3/" do |env|
-  query = env.params.json.fetch("query", "").as(String)
+  query = env.params.json.fetch("query", "").to_s
 
   "<html><body>#{query}</body></html>"
 end

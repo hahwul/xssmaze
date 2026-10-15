@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- A raw `;` no longer splits a parameter: Crystal's form decoder still treats `;` as a separator, so `?query=';alert(1);//` reached every maze as `'`. Query strings and form bodies now split on `&` only, as browsers and real frameworks do
+- Every answer key was run in headless Chrome (with hover/click/focus simulated): 43 fire again thanks to the `;` fix, and 97 that could never fire (legacy vectors such as UTF-7, CSS `expression()` and `javascript:` in meta refresh/object/embed, JS syntax errors, wrong quote) now carry a payload that does, and `\`` no longer leaks a backslash into `/solutions.json`
+- Seven DOM mazes (`dom-level7/16/26/27/28/31/35`) never fired in a modern browser, which percent-encodes `<>` in the hash, search and path; they now decode like their siblings. `dom-level28` also 404'd for any payload in its path
+- Fixed `worker-level3` (invalid worker JS), `modern-bypass-level2` (`var config` shadowed the clobbered global) and `modern-bypass-level7` (no charset, so the fullwidth homoglyphs never decoded)
+- JSON-body mazes (`post-level2`, `postmethod-level3`, `querymethod-level2`, `realworld_input-level2`) no longer 500 on a missing or non-string field; the smoke spec now sweeps POST/QUERY mazes too
+- `modern-bypass-level1` drafts moved into `Xssmaze::Store`, so they are bounded and cleared by `/reset`
+
 ## v0.4.0
 
 - Fixed `modern-bypass-level19`: an escaping typo made its inline `<script>` a SyntaxError, so the postMessage → `eval` flow never registered. It is a real DOM flow again, verified in headless Chrome via `/beacon` (#58)

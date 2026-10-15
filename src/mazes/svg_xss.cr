@@ -43,7 +43,7 @@ maze_get "/svg/level4/" do |env|
 end
 
 Xssmaze.push("svg-xss-level5", "/svg/level5/?query=a", "SVG embedded with data URI",
-  vuln: "reflected-attr", delivery: ["query"], note: "lands in a single-quoted svg onload inside a data:image/svg+xml embed; runs as JS on load")
+  vuln: "reflected-attr", delivery: ["query"], note: "lands in a single-quoted svg onload inside a data:image/svg+xml embed, which modern browsers render without script; break out of the embed src instead")
 maze_get "/svg/level5/" do |env|
   query = env.params.query.fetch("query", "")
 

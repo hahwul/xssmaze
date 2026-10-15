@@ -20,7 +20,7 @@ maze_get "/srcdoc/level3/" do |env|
 end
 
 Xssmaze.push("srcdoc-level4", "/srcdoc/level4/?query=a", "srcdoc with sandbox=allow-scripts",
-  vuln: "reflected-attr", sinks: ["srcdoc"], delivery: ["query"], note: "sandbox='allow-scripts' still permits script execution inside the frame")
+  vuln: "reflected-attr", sinks: ["srcdoc"], delivery: ["query"], note: "sandbox='allow-scripts' runs script only in an opaque origin with dialogs blocked; the unescaped srcdoc attribute also lets a \" break out into the parent page")
 maze_get "/srcdoc/level4/" do |env|
   query = env.params.query.fetch("query", "")
   "<iframe sandbox='allow-scripts' srcdoc=\"#{query}\"></iframe>"

