@@ -41,5 +41,5 @@ Server-side case/space/char-stripping that fails against case-insensitive HTML o
 
 `/obfuscation/level6/?query=%3Cimg%20src%3Dx%20onerror%3Dalert%601%60%3E`
 
-- payload: `<img src=x onerror=alert\`1\`>`
+- payload: ``<img src=x onerror=alert`1`>``
 - context: ( and ) stripped; use backticks for tagged template call

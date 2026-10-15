@@ -27,7 +27,7 @@ Single-character stripping filters; choose a payload that doesn't need the strip
 
 `/charlimit/level4/?query=%3Cimg%20src=x%20onerror=alert%601%60%3E`
 
-- payload: `<img src=x onerror=alert\`1\`>`
+- payload: ``<img src=x onerror=alert`1`>``
 - context: parens stripped; tagged template literal call
 
 ### charlimit-level5

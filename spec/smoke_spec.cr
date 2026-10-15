@@ -153,6 +153,30 @@ describe "catalog smoke test" do
 
     SmokeSpec.report(failures)
   end
+
+  # Everything above is GET-only, so a JSON maze reading `json["name"].as(String)`
+  # answered 500 to a form post, a missing field, or `{"name": 1}`.
+  it "answers every POST/QUERY maze without a 5xx, form or JSON" do
+    failures = [] of String
+    payload = SmokeSpec::PAYLOADS.first
+
+    Xssmaze.get.reject { |maze| maze.method == "GET" }.each do |maze|
+      path = maze.url.partition('?').first
+      form = HTTP::Params.encode(maze.params.to_h { |param| {param, payload} })
+      {
+        {"application/x-www-form-urlencoded", form},
+        {"application/json", maze.params.to_h { |param| {param, payload} }.to_json},
+        {"application/json", maze.params.to_h { |param| {param, 1} }.to_json},
+        {"application/json", "{}"},
+      }.each do |content_type, body|
+        headers = HTTP::Headers{"Content-Type" => content_type}
+        status = SpecKemal.process_request(HTTP::Request.new(maze.method, path, headers, body)).status_code
+        failures << "#{maze.name}: HTTP #{status} for #{maze.method} #{path} (#{content_type}: #{body})" if status >= 500
+      end
+    end
+
+    SmokeSpec.report(failures)
+  end
 end
 
 # The sweep above only asserts "not 5xx", which a future refactor could

@@ -8,6 +8,17 @@ describe "Kemal routing integration" do
     response.body.should contain(payload)
   end
 
+  # Crystal's form decoder splits on `;`; browsers and real frameworks do not.
+  it "keeps a raw ; inside a query value" do
+    get "/basic/level1/?query=';alert(1);//&x=1"
+    response.body.should eq("';alert(1);//")
+  end
+
+  it "keeps a raw ; inside a form body value" do
+    post "/post/level1/", headers: HTTP::Headers{"Content-Type" => "application/x-www-form-urlencoded"}, body: "query=a;b"
+    response.body.should contain("a;b")
+  end
+
   it "serves basic level2 and reflects escaped query" do
     payload = %(a"b)
     get "/basic/level2/?query=#{URI.encode_www_form(payload)}"

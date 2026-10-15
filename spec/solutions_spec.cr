@@ -31,6 +31,13 @@ describe "solutions answer key" do
     end
   end
 
+  # A code span cannot escape a backtick: `alert\`1\`` ends at the first one,
+  # so the key served `alert\` with a literal backslash. Use a `` fence instead.
+  it "never serves a payload with a backslash-escaped backtick" do
+    broken = entries.select { |_, sol| sol.payload.includes?("\\`") }.keys.sort!
+    fail "fence these with `` instead of escaping:\n  #{broken.join("\n  ")}" unless broken.empty?
+  end
+
   it "exposes a markdown page per category, keyed by file stem" do
     Xssmaze::Solutions.categories.each do |category|
       Xssmaze::Solutions.markdown(category).should_not be_nil

@@ -1,7 +1,7 @@
 require "html"
 
-# Global session-like store for Level 1 Multi-Step XSS
-level1_store = Hash(String, String).new
+# Session-keyed drafts for Level 1 Multi-Step XSS (bounded, cleared by /reset)
+level1_store = Xssmaze::Store.group("modern-bypass/level1")
 
 # Level 1: Multi-Step / Multi-State Session-Locked Stored XSS
 # DAST scanners scan endpoints in isolation and do not track states across distinct HTTP methods/pages.
@@ -15,7 +15,7 @@ maze_post "/modern-bypass/level1/save" do |env|
   env.response.cookies << HTTP::Cookie.new("session_id", session_id, path: "/modern-bypass/level1/")
 
   content = env.params.body["content"]? || ""
-  level1_store[session_id] = content
+  level1_store.push(session_id, content)
 
   env.response.content_type = "application/json"
   {status: "success", message: "Draft saved successfully!"}.to_json
@@ -26,8 +26,7 @@ maze_get "/modern-bypass/level1/preview" do |env|
   session_id = env.request.cookies["session_id"]?.try(&.value)
   view = env.params.query["view"]?
 
-  if session_id && view == "draft" && level1_store.has_key?(session_id)
-    draft = level1_store[session_id]
+  if session_id && view == "draft" && (draft = level1_store[session_id].last?)
     "<!doctype html><html><head><title>Draft Preview</title></head><body>
     <h1>Draft Preview</h1>
     <div class='preview-container'>#{draft}</div>

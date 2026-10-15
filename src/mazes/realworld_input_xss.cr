@@ -16,7 +16,7 @@ maze_get "/realworld-input/level2/" do |_|
   "<html><body><h2>API Endpoint</h2><p>POST JSON with {\"name\": \"value\"}</p></body></html>"
 end
 maze_post "/realworld-input/level2/" do |env|
-  name = env.params.json["name"].as(String)
+  name = env.params.json.fetch("name", "").to_s
 
   "<html><body><h2>Hello, #{name}!</h2></body></html>"
 end

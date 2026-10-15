@@ -22,6 +22,6 @@ maze_get "/post/level2/" do |_|
        </script>"
 end
 maze_post "/post/level2/" do |env|
-  query = env.params.json.fetch("query", "").as(String)
+  query = env.params.json.fetch("query", "").to_s
   "query: #{query}"
 end

@@ -1,5 +1,14 @@
 require "http"
 
+# Crystal's form decoder still splits on `;` (the pre-WHATWG rule), so a raw
+# `';alert(1);//` reached every maze as `'`. Browsers and the frameworks this
+# lab imitates split on `&` alone; hide `;` from the splitter so it decodes back.
+struct URI::Params
+  def self.parse(query : String) : self
+    previous_def(query.gsub(';', "%3B"))
+  end
+end
+
 macro maze_get(path, &block)
   get {{ path }} {{ block }}
   {% if path.ends_with?("/") %}

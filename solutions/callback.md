@@ -13,7 +13,7 @@ JSONP-style and callback-name injection sinks.
 
 `/callback/level2/?callback=alert%601%60//`
 
-- payload: `alert\`1\`//`
+- payload: ``alert`1`//``
 - context: parens stripped from callback; tagged template call bypasses; load via <script src=…>
 
 ### callback-level3
