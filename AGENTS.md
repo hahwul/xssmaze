@@ -288,5 +288,7 @@ its own payload cannot ship.
   route plus its trailing-slash-less alias. `maze_query` is the HTTP QUERY
   method (RFC 10008, Kemal >= 1.13): body-carrying but GET-shaped, and Kemal
   answers 400 when such a request has a body and no `Content-Type`.
+- `src/route_helper.cr` makes query/body parsing split on `&` only (Crystal's
+  decoder also splits on `;`), so a raw `';alert(1);//` arrives intact.
 - String manipulation: `.gsub("old", "new")` for replacements
 - HTML escaping methods available through Kemal framework
