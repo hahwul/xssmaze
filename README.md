@@ -97,6 +97,7 @@ Every endpoint in `/map/json` carries a `vuln` object:
     "sources": ["location.hash"],
     "sinks": ["innerHTML"],
     "exploitable": true,
+    "baseline": false,
     "note": null
   }
 }
@@ -109,6 +110,7 @@ Every endpoint in `/map/json` carries a `vuln` object:
 | `delivery` | where the payload enters: `query`, `path`, `body`, `header`, `cookie`, `referer`, `fragment`, `postmessage`, `window-name`, … |
 | `reach` | derived — `server` if any delivery channel fits an HTTP request, `client` if the payload only exists browser-side, `unknown` if untriaged |
 | `exploitable` | `false` marks a deliberate control / true negative |
+| `baseline` | `true` when `<svg onload=alert(1)>` alone runs in headless Chrome with no interaction (GET mazes only; see below) |
 | `note` | caveats: required interaction, why it is a control, non-obvious parameter names |
 
 Classification follows the **injection context** — where the bytes land — not what the
@@ -122,6 +124,11 @@ Two things this exists to stop a benchmark getting wrong:
   misses measures the wrong thing.
 - **`exploitable: false`** endpoints are not bugs. The whole `xsleak` category is
   cross-site *leaks*, not XSS — a scanner that reports nothing there is correct.
+
+- **`baseline: true`** endpoints fall to one textbook payload. About 40% of the GET mazes
+  do, so raw recall flatters a scanner that sends nothing else; `benchmark.py` reports
+  recall on the rest separately. The list is measured, not hand-tagged:
+  `node scripts/baseline.mjs http://127.0.0.1:3000 > solutions/baseline.txt`.
 
 Every endpoint in the catalog is classified — `unclassified` / `reach: "unknown"` remain in
 the schema for anything added later, deliberately distinct from "reviewed and found safe",

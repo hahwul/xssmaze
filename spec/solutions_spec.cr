@@ -23,6 +23,12 @@ describe "solutions answer key" do
     end
   end
 
+  it "lists only live, exploitable GET mazes in baseline.txt" do
+    eligible = Xssmaze.get.select { |maze| maze.method == "GET" && maze.exploitable? }.map(&.name).to_set
+    stale = (Xssmaze::BASELINE - eligible).to_a.sort!
+    fail "rerun scripts/baseline.mjs; not live exploitable GET mazes:\n  #{stale.join("\n  ")}" unless stale.empty?
+  end
+
   it "records a payload and context for every entry" do
     incomplete = entries.reject { |_, sol| !sol.payload.strip.empty? && !sol.context.strip.empty? }
       .keys.sort!

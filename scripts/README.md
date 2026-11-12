@@ -101,6 +101,21 @@ insensitive, host and query ignored). Mazes that take their payload in the
 path (`:path` params, e.g. `/path/level1/a`) match on their parent directory,
 because a scanner reports the segment it actually sent.
 
+### Baseline vs beyond-baseline
+
+About 40% of the GET mazes fall to `<svg onload=alert(1)>` with no interaction
+(`vuln.baseline: true`), so a scanner that sends that one payload already scores
+well on raw recall. Every report splits recall on `baseline` vs
+`beyond-baseline` ("By baseline payload"; `by_baseline` in `--json`). Read the
+`beyond-baseline` row to see what a scanner adds over a single payload.
+
+The flag is measured in headless Chrome, not hand-tagged. Regenerate it after
+adding or changing mazes:
+
+```bash
+node scripts/baseline.mjs http://127.0.0.1:3000 > solutions/baseline.txt
+```
+
 ## Reach modes
 
 ```bash

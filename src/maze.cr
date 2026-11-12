@@ -107,6 +107,7 @@ class Maze
         sources:     @sources,
         sinks:       @sinks,
         exploitable: @exploitable,
+        baseline:    Xssmaze::BASELINE.includes?(@name),
         note:        @note,
       },
     }

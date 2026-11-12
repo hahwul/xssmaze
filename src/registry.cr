@@ -8,6 +8,14 @@ module Xssmaze
   # time so it can never drift from the released version again.
   VERSION = {{ read_file("#{__DIR__}/../shard.yml").lines.find(&.starts_with?("version:")).split(":")[1].strip }}
 
+  # Mazes that `<svg onload=alert(1)>` already beats with no interaction,
+  # measured in headless Chrome by scripts/baseline.mjs. A measured property,
+  # not a design one, so it lives in a generated file instead of 400 `push`es.
+  # ponytail: a maze added or changed without regenerating the file reads as
+  # non-baseline; rerun scripts/baseline.mjs (needs Chrome) after maze changes.
+  BASELINE = {{ read_file("#{__DIR__}/../solutions/baseline.txt") }}
+    .lines.map(&.strip).reject { |line| line.empty? || line.starts_with?('#') }.to_set
+
   @@mazes = [] of Maze
   @@frozen = false
 
