@@ -70,6 +70,7 @@ class Endpoint:
     sources: Tuple[str, ...]
     sinks: Tuple[str, ...]
     exploitable: bool
+    baseline: Optional[bool]  # None: not measured (POST/QUERY, header, cookie, ...)
     note: Optional[str]
 
     @classmethod
@@ -87,6 +88,7 @@ class Endpoint:
             sources=tuple(vuln.get("sources") or ()),
             sinks=tuple(vuln.get("sinks") or ()),
             exploitable=bool(vuln.get("exploitable", True)),
+            baseline=vuln.get("baseline"),
             note=vuln.get("note"),
         )
 
@@ -110,6 +112,17 @@ class Endpoint:
             return None
         parent = self.path.rsplit("/", 1)[0]
         return parent or None
+
+
+def baseline_key(ep: Endpoint) -> str:
+    """Split recall into what <svg onload=alert(1)> alone beats and the rest.
+
+    Unmeasured endpoints get their own row: folding them into beyond-baseline
+    would credit a one-payload scanner there for every trivial POST maze.
+    """
+    if ep.baseline is None:
+        return "unmeasured"
+    return "baseline" if ep.baseline else "beyond-baseline"
 
 
 class EndpointIndex:
@@ -644,6 +657,8 @@ class XSSMazeBenchmark:
         if self.reach_mode == "all":
             self._print_table("By reach", breakdown(score.population, detected,
                                                     lambda ep: ep.reach), 0)
+        self._print_table("By baseline payload (<svg onload=alert(1)>)",
+                          breakdown(score.population, detected, baseline_key), 0)
         self._print_table("By vulnerability class",
                           breakdown(score.population, detected,
                                     lambda ep: ep.vuln_class), 0)
@@ -734,6 +749,8 @@ class XSSMazeBenchmark:
                     self._write_table(f, "By Reach",
                                       breakdown(score.population, detected,
                                                 lambda ep: ep.reach))
+                self._write_table(f, "By Baseline Payload",
+                                  breakdown(score.population, detected, baseline_key))
                 self._write_table(f, "By Vulnerability Class",
                                   breakdown(score.population, detected,
                                             lambda ep: ep.vuln_class))
@@ -807,6 +824,7 @@ class XSSMazeBenchmark:
                 "f1": round(score.f1, 6),
                 "by_reach": breakdown(score.population, detected,
                                       lambda ep: ep.reach),
+                "by_baseline": breakdown(score.population, detected, baseline_key),
                 "by_class": breakdown(score.population, detected,
                                       lambda ep: ep.vuln_class),
                 "by_type": breakdown(score.population, detected,

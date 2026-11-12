@@ -8,6 +8,22 @@ module Xssmaze
   # time so it can never drift from the released version again.
   VERSION = {{ read_file("#{__DIR__}/../shard.yml").lines.find(&.starts_with?("version:")).split(":")[1].strip }}
 
+  # maze name -> does `<svg onload=alert(1)>` alone beat it with no
+  # interaction? Measured in headless Chrome by scripts/baseline.mjs into a
+  # generated file, not hand-tagged on 400 `push`es. A maze missing from the
+  # file was not measured and reports `baseline: null`. spec/solutions_spec.cr
+  # catches mazes added without regenerating; a maze *changed* without
+  # regenerating is not caught (that needs Chrome in CI).
+  BASELINE = begin
+    measured = {} of String => Bool
+    {{ read_file("#{__DIR__}/../solutions/baseline.txt") }}.each_line do |line|
+      next if line.blank? || line.starts_with?('#')
+      name, verdict = line.split
+      measured[name] = verdict == "true"
+    end
+    measured
+  end
+
   @@mazes = [] of Maze
   @@frozen = false
 

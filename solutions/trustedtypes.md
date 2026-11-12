@@ -28,7 +28,7 @@ Trusted Types misconfigurations (report-only, permissive default policy, partial
 `/trustedtypes/level4/?query=%3Cimg%20src=x%20onerror=alert(1)%3E`
 
 - payload: `<img src=x onerror=alert(1)>`
-- context: no TT header set — innerHTML works directly
+- context: TT blocks the innerHTML write, but the value is also reflected raw in the `<h1>`; parser-inserted markup is outside Trusted Types
 
 ### trustedtypes-level5
 

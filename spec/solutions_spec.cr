@@ -23,6 +23,31 @@ describe "solutions answer key" do
     end
   end
 
+  # Mirrors scripts/baseline.mjs's "measured" rule, so a maze added without
+  # regenerating the file fails here instead of silently reading as unmeasured.
+  describe "baseline.txt" do
+    url_delivered = Xssmaze.get.select do |maze|
+      maze.method == "GET" && maze.exploitable? && maze.delivery.any?(&.in?("query", "path", "fragment"))
+    end
+    measurable = url_delivered.map(&.name).to_set
+    listed = Xssmaze::BASELINE.keys.to_set
+    regen = "rerun: node scripts/baseline.mjs http://127.0.0.1:3000 solutions/baseline.txt"
+
+    it "is not empty" do
+      Xssmaze::BASELINE.values.count(true).should be > 0
+    end
+
+    it "measures every URL-delivered exploitable GET maze" do
+      missing = (measurable - listed).to_a.sort!
+      fail "#{regen}; not measured:\n  #{missing.join("\n  ")}" unless missing.empty?
+    end
+
+    it "names only mazes that are still measurable" do
+      stale = (listed - measurable).to_a.sort!
+      fail "#{regen}; stale:\n  #{stale.join("\n  ")}" unless stale.empty?
+    end
+  end
+
   it "records a payload and context for every entry" do
     incomplete = entries.reject { |_, sol| !sol.payload.strip.empty? && !sol.context.strip.empty? }
       .keys.sort!
