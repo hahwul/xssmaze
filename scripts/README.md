@@ -103,17 +103,22 @@ because a scanner reports the segment it actually sent.
 
 ### Baseline vs beyond-baseline
 
-About 40% of the GET mazes fall to `<svg onload=alert(1)>` with no interaction
-(`vuln.baseline: true`), so a scanner that sends that one payload already scores
-well on raw recall. Every report splits recall on `baseline` vs
-`beyond-baseline` ("By baseline payload"; `by_baseline` in `--json`). Read the
-`beyond-baseline` row to see what a scanner adds over a single payload.
+More than 40% of the measured mazes fall to `<svg onload=alert(1)>` with no
+interaction (`vuln.baseline: true`), so a scanner that sends that one payload
+already scores well on raw recall. Every report splits recall into
+`baseline`, `beyond-baseline` and `unmeasured` ("By baseline payload";
+`by_baseline` in `--json`). Read the `beyond-baseline` row to see what a
+scanner adds over a single payload.
+
+Only exploitable GET mazes delivered by query, path or fragment are measured.
+POST/QUERY and header/cookie/referer-delivered mazes are `baseline: null` and
+land in `unmeasured`, never in `beyond-baseline`.
 
 The flag is measured in headless Chrome, not hand-tagged. Regenerate it after
-adding or changing mazes:
+adding or changing mazes (the file is written only after a complete sweep):
 
 ```bash
-node scripts/baseline.mjs http://127.0.0.1:3000 > solutions/baseline.txt
+node scripts/baseline.mjs http://127.0.0.1:3000 solutions/baseline.txt
 ```
 
 ## Reach modes

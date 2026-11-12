@@ -70,7 +70,7 @@ class Endpoint:
     sources: Tuple[str, ...]
     sinks: Tuple[str, ...]
     exploitable: bool
-    baseline: bool
+    baseline: Optional[bool]  # None: not measured (POST/QUERY, header, cookie, ...)
     note: Optional[str]
 
     @classmethod
@@ -88,7 +88,7 @@ class Endpoint:
             sources=tuple(vuln.get("sources") or ()),
             sinks=tuple(vuln.get("sinks") or ()),
             exploitable=bool(vuln.get("exploitable", True)),
-            baseline=bool(vuln.get("baseline", False)),
+            baseline=vuln.get("baseline"),
             note=vuln.get("note"),
         )
 
@@ -115,7 +115,13 @@ class Endpoint:
 
 
 def baseline_key(ep: Endpoint) -> str:
-    """Split recall into what <svg onload=alert(1)> alone beats and the rest."""
+    """Split recall into what <svg onload=alert(1)> alone beats and the rest.
+
+    Unmeasured endpoints get their own row: folding them into beyond-baseline
+    would credit a one-payload scanner there for every trivial POST maze.
+    """
+    if ep.baseline is None:
+        return "unmeasured"
     return "baseline" if ep.baseline else "beyond-baseline"
 
 

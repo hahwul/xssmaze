@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- New `vuln.baseline` flag: `true` on the GET mazes that `<svg onload=alert(1)>` alone beats in headless Chrome with no interaction (about 40%). `benchmark.py` now splits recall into `baseline` / `beyond-baseline`, so a one-payload scanner no longer looks strong on raw recall. The list is measured by `scripts/baseline.mjs` into `solutions/baseline.txt`, and a spec rejects stale names
+- New `vuln.baseline` flag: `true` on the mazes that `<svg onload=alert(1)>` alone beats in headless Chrome with no interaction (more than 40% of those measured), `false` on the rest, `null` where not measured (POST/QUERY, header/cookie delivery). `benchmark.py` now splits recall into `baseline` / `beyond-baseline` / `unmeasured`, so a one-payload scanner no longer looks strong on raw recall. `scripts/baseline.mjs` measures it into `solutions/baseline.txt`, and a spec fails when a maze is added without regenerating
 - `trustedtypes-level4` claimed Trusted Types covered `script` but not `innerHTML` (it covers both) and sent no TT header at all, making it a copy of level1. Trusted Types is now enforced and really blocks the DOM sink; the bug is the same value reflected server-side, which TT never sees (now `reflected-html`)
 - `shard.yml` now says `0.4.0`: the v0.4.0 release kept `0.3.0`, so `/version`, `-v` and the banner under-reported. The release workflow now fails when the tag and `shard.yml` disagree
 - `AGENTS.md` and `scripts/README.md` no longer quote numbers from before the triage (6 controls, 200 scored endpoints, Crystal 1.8.2, a stale tree)

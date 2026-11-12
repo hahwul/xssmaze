@@ -38,6 +38,7 @@ end
 # Trusted Types guards DOM sinks only. The innerHTML write below really is
 # blocked (no policy exists, so the assignment throws), but the same value is
 # also rendered server-side, and parser-inserted markup is outside TT entirely.
+# `</` is escaped in the script copy so the heading is the only way out.
 Xssmaze.push("trustedtypes-level4", "/trustedtypes/level4/?query=a", "TT enforced on the DOM sink, value also reflected server-side",
   vuln: "reflected-html", delivery: ["query"], note: "require-trusted-types-for 'script' is enforced with no policy, so the innerHTML write throws; the bug is the server-side reflection in the heading, which the HTML parser inserts and Trusted Types never sees")
 maze_get "/trustedtypes/level4/" do |env|
@@ -47,7 +48,7 @@ maze_get "/trustedtypes/level4/" do |env|
    <div id='out'></div>
    <script>
      try {
-       document.getElementById('out').innerHTML = #{query.to_json};
+       document.getElementById('out').innerHTML = #{query.to_json.gsub("</", "<\\/")};
      } catch (e) {
        document.getElementById('out').textContent = 'blocked by Trusted Types';
      }
