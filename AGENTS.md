@@ -7,7 +7,7 @@ Always reference these instructions first and fallback to search or bash command
 ## Working Effectively
 
 ### Prerequisites and Setup
-- Install Crystal programming language (version 1.8.2 as specified in shard.yml)
+- Install Crystal (>= 1.12.0 per shard.yml; CI tests a version matrix, see `.github/workflows/ci.yml`)
 - Ensure network connectivity for dependency installation
 - Docker (optional, for containerized builds)
 
@@ -118,68 +118,43 @@ After building and running XSSMaze, ALWAYS validate functionality by:
 
 ### Linting and Code Quality
 ```bash
-# Install Crystal Ameba linter (if not installed)
-# The CI uses crystal-ameba/github-action@v0.8.0
+# The CI uses crystal-ameba/github-action@master
 
-# Run linting (via GitHub Actions workflow)
-# Manual linting requires Ameba to be installed separately
+# Run linting locally (ameba is a development dependency)
+./bin/ameba src/
 ```
 
 ## Repository Structure and Navigation
 
 ### Key Directories
 ```
-/home/runner/work/xssmaze/xssmaze/
-├── src/                    # Main source code
-│   ├── xssmaze.cr         # Application entry point
-│   ├── maze.cr            # Maze class definition
-│   ├── banner.cr          # Application banner
-│   ├── mazes/             # XSS vulnerability implementations
-│   │   ├── basic.cr       # Basic XSS scenarios
-│   │   ├── dom.cr         # DOM-based XSS
-│   │   ├── header.cr      # Header injection XSS
-│   │   ├── post.cr        # POST-based XSS
-│   │   └── [others].cr    # Additional XSS types
-│   └── protections/       # XSS protection modules
-│       └── protections.cr # Protection escape functions
-├── spec/                  # Test files
-│   ├── spec_helper.cr     # Test configuration
-│   └── xssmaze_spec.cr    # Main test suite (minimal)
-├── .github/workflows/     # CI/CD configuration
-├── shard.yml             # Dependencies (like package.json)
-├── shard.lock           # Lock file with exact versions
-├── Dockerfile           # Docker build configuration
-└── README.md           # Project documentation
+xssmaze/
+├── src/
+│   ├── xssmaze.cr         # Entry point
+│   ├── server.cr          # Kemal setup, index / map / stats routes
+│   ├── cli.cr, banner.cr, ui.cr, request_log.cr   # Console
+│   ├── maze.cr, registry.cr, catalog.cr           # Maze model + catalog (/map/*)
+│   ├── route_helper.cr    # maze_get / maze_post / maze_query
+│   ├── filters.cr         # Shared escape/filter helpers
+│   ├── store.cr, solutions.cr, assets.cr
+│   └── mazes/             # One file per category (180+ files)
+├── solutions/             # Answer key, one <category>.md per category
+├── spec/                  # routing, smoke, solutions parity, store, beacon, ...
+├── scripts/               # benchmark.py scorecard
+├── shard.yml / shard.lock
+└── Dockerfile
 ```
 
 ### Important Files to Review When Making Changes
-- Always check `src/xssmaze.cr` after modifying route definitions
 - Review `shard.yml` when adding new dependencies
 - Update `README.md` if adding new XSS vulnerability types
 - Check existing maze files in `src/mazes/` for patterns when adding new vulnerabilities
 
 ### XSS Maze Categories
-The application includes these vulnerability categories:
-- **Basic XSS** (`basic.cr`): 7 levels of basic reflection vulnerabilities
-- **DOM XSS** (`dom.cr`): Client-side DOM manipulation vulnerabilities
-- **Header Injection** (`header.cr`): HTTP header-based XSS
-- **Path-based** (`path.cr`): URL path injection vulnerabilities
-- **POST-based** (`post.cr`): Form submission XSS
-- **Redirect** (`redirect.cr`): URL redirection vulnerabilities
-- **Decode** (`decode.cr`): Encoding/decoding bypass scenarios
-- **Hidden XSS** (`hidden_xss.cr`): Non-obvious XSS cases
-- **Injection XSS** (`injs_xss.cr`): SQL injection combined with XSS
-- **In-Frame XSS** (`inframe_xss.cr`): Frame-based XSS
-- **In-Attribute XSS** (`inattr_xss.cr`): HTML attribute injection
-- **JavaScript Function XSS** (`jf_xss.cr`): Function call vulnerabilities
-- **Event Handler XSS** (`event_handler.cr`): HTML event handler injection
-- **CSP Bypass** (`csp_bypass.cr`): 5 levels of Content Security Policy bypass scenarios
-- **SVG XSS** (`svg_xss.cr`): 6 levels of SVG-based XSS vulnerabilities
-- **CSS Injection** (`css_injection.cr`): 6 levels of CSS-based injection attacks
-- **Template Injection** (`template_injection.cr`): 6 levels of template injection vulnerabilities
-- **WebSocket XSS** (`websocket_xss.cr`): 5 levels of WebSocket message-based XSS
-- **JSON XSS** (`json_xss.cr`): 6 levels of JSON response XSS vulnerabilities
-- **Advanced XSS** (`advanced_xss.cr`): 6 levels of advanced techniques (WAF bypass, mutation observer, service worker, web components, trusted types, proxy manipulation)
+There are 170+ categories and 1000+ endpoints; this file does not list them.
+The live catalog is the source of truth: `/map/json` (per-endpoint metadata),
+`/version` (endpoint and category counts) and `solutions/<category>.md`. A
+category is the maze name up to its first `-` (`basic-level1` -> `basic`).
 
 ## Common Tasks and Troubleshooting
 
@@ -189,7 +164,7 @@ The application includes these vulnerability categories:
 - The application requires the Kemal framework (version 1.13.x)
 
 ### Build Failures
-- Ensure Crystal version matches shard.yml specification (>= 1.12.0; CI builds on 1.20.x)
+- Ensure Crystal version matches shard.yml specification (>= 1.12.0; the CI matrix in `.github/workflows/ci.yml` includes `latest`)
 - Build failures often relate to syntax errors in .cr files
 - Production builds are more strict than development builds
 
@@ -200,8 +175,8 @@ The application includes these vulnerability categories:
 
 ### CI/CD Information
 - GitHub Actions run Crystal builds and linting automatically
-- Build workflow uses `crystallang/crystal` Docker image
-- Lint workflow uses `crystal-ameba/github-action@v0.8.0`
+- Build workflow uses `crystal-lang/install-crystal@v1` across a Crystal version matrix
+- Lint workflow uses `crystal-ameba/github-action@master`
 - Docker images are published to `ghcr.io/hahwul/xssmaze:main`
 - Security analysis workflow uses OWASP Noir (`owasp-noir/noir@v0.24.0`) for endpoint discovery
 - SBOM generation workflow uses `hahwul/cyclonedx-cr@v1.0.0` for release artifacts
@@ -215,7 +190,7 @@ Based on successful GitHub Actions builds, here are realistic timing expectation
 | `shards install` | 1-30 seconds | 5+ minutes | Network dependent |
 | `shards build` | 15-30 seconds | 5+ minutes | Development build |
 | `shards build --release` | 30-90 seconds | 5+ minutes | Production optimized |
-| `crystal spec` | 5-15 seconds | 2+ minutes | Minimal test suite |
+| `crystal spec` | 5-15 seconds | 2+ minutes | ~200 examples incl. catalog-wide smoke |
 | Docker build | 5-15 minutes | 30+ minutes | Multi-stage build with downloads |
 | Application startup | 1-3 seconds | 30 seconds | Port binding time |
 
@@ -245,21 +220,26 @@ If network access is restricted:
 ### Adding New XSS Scenarios
 When adding new vulnerability scenarios, follow these patterns:
 
-1. **Create route in maze file:**
+1. **Create route in maze file** (`src/mazes/*.cr` is required by a glob, so a
+   new file needs no registration):
    ```crystal
-   Xssmaze.push("scenario-name", "/path/to/endpoint?query=a", "description")
-   get "/path/to/endpoint" do |env|
-     # XSS vulnerability implementation
-     env.params.query["query"] # or manipulated version
+   Xssmaze.push("scenario-level1", "/scenario/level1/?query=a", "description",
+     vuln: "reflected-html", delivery: ["query"])
+   maze_get "/scenario/level1/" do |env|
+     # Default every param: a bare request must not 500 (spec/smoke_spec.cr)
+     query = env.params.query.fetch("query", "")
+     "<html><body>#{query}</body></html>"
    end
    ```
+   Fill the `vuln:` metadata (see `src/maze.cr`); omitting it leaves the
+   endpoint `unclassified` and out of the default benchmark population.
 
-2. **Load maze in main file:**
-   Add `load_your_maze` call in `src/xssmaze.cr`
+2. **Add the answer key:** a `### scenario-level1` entry in
+   `solutions/<category>.md`, or `spec/solutions_spec.cr` fails.
 
 3. **Test the endpoint:**
    ```bash
-   curl "http://localhost:3000/your/endpoint?query=<script>alert(1)</script>"
+   curl "http://localhost:3000/scenario/level1/?query=<script>alert(1)</script>"
    ```
 
 ### Lab infrastructure (not mazes)

@@ -34,8 +34,9 @@ held out, and both exclusions are on purpose:
 
 ### `exploitable: false` — controls
 
-Six endpoints (the whole `xsleak` category plus `dom-level10`) are marked
-`vuln.class: non-xss-control`, `exploitable: false`. They are not XSS bugs;
+Control endpoints (the whole `xsleak` category, the `redirect` levels, and
+single controls such as `dom-level10`; the report header prints the count) are marked `vuln.class: non-xss-control`,
+`exploitable: false`. They are not XSS bugs;
 they are true negatives that exist to catch scanners which cry wolf.
 
 - They are **removed from the denominator**. A scanner that reports nothing
@@ -47,8 +48,10 @@ they are true negatives that exist to catch scanners which cry wolf.
 
 ### `reach: "client"` — browser-only delivery
 
-Twenty endpoints take their payload from a channel that only exists inside a
-browser: `fragment`, `postmessage`, `window-name`, clipboard, drag-and-drop.
+Some endpoints take their payload from a channel that only exists inside a
+browser, e.g. `fragment`, `postmessage`, `window-name` (`reach` is derived from
+`delivery`: any channel outside query/path/body/header/cookie/referer is
+client-only).
 A request-only scanner cannot deliver a payload to them at all — the fragment
 is never even sent to the server. Scoring one against them measures nothing,
 so `--reach` picks the population explicitly and the report always labels
@@ -56,23 +59,25 @@ which one it used.
 
 ### `reach: "unknown"` — untriaged
 
-Most of the catalog has not been triaged yet (`vuln.class: unclassified`,
-`reach: "unknown"`). "Not yet classified" is a different claim from "reviewed
-and found reachable", so untriaged endpoints stay out of the default
-denominator too. `--reach all` includes them, broken out on their own row so
-they are never silently folded into the server-reachable score.
+Every endpoint is triaged today, so this population is empty. An endpoint
+added without metadata lands here (`vuln.class: unclassified`,
+`reach: "unknown"`): "not yet classified" is a different claim from "reviewed
+and found reachable", so it stays out of the default denominator. `--reach all`
+includes it, broken out on its own row so it is never silently folded into the
+server-reachable score.
 
 The header of every report prints the census, so the size of each population
-is visible before any rate is read:
+is visible before any rate is read (counts below are from one run; yours will
+differ as mazes are added):
 
 ```
-Catalog:           1064 endpoints, 175 categories
-Controls:          6 with exploitable=false (a detection there is a FALSE POSITIVE, never a miss)
-Exploitable reach: 20 client, 200 server, 838 unknown
+Catalog:           1068 endpoints, 176 categories
+Controls:          28 with exploitable=false (a detection there is a FALSE POSITIVE, never a miss)
+Exploitable reach: 24 client, 1016 server
 
 Scoring mode:      --reach server
-Scored population: 200 exploitable endpoints (reach: server)
-Not scored:        20 client-reach, 838 unknown-reach, plus 6 controls — hits there are listed separately, never as TP or FN
+Scored population: 1016 exploitable endpoints (reach: server)
+Not scored:        24 client-reach, plus 28 controls — hits there are listed separately, never as TP or FN
 ```
 
 ### The metrics
@@ -99,8 +104,8 @@ because a scanner reports the segment it actually sent.
 ## Reach modes
 
 ```bash
---reach server   # default: the 200 endpoints a request-only scanner can reach
---reach client   # the 20 browser-only endpoints, for a browser-driven scanner
+--reach server   # default: the ~1000 endpoints a request-only scanner can reach
+--reach client   # the ~24 browser-only endpoints, for a browser-driven scanner
 --reach all      # every exploitable endpoint, with a per-reach breakdown
 ```
 
@@ -283,9 +288,9 @@ curl http://localhost:3000/health
 
 ### Every rate looks low
 
-Check the header first. Under `--reach server` the denominator is the ~200
-server-reachable endpoints, not the whole catalog; a scanner finding 8 of them
-is at 4% recall, not 0.8%. If the "unscored hits" list is long, the scanner is
+Check the header first. Under `--reach server` the denominator is the ~1000
+exploitable server-reachable endpoints, not the whole catalog: controls and
+browser-only endpoints are held out. If the "unscored hits" list is long, the scanner is
 finding real bugs in a population this mode does not score — try `--reach all`.
 
 ## Notes
